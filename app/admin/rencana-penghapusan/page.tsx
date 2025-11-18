@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { FileSpreadsheet } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -19,47 +20,90 @@ import {
 } from "@/components/ui/dialog";
 import {
   dataUsulanHapus as initialData,
-  dataUsulanHapus as DataType,
+  UsulanHapus,
 } from "@/data/dataUsulanHapus";
+import { dataBMN as initialBMN } from "@/data/dataBMN";
+import { dataLogBMN as initialLog } from "@/data/dataLogBMN";
+import { LogBMN } from "@/data/dataLogBMN";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 export default function UsulanHapusPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [hapusData, setHapusData] = useState<DataType[]>([]);
+  const [hapusData, setHapusData] = useState<UsulanHapus[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [disetujuiOleh, setDisetujuiOleh] = useState("");
+  const [bmnData, setBmnData] = useState(initialBMN);
+  const [logBMN, setLogBMN] = useState<LogBMN[]>(initialLog);
 
   useEffect(() => {
     setHapusData(initialData);
   }, []);
 
-  // === Ubah status ===
-  const handleStatusChange = (
+  const handleStatusChange = async (
     id: number,
     newStatus: "Menunggu" | "Disetujui" | "Ditolak"
   ) => {
+    const item = hapusData.find((x) => x.idUsulan === id);
+    if (!item) return;
+
+    if (newStatus === "Disetujui") {
+      const confirmDelete = window.confirm(
+        `Apakah Anda yakin ingin menghapus data "${item.namaBarang}" secara permanen dari tabel BMN?`
+      );
+
+      if (confirmDelete) {
+        setHapusData((prev) => prev.filter((x) => x.idUsulan !== id));
+        setBmnData((prev) => prev.filter((b) => b.ikmm !== item.ikmm));
+
+        const logBaru: LogBMN = {
+          idBMN: item.idUsulan,
+          ikmm: item.ikmm.toString(),
+          akun: item.akun,
+          unit: item.unit,
+          namaBarang: item.namaBarang,
+          kategori: item.kategori,
+          kondisiBarang: item.kondisiBarang,
+          tanggalPerolehan: new Date().toISOString().split("T")[0],
+          dipinjam: "Tidak Tersedia",
+          foto: "",
+          tanggalPenghapusan: new Date().toISOString().split("T")[0],
+          alasanPenghapusan: item.alasan,
+          disetujuiOleh: item.disetujuiOleh || "-",
+        };
+
+        setLogBMN((prev) => [...prev, logBaru]);
+
+        alert(
+          `Data "${item.namaBarang}" berhasil dihapus dari tabel BMN dan dipindahkan ke Log BMN.`
+        );
+      } else {
+        return;
+      }
+    }
+
     setHapusData((prev) =>
-      prev.map((item) =>
-        item.idUsulan === id
+      prev.map((i) =>
+        i.idUsulan === id
           ? {
-              ...item,
+              ...i,
               statusUsulan: newStatus,
-              disetujuiOleh: newStatus === "Disetujui" ? item.disetujuiOleh : "",
+              disetujuiOleh: newStatus === "Disetujui" ? i.disetujuiOleh : "",
             }
-          : item
+          : i
       )
     );
   };
 
-  // === Buka dialog edit disetujui oleh ===
+  // Dialog "Disetujui Oleh"
   const handleOpenDialog = (id: number, currentValue: string) => {
     setSelectedId(id);
     setDisetujuiOleh(currentValue || "");
     setOpenDialog(true);
   };
 
-  // === Simpan hasil edit ===
   const handleSaveDisetujuiOleh = () => {
     if (selectedId !== null) {
       setHapusData((prev) =>
@@ -75,7 +119,7 @@ export default function UsulanHapusPage() {
     setDisetujuiOleh("");
   };
 
-  // === Filter + Search ===
+  // Filter & Search 
   const filteredData = hapusData
     .filter((item) => {
       const matchSearch = item.namaBarang
@@ -91,11 +135,41 @@ export default function UsulanHapusPage() {
         new Date(a.tanggalUsulan).getTime()
     );
 
+  // Download Excel
+  const handleDownloadExcel = () => {
+    const exportData = filteredData.map((item, i) => ({
+      No: i + 1,
+      IKMM: item.ikmm,
+      Akun: item.akun,
+      "Nama Barang": item.namaBarang,
+      NUP: item.unit,
+      Kategori: item.kategori,
+      "Kondisi Barang": item.kondisiBarang,
+      "Tanggal Usulan": item.tanggalUsulan,
+      "Alasan Penghapusan": item.alasan,
+      "Status Usulan": item.statusUsulan,
+      "Disetujui Oleh": item.disetujuiOleh || "-",
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Usulan Hapus");
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const blob = new Blob([excelBuffer], {
+      type: "application/octet-stream",
+    });
+    saveAs(blob, "usulan_hapus.xlsx");
+  };
+
   return (
     <div className="p-2 space-y-2">
       <h1 className="text-xs font-bold">Usulan Penghapusan BMN</h1>
 
-      {/* Search + Filter */}
+      {/* Search + Filter + Download */}
       <div className="flex items-center justify-between">
         <div className="flex flex-wrap items-center gap-1">
           <Input
@@ -135,7 +209,17 @@ export default function UsulanHapusPage() {
           >
             Reset
           </Button>
+
+        {/* Tombol Download Excel */}
+        <Button
+          className="cursor-pointer text-xs h-[24px] px-3"
+          variant="default"
+          onClick={handleDownloadExcel}
+        >
+          <FileSpreadsheet className="w-3.5 h-3.5" />
+        </Button>
         </div>
+
       </div>
 
       {/* Table */}
@@ -145,15 +229,20 @@ export default function UsulanHapusPage() {
             <thead className="bg-blue-100 text-left sticky top-0 z-10">
               <tr>
                 <th className="border p-2">No</th>
-                <th className="border p-2">IKMM</th>
+                <th className="border p-2 min-w-[140px]">IKMM / Kode Barang</th>
+                <th className="border p-2">Akun</th>
                 <th className="border p-2 min-w-[150px]">Nama / Merek / Tipe</th>
                 <th className="border p-2">NUP</th>
                 <th className="border p-2">Kategori</th>
                 <th className="border p-2 min-w-[100px]">Kondisi</th>
                 <th className="border p-2 min-w-[130px]">Tanggal Usulan</th>
                 <th className="border p-2 min-w-[150px]">Alasan Penghapusan</th>
-                <th className="border p-2 min-w-[120px] text-center">Status Usulan</th>
-                <th className="border p-2 min-w-[140px] text-center">Disetujui Oleh</th>
+                <th className="border p-2 min-w-[120px] text-center">
+                  Status Usulan
+                </th>
+                <th className="border p-2 min-w-[140px] text-center">
+                  Disetujui Oleh
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -161,6 +250,7 @@ export default function UsulanHapusPage() {
                 <tr key={item.idUsulan} className="hover:bg-gray-50">
                   <td className="border p-2">{index + 1}</td>
                   <td className="border p-2">{item.ikmm}</td>
+                  <td className="border p-2">{item.akun}</td>
                   <td className="border p-2">{item.namaBarang}</td>
                   <td className="border p-2">{item.unit}</td>
                   <td className="border p-2">{item.kategori}</td>
@@ -198,9 +288,13 @@ export default function UsulanHapusPage() {
 
                   <td
                     className="border p-2 text-center text-blue-600 hover:underline cursor-pointer"
-                    onClick={() => handleOpenDialog(item.idUsulan, item.disetujuiOleh)}
+                    onClick={() =>
+                      handleOpenDialog(item.idUsulan, item.disetujuiOleh ?? "")
+                    }
                   >
-                    {item.disetujuiOleh || <span className="text-gray-400">-</span>}
+                    {item.disetujuiOleh || (
+                      <span className="text-gray-400">-</span>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -214,7 +308,7 @@ export default function UsulanHapusPage() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-sm font-medium">
-            Usulan hapus disetujui oleh:
+              Usulan hapus disetujui oleh:
             </DialogTitle>
           </DialogHeader>
           <div className="py-2">
@@ -233,7 +327,10 @@ export default function UsulanHapusPage() {
             >
               Batal
             </Button>
-            <Button className="text-xs h-[26px]" onClick={handleSaveDisetujuiOleh}>
+            <Button
+              className="text-xs h-[26px]"
+              onClick={handleSaveDisetujuiOleh}
+            >
               Simpan
             </Button>
           </DialogFooter>

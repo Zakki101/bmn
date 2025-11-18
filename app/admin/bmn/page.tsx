@@ -9,13 +9,17 @@ import {
 import { MdDeleteOutline } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import imageCompression from "browser-image-compression";
-import { dataBMN as initialDataBMN } from "@/data/dataBMN";
+import { dataBMN as initialDataBMN, BMN } from "@/data/dataBMN";
+import { dataUsulanHapus, UsulanHapus } from "@/data/dataUsulanHapus";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import { FileSpreadsheet } from "lucide-react";
 
 export default function DataBMNAdminPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
   const [kategori, setKategori] = useState("all");
-  const [bmnData, setBmnData] = useState(initialDataBMN);
+  const [bmnData, setBmnData] = useState<BMN[]>(initialDataBMN);
   const [kondisi, setKondisi] = useState("all");
   const router = useRouter();
 
@@ -37,36 +41,122 @@ export default function DataBMNAdminPage() {
   const handleDelete = (id: number) => {
     if (!confirm("Apakah Anda yakin ingin menghapus data ini?")) return;
     setBmnData(bmnData.filter((i) => i.idBMN !== id));
+    try {
+      const mod = require("@/data/dataBMN");
+      mod.dataBMN.splice(0, mod.dataBMN.length, ...mod.dataBMN.filter((d: BMN) => d.idBMN !== id));
+    } catch {}
     alert("Data berhasil dihapus!");
   };
 
   const handleUploadFoto = async (e: React.ChangeEvent<HTMLInputElement>, id: number) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    try {
-      const compressed = await imageCompression(file, {
-        maxSizeMB: 0.3,
-        maxWidthOrHeight: 800,
-        useWebWorker: true,
-      });
-      const previewUrl = URL.createObjectURL(compressed);
-      setBmnData(bmnData.map((b) => (b.idBMN === id ? { ...b, foto: previewUrl } : b)));
-    } catch (err) {
-      console.error("Gagal kompres gambar:", err);
-    }
-  };
+  const files = Array.from(e.target.files ?? []);
+  if (!files.length) return;
+
+  try {
+    const compressedImages = await Promise.all(
+      files.map(async (file) => {
+        const compressed = await imageCompression(file, {
+          maxSizeMB: 0.3,
+          maxWidthOrHeight: 800,
+          useWebWorker: true,
+        });
+        return URL.createObjectURL(compressed);
+      })
+    );
+
+    setBmnData((prev) =>
+      prev.map((b) =>
+        b.idBMN === id
+          ? { ...b, foto: [...(b.foto ?? []), ...compressedImages] }
+          : b
+      )
+    );
+  } catch (err) {
+    console.error("Gagal kompres gambar:", err);
+  }
+};
+
 
   const handleKondisiChange = (id: number, kondisi: "Baik" | "Rusak" | "Dalam Perbaikan") => {
     setBmnData(bmnData.map((b) => (b.idBMN === id ? { ...b, kondisiBarang: kondisi } : b)));
+    try {
+      const mod = require("@/data/dataBMN");
+      const idx = mod.dataBMN.findIndex((d: BMN) => d.idBMN === id);
+      if (idx !== -1) mod.dataBMN[idx].kondisiBarang = kondisi;
+    } catch {}
   };
-
   const handleAjukanPenghapusan = (id: number) => {
     const item = bmnData.find((b) => b.idBMN === id);
     if (!item) return;
-    if (confirm(`Ajukan penghapusan untuk ${item.namaBarang} (NUP: ${item.unit})?`)) {
-      alert(`Usulan penghapusan untuk "${item.namaBarang}" berhasil diajukan!`);
+
+    const alreadyExists = dataUsulanHapus.some(
+      (u) => u.ikmm === item.ikmm && u.namaBarang === item.namaBarang
+    );
+
+    if (alreadyExists) {
+      alert("Barang ini sudah ada dalam daftar usulan penghapusan.");
+      return;
     }
+
+    if (!confirm(`Ajukan penghapusan untuk barang "${item.namaBarang}" (NUP:  ${item.unit})?`)) return;
+
+    const newUsulan: UsulanHapus = {
+      idUsulan: dataUsulanHapus.length + 1,
+      ikmm: String(item.ikmm),
+      akun: item.akun,
+      namaBarang: item.namaBarang,
+      unit: item.unit,
+      kategori: item.kategori as UsulanHapus["kategori"],
+      kondisiBarang:
+        item.kondisiBarang === "Rusak"
+          ? "Rusak"
+          : item.kondisiBarang === "Dalam Perbaikan"
+          ? "Dalam Perbaikan"
+          : "Baik",
+      tanggalUsulan: new Date().toISOString().split("T")[0],
+      alasan: "Diajukan oleh admin untuk penghapusan BMN.",
+      statusUsulan: "Menunggu",
+      disetujuiOleh: "",
+    };
+
+    try {
+      const mod = require("@/data/dataUsulanHapus");
+      mod.dataUsulanHapus.push(newUsulan);
+    } catch (err) {
+      console.error("Gagal menambah data ke dataUsulanHapus:", err);
+    }
+
+    alert(`Usulan penghapusan untuk "${item.namaBarang}" berhasil diajukan!`);
   };
+
+  // Download Excel
+  const handleDownloadExcel = () => {
+      const exportData = filteredData.map((item, i) => ({
+        No: i + 1,
+        IKMM: item.ikmm,
+        Akun: item.akun,
+        "Nama Barang": item.namaBarang,
+        NUP: item.unit,
+        Kategori: item.kategori,
+        "Tanggal Perolehan": item.tanggalPerolehan,
+        "Kondisi Barang": item.kondisiBarang,
+        status: item.dipinjam,
+        foto: item.foto ? "Ada" : "Tidak Ada",
+      }));
+  
+      const worksheet = XLSX.utils.json_to_sheet(exportData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Data BMN");
+  
+      const excelBuffer = XLSX.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+      const blob = new Blob([excelBuffer], {
+        type: "application/octet-stream",
+      });
+      saveAs(blob, "data_bmn.xlsx");
+    };
 
   return (
     <div className="p-2 space-y-2">
@@ -99,7 +189,7 @@ export default function DataBMNAdminPage() {
             <SelectContent className="text-xs">
               <SelectItem value="all" className="text-[10px]">Semua Kondisi</SelectItem>
               <SelectItem value="Baik" className="text-[10px]">Baik</SelectItem>
-              <SelectItem value="Rusak" className="text-[10px]">Rusak</SelectItem>  
+              <SelectItem value="Rusak" className="text-[10px]">Rusak</SelectItem>
               <SelectItem value="Dalam Perbaikan" className="text-[10px]">Dalam Perbaikan</SelectItem>
             </SelectContent>
           </Select>
@@ -115,16 +205,29 @@ export default function DataBMNAdminPage() {
               ))}
             </SelectContent>
           </Select>
-           <Button
+          <Button
             variant="outline"
             className="cursor-pointer text-xs h-[24px] px-3 !bg-gray-50"
             onClick={() => {
               setSearch("");
               setKategori("all");
+              setStatus("all");
+              setKondisi("all");
             }}
-          >Reset
+          >
+            Reset
           </Button>
-        </div>
+
+          {/* Tombol Download Excel */}
+          <Button
+            className="cursor-pointer text-xs h-[24px] px-3"
+            variant="default"
+            onClick={handleDownloadExcel}
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5" />
+          </Button>
+          </div>
+        
         <Button
           className="bg-blue-500 hover:bg-blue-600 cursor-pointer text-xs h-[24px] px-3"
           onClick={() => router.push("/admin/bmn/add-bmn")}
@@ -165,7 +268,6 @@ export default function DataBMNAdminPage() {
                   <td className="border p-2">{item.kategori}</td>
                   <td className="border p-2">{item.tanggalPerolehan}</td>
 
-                  {/* kondisi */}
                   <td className="border p-2 text-center">
                     <Select
                       value={item.kondisiBarang}
@@ -184,7 +286,6 @@ export default function DataBMNAdminPage() {
                     </Select>
                   </td>
 
-                  {/* status */}
                   <td className="border p-2 text-center">
                     <Select
                       value={item.dipinjam}
@@ -209,44 +310,56 @@ export default function DataBMNAdminPage() {
                     </Select>
                   </td>
 
-                  {/* foto */}
                   <td className="border p-2 text-center">
-                    {item.foto ? (
-                      <button
-                        onClick={() => window.open(item.foto, "_blank")}
-                        className="bg-blue-500 text-white text-[10px] py-1 px-2 rounded hover:bg-blue-600"
-                      >
-                        Lihat Foto
-                      </button>
-                    ) : (
-                      <>
-                        <label
-                          htmlFor={`upload-${item.idBMN}`}
-                          className="cursor-pointer bg-green-500 text-white text-[10px] py-1 px-2 rounded hover:bg-green-600"
-                        >
-                          Tambah Foto
-                        </label>
-                        <input
-                          id={`upload-${item.idBMN}`}
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => handleUploadFoto(e, item.idBMN)}
-                          className="hidden"
-                        />
-                      </>
-                    )}
+                    {item.foto && item.foto.length > 0 ? (
+  <div className="flex gap-1 flex-wrap justify-center">
+    {item.foto.map((img, i) => (
+          <button
+            key={i}
+            onClick={() => window.open(img, "_blank")}
+            className="bg-blue-500 text-white text-[10px] py-1 px-2 rounded hover:bg-blue-600"
+          >
+            Foto {i + 1}
+          </button>
+        ))}
+
+        {/* Tombol Tambah */}
+        <label
+          htmlFor={`upload-${item.idBMN}`}
+          className="cursor-pointer bg-green-500 text-white text-[10px] py-1 px-2 rounded hover:bg-green-600"
+        >
+          + Foto
+        </label>
+      </div>
+    ) : (
+      <>
+        <label
+          htmlFor={`upload-${item.idBMN}`}
+          className="cursor-pointer bg-green-500 text-white text-[10px] py-1 px-2 rounded hover:bg-green-600"
+        >
+          Tambah Foto
+        </label>
+        <input
+          id={`upload-${item.idBMN}`}
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={(e) => handleUploadFoto(e, item.idBMN)}
+          className="hidden"
+        />
+      </>
+    )}
                   </td>
-                  
+
                   <td className="border p-2 text-center">
                     <button
                       onClick={() => handleAjukanPenghapusan(item.idBMN)}
                       className="cursor-pointer bg-yellow-500 text-white text-[10px] py-1 px-2 rounded hover:bg-yellow-600"
                     >
-                      Usulkan 
+                      Usulkan
                     </button>
                   </td>
 
-                  {/* hapus */}
                   <td className="border p-2 text-center">
                     <button
                       className="cursor-pointer rounded bg-gray-300 p-1 text-gray-500 hover:text-white hover:bg-red-600"
@@ -255,8 +368,6 @@ export default function DataBMNAdminPage() {
                       <MdDeleteOutline className="text-lg" />
                     </button>
                   </td>
-
-                  
                 </tr>
               ))}
             </tbody>

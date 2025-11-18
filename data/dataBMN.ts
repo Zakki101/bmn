@@ -15,7 +15,7 @@ export type BMN = {
   kondisiBarang: "Baik" | "Rusak" | "Dalam Perbaikan";
   tanggalPerolehan: string;
   dipinjam: "Dipinjam" | "Tersedia" | "Tidak Tersedia";
-  foto?: string;
+  foto?: string [];
 };
 
 export const dataBMN: BMN[] = [

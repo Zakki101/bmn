@@ -1,6 +1,10 @@
-export type dataUsulanHapus = {
+// dataUsulanHapus.ts
+
+export type UsulanHapus = {
   idUsulan: number;
-  ikmm: number;
+  idBMN?: number; // tambahkan agar bisa dikaitkan dengan data BMN
+  ikmm: string; // string supaya tidak hilang angka nol di depan
+  akun: number;
   namaBarang: string;
   unit: number;
   kategori:
@@ -11,29 +15,34 @@ export type dataUsulanHapus = {
     | "Peripheral"
     | "Internet"
     | "Lainnya";
-  kondisiBarang: "Baik" | "Rusak" | "Dalam Perbaikan" | "Rusak Berat";
-  tanggalUsulan: string;
+  kondisiBarang: "Baik" | "Rusak" | "Dalam Perbaikan";
+  tanggalUsulan: string; // format ISO (YYYY-MM-DD)
   alasan: string;
-  statusUsulan: "Menunggu" | "Disetujui" | "Ditolak"; 
-  disetujuiOleh: string;
+  statusUsulan: "Menunggu" | "Disetujui" | "Ditolak";
+  disetujuiOleh?: string; // optional
+  tanggalPerolehan?: string; // ditambah supaya bisa dipindah ke logBMN
 };
 
-export const dataUsulanHapus: dataUsulanHapus[] = [
+export const dataUsulanHapus: UsulanHapus[] = [
   {
     idUsulan: 1,
-    ikmm: 3100102002,
+    idBMN: 101, // tambahkan idBMN biar bisa dihapus dari tabel BMN
+    ikmm: "3100102002",
+    akun: 132111,
     namaBarang: "Printer Epson L3150",
     unit: 2,
     kategori: "Printer",
-    kondisiBarang: "Rusak Berat",
+    kondisiBarang: "Rusak",
     tanggalUsulan: "2025-10-20",
     alasan: "Sudah tidak berfungsi dan tidak bisa diperbaiki",
     statusUsulan: "Menunggu",
-    disetujuiOleh: "",
+    tanggalPerolehan: "2023-06-10", // contoh
   },
   {
     idUsulan: 2,
-    ikmm: 3100102003,
+    idBMN: 102,
+    ikmm: "3100102003",
+    akun: 132111,
     namaBarang: "Monitor Dell 24 inch",
     unit: 1,
     kategori: "Monitor",
@@ -42,5 +51,6 @@ export const dataUsulanHapus: dataUsulanHapus[] = [
     alasan: "Sudah tidak digunakan",
     statusUsulan: "Disetujui",
     disetujuiOleh: "Kepala Subbag BMN",
+    tanggalPerolehan: "2022-08-15",
   },
 ];

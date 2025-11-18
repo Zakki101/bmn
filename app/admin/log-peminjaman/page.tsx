@@ -11,6 +11,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { dataLogPeminjaman } from "@/data/dataLogPeminjaman";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import { FileSpreadsheet } from "lucide-react";
 
 export default function LogPeminjamanPage() {
   const [search, setSearch] = useState("");
@@ -29,6 +32,39 @@ export default function LogPeminjamanPage() {
       return matchSearch && matchStatus;
     })
     .sort((a, b) => new Date(b.tanggalPinjam).getTime() - new Date(a.tanggalPinjam).getTime());
+  
+  const handleDownloadExcel = () => {
+          const exportData = filteredData.map((item, i) => ({
+            No: i + 1,
+            "Nomor Peminjaman": item.nomorPeminjaman,
+            "Nama Peminjam": item.namaPeminjam,
+            "Status Pegawai": item.statusPegawai,
+            NIP: item.nip,
+            IKMM: item.ikmm,
+            "Nama Barang": item.namaBarang,
+            NUP: item.unit,
+            Kategori: item.kategori,
+            Jumlah: item.jumlahPinjam,
+            "Tanggal Pinjam": item.tanggalPinjam,
+            "Tanggal Selesai": item.tanggalSelesai || "-",
+            Keterangan: item.keterangan || "-",
+            statusPeminjaman: item.statusPeminjaman,
+            foto: item.foto ? "Ada" : "Tidak Ada",
+          }));
+      
+          const worksheet = XLSX.utils.json_to_sheet(exportData);
+          const workbook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workbook, worksheet, "Data Peminjaman");
+      
+          const excelBuffer = XLSX.write(workbook, {
+            bookType: "xlsx",
+            type: "array",
+          });
+          const blob = new Blob([excelBuffer], {
+            type: "application/octet-stream",
+          });
+          saveAs(blob, "data_peminjaman.xlsx");
+        };
 
   return (
     <div className="p-2 space-y-2">
@@ -65,6 +101,14 @@ export default function LogPeminjamanPage() {
             }}
           >
             Reset
+          </Button>
+
+          <Button
+            className="cursor-pointer text-xs h-[24px] px-3"
+            variant="default"
+            onClick={handleDownloadExcel}
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5" />
           </Button>
         </div>
       </div>

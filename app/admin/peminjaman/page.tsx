@@ -16,6 +16,12 @@ import { useRouter } from "next/navigation";
 import imageCompression from "browser-image-compression";
 import { dataPeminjaman as initialDataPeminjaman } from "@/data/dataPeminjaman";
 import { dataLogPeminjaman } from "@/data/dataLogPeminjaman";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import { FileSpreadsheet } from "lucide-react";
+import { pdf } from "@react-pdf/renderer";
+import GenerateBA from "@/components/GenerateBA"; 
+import { Download } from "lucide-react";
 
 // Format tanggal ke dd/mm/yyyy
 function formatDateToDDMMYYYY(date: Date): string {
@@ -156,6 +162,56 @@ export default function DataPeminjamanAdminPage() {
     setSelectedPeminjaman(null);
   };
 
+  const handleDownloadExcel = () => {
+        const exportData = filteredData.map((item, i) => ({
+          No: i + 1,
+          "Nomor Peminjaman": item.nomorPeminjaman,
+          "Nama Peminjam": item.namaPeminjam,
+          "Status Pegawai": item.statusPegawai,
+          NIP: item.nip,
+          IKMM: item.ikmm,
+          "Nama Barang": item.namaBarang,
+          NUP: item.unit,
+          Kategori: item.kategori,
+          Jumlah: item.jumlahPinjam,
+          "Tanggal Pinjam": item.tanggalPinjam,
+          "Tanggal Selesai": item.tanggalSelesai || "-",
+          Keterangan: item.keterangan || "-",
+          statusPeminjaman: item.statusPeminjaman,
+          foto: item.foto ? "Ada" : "Tidak Ada",
+        }));
+    
+        const worksheet = XLSX.utils.json_to_sheet(exportData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Data Peminjaman");
+    
+        const excelBuffer = XLSX.write(workbook, {
+          bookType: "xlsx",
+          type: "array",
+        });
+        const blob = new Blob([excelBuffer], {
+          type: "application/octet-stream",
+        });
+        saveAs(blob, "data_peminjaman.xlsx");
+      };
+  
+  const handleDownloadPDF = async (item: any) => {
+    try {
+      const blob = await pdf(<GenerateBA data={item} />).toBlob();
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `BA_Peminjaman_${item.nomorPeminjaman}.pdf`;
+      a.click();
+
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Gagal download PDF:", error);
+      alert("Gagal membuat PDF");
+    }
+  };
+
   return (
     <div className="p-2 space-y-2">
       <h1 className="pt-0 pb-0 text-xs font-bold">Data Peminjaman</h1>
@@ -205,6 +261,14 @@ export default function DataPeminjamanAdminPage() {
           >
             Reset
           </Button>
+
+          <Button
+            className="cursor-pointer text-xs h-[24px] px-3"
+            variant="default"
+            onClick={handleDownloadExcel}
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5" />
+          </Button>
         </div>
 
         <Button
@@ -238,6 +302,7 @@ export default function DataPeminjamanAdminPage() {
                 <th className="border p-2 text-center">Status</th>
                 <th className="border p-2 min-w-[100px] text-center">Bukti Foto</th>
                 <th className="border p-2 text-center">Hapus</th>
+                <th className="border p-2 text-center min-w-[100px]">Download</th>
               </tr>
             </thead>
             <tbody>
@@ -327,6 +392,16 @@ export default function DataPeminjamanAdminPage() {
                       <MdDeleteOutline className="text-lg" />
                     </button>
                   </td>
+
+                  <td className="border p-2 text-center">
+                    <button
+                      className="cursor-pointer rounded bg-blue-500 p-1 text-white hover:bg-blue-600"
+                      onClick={() => handleDownloadPDF(item)}
+                    >
+                      <Download className="w-4 h-4" />
+                    </button>
+                  </td>
+
                 </tr>
               ))}
             </tbody>
