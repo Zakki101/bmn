@@ -40,7 +40,6 @@ export default function DataPeminjamanAdminPage() {
   const [editKeterangan, setEditKeterangan] = useState("");
   const router = useRouter();
 
-  // parse tanggal dd/mm/yyyy -> Date (for sorting and 7-day log)
   function parseDate(dateStr: string): Date {
     const [day, month, year] = dateStr.split(/[/-]/).map(Number);
     return new Date(year, month - 1, day);
@@ -87,7 +86,8 @@ export default function DataPeminjamanAdminPage() {
       });
       const previewUrl = URL.createObjectURL(compressed);
       setPeminjamanData(
-        peminjamanData.map((p) => (p.idPeminjaman === id ? { ...p, foto: previewUrl } : p))
+        peminjamanData.map((p) => (p.idPeminjaman === id ? {...p,foto: p.foto ? [...p.foto, previewUrl] : [previewUrl]}
+ : p))
       );
     } catch (err) {
       console.error("Gagal kompres gambar:", err);
@@ -302,7 +302,8 @@ export default function DataPeminjamanAdminPage() {
                 <th className="border p-2 text-center">Status</th>
                 <th className="border p-2 min-w-[100px] text-center">Bukti Foto</th>
                 <th className="border p-2 text-center">Hapus</th>
-                <th className="border p-2 text-center min-w-[100px]">Download</th>
+                <th className="border p-2 text-center min-w-[100px]">Download BA</th>
+               <th className="border p-2 text-center min-w-[100px]">Download SIP</th>
               </tr>
             </thead>
             <tbody>
@@ -359,7 +360,7 @@ export default function DataPeminjamanAdminPage() {
                   <td className="border p-2 text-center">
                     {item.foto ? (
                       <button
-                        onClick={() => window.open(item.foto, "_blank")}
+                        onClick={() => item.foto?.[0] && window.open(item.foto[0], "_blank")}
                         className="bg-blue-500 text-white text-[10px] py-1 px-2 rounded hover:bg-blue-600"
                       >
                         Lihat Foto
@@ -386,7 +387,7 @@ export default function DataPeminjamanAdminPage() {
                   {/* Hapus */}
                   <td className="border p-2 text-center">
                     <button
-                      className="cursor-pointer rounded bg-gray-300 p-1 text-gray-500 hover:text-white hover:bg-red-600"
+                      className="cursor-pointer rounded bg-red-500 p-1 text-white hover:bg-red-600"
                       onClick={() => handleDelete(item.idPeminjaman)}
                     >
                       <MdDeleteOutline className="text-lg" />
@@ -397,6 +398,15 @@ export default function DataPeminjamanAdminPage() {
                     <button
                       className="cursor-pointer rounded bg-blue-500 p-1 text-white hover:bg-blue-600"
                       onClick={() => handleDownloadPDF(item)}
+                    >
+                      <Download className="w-4 h-4" />
+                    </button>
+                  </td>
+
+                  <td className="border p-2 text-center">
+                    <button
+                      className="cursor-pointer rounded bg-blue-500 p-1 text-white hover:bg-blue-600"   
+                      onClick={() => alert("Fitur download SIP belum tersedia.")}
                     >
                       <Download className="w-4 h-4" />
                     </button>

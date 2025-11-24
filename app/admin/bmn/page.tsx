@@ -10,6 +10,9 @@ import { MdDeleteOutline } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import imageCompression from "browser-image-compression";
 import { dataBMN as initialDataBMN } from "@/data/dataBMN";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import { FileSpreadsheet } from "lucide-react";
 
 export default function DataBMNAdminPage() {
   const [search, setSearch] = useState("");
@@ -56,7 +59,7 @@ export default function DataBMNAdminPage() {
       setBmnData(
         bmnData.map((b) =>
           b.idBMN === id
-            ? { ...b, foto: [previewUrl] } // ← PASTIKAN ARRAY
+            ? { ...b, foto: [previewUrl] } 
             : b
         )
       );
@@ -77,6 +80,35 @@ export default function DataBMNAdminPage() {
       alert(`Usulan penghapusan untuk "${item.namaBarang}" berhasil diajukan!`);
     }
   };
+
+  const handleDownloadExcel = () => {
+          const exportData = filteredData.map((item, i) => ({
+            No: i + 1,
+            IKMM: item.ikmm,
+            Akun: item.akun,
+            Bidang: item.bidang,
+            "Nama Barang": item.namaBarang,
+            NUP: item.unit,
+            Kategori: item.kategori,
+            "Tanggal Perolehan": item.tanggalPerolehan,
+            "Kondisi Barang": item.kondisiBarang,
+            "Status": item.dipinjam,
+            Foto: item.foto ? "Ada" : "Tidak Ada",
+          }));
+      
+          const worksheet = XLSX.utils.json_to_sheet(exportData);
+          const workbook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workbook, worksheet, "Data BMN");
+      
+          const excelBuffer = XLSX.write(workbook, {
+            bookType: "xlsx",
+            type: "array",
+          });
+          const blob = new Blob([excelBuffer], {
+            type: "application/octet-stream",
+          });
+          saveAs(blob, "data_bmn.xlsx");
+        };
 
   return (
     <div className="p-2 space-y-2">
@@ -134,6 +166,15 @@ export default function DataBMNAdminPage() {
             }}
           >Reset
           </Button>
+
+          <Button
+            className="cursor-pointer text-xs h-[24px] px-3"
+            variant="default"
+            onClick={handleDownloadExcel}
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5" />
+          </Button>
+
         </div>
         <Button
           className="bg-blue-500 hover:bg-blue-600 cursor-pointer text-xs h-[24px] px-3"
@@ -152,6 +193,7 @@ export default function DataBMNAdminPage() {
                 <th className="border p-2">No</th>
                 <th className="border p-2 min-w-[140px]">IKMM / Kode Barang</th>
                 <th className="border p-2">Akun</th>
+                <th className="border p-2">Bidang</th>
                 <th className="border p-2 min-w-[150px]">Nama / Merek / Tipe</th>
                 <th className="border p-2">NUP</th>
                 <th className="border p-2">Kategori</th>
@@ -170,6 +212,7 @@ export default function DataBMNAdminPage() {
                   <td className="border p-2">{index + 1}</td>
                   <td className="border p-2">{item.ikmm}</td>
                   <td className="border p-2">{item.akun}</td>
+                  <td className="border p-2">{item.bidang}</td>
                   <td className="border p-2">{item.namaBarang}</td>
                   <td className="border p-2">{item.unit}</td>
                   <td className="border p-2">{item.kategori}</td>

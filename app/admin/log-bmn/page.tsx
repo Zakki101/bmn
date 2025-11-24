@@ -29,6 +29,7 @@ export default function LogBMNPage() {
           No: i + 1,
           IKMM: item.ikmm,
           Akun: item.akun,
+          Bidang: item.bidang,
           "Nama Barang": item.namaBarang,
           NUP: item.unit,
           Kategori: item.kategori,
@@ -105,6 +106,7 @@ export default function LogBMNPage() {
                 <th className="border p-2">No</th>
                 <th className="border p-2 min-w-[140px]">IKMM / Kode Barang</th>
                 <th className="border p-2">Akun</th>
+                <th className="border p-2">Bidang</th>
                 <th className="border p-2 min-w-[150px]">Nama / Merek / Tipe</th>
                 <th className="border p-2">NUP</th>
                 <th className="border p-2">Kategori</th>
@@ -122,6 +124,7 @@ export default function LogBMNPage() {
                     <td className="border p-2">{index + 1}</td>
                     <td className="border p-2">{item.ikmm}</td>
                     <td className="border p-2">{item.akun}</td>
+                    <td className="border p-2">{item.bidang}</td>
                     <td className="border p-2">{item.namaBarang}</td>
                     <td className="border p-2">{item.unit}</td>
                     <td className="border p-2">{item.kategori}</td>

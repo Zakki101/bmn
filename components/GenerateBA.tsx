@@ -42,8 +42,7 @@ const formatSuratDate = (dateString: string | null) => {
     const year = date.getFullYear();
     return `Jakarta, ${day} ${monthName} ${year}`;
   }
-
-  // Kalau semua gagal, kembalikan string aslinya
+  
   return dateString;
 };
 

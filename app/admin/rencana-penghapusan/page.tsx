@@ -63,12 +63,13 @@ export default function UsulanHapusPage() {
           ikmm: item.ikmm.toString(),
           akun: item.akun,
           unit: item.unit,
+          bidang: item.bidang,
           namaBarang: item.namaBarang,
           kategori: item.kategori,
           kondisiBarang: item.kondisiBarang,
           tanggalPerolehan: new Date().toISOString().split("T")[0],
           dipinjam: "Tidak Tersedia",
-          foto: "",
+          foto : [],
           tanggalPenghapusan: new Date().toISOString().split("T")[0],
           alasanPenghapusan: item.alasan,
           disetujuiOleh: item.disetujuiOleh || "-",
@@ -141,6 +142,7 @@ export default function UsulanHapusPage() {
       No: i + 1,
       IKMM: item.ikmm,
       Akun: item.akun,
+      Bidang: item.bidang,
       "Nama Barang": item.namaBarang,
       NUP: item.unit,
       Kategori: item.kategori,
@@ -231,6 +233,7 @@ export default function UsulanHapusPage() {
                 <th className="border p-2">No</th>
                 <th className="border p-2 min-w-[140px]">IKMM / Kode Barang</th>
                 <th className="border p-2">Akun</th>
+                <th className="border p-2">Bidang</th>
                 <th className="border p-2 min-w-[150px]">Nama / Merek / Tipe</th>
                 <th className="border p-2">NUP</th>
                 <th className="border p-2">Kategori</th>
@@ -251,6 +254,7 @@ export default function UsulanHapusPage() {
                   <td className="border p-2">{index + 1}</td>
                   <td className="border p-2">{item.ikmm}</td>
                   <td className="border p-2">{item.akun}</td>
+                  <td className="border p-2">{item.bidang}</td>
                   <td className="border p-2">{item.namaBarang}</td>
                   <td className="border p-2">{item.unit}</td>
                   <td className="border p-2">{item.kategori}</td>

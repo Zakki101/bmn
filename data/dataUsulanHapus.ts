@@ -2,9 +2,10 @@
 
 export type UsulanHapus = {
   idUsulan: number;
-  idBMN?: number; // tambahkan agar bisa dikaitkan dengan data BMN
-  ikmm: string; // string supaya tidak hilang angka nol di depan
+  idBMN?: number; 
+  ikmm: string; 
   akun: number;
+  bidang: "MTI" | "BDI" | "TU";
   namaBarang: string;
   unit: number;
   kategori:
@@ -29,6 +30,7 @@ export const dataUsulanHapus: UsulanHapus[] = [
     idBMN: 101, // tambahkan idBMN biar bisa dihapus dari tabel BMN
     ikmm: "3100102002",
     akun: 132111,
+    bidang: "BDI",
     namaBarang: "Printer Epson L3150",
     unit: 2,
     kategori: "Printer",
@@ -43,6 +45,7 @@ export const dataUsulanHapus: UsulanHapus[] = [
     idBMN: 102,
     ikmm: "3100102003",
     akun: 132111,
+    bidang: "MTI",
     namaBarang: "Monitor Dell 24 inch",
     unit: 1,
     kategori: "Monitor",
