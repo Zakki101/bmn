@@ -216,16 +216,37 @@ const styles = StyleSheet.create({
 
   // LAMPIRAN
   lampiranTitle: {
-    fontSize: 10,
-    fontWeight: 700,
-    marginBottom: 8,
+  fontSize: 12,
+  fontWeight: "bold",
+  marginBottom: 16,
+  textDecoration: "underline",
   },
-  lampiranImage: {
-    width: "100%",
-    height: 250,
-    objectFit: "cover",
+
+  lampiranItem: {
+    marginBottom: 18,
+  },
+
+  lampiranText: {
+    fontSize: 11,
+    marginBottom: 6,
+  },
+
+  placeholderBox: {
     borderWidth: 1,
-    marginBottom: 10,
+    borderColor: "#000",
+    height: 80,
+    width: "100%",
+  },
+
+  // FOTO
+  img: {
+    width: "60%",
+    height: "60%",
+    borderWidth: 1,
+    borderColor: "#000",
+    marginLeft: "auto",
+    marginRight: "auto",
+    marginTop: 10,
   },
 });
 
@@ -368,13 +389,46 @@ const GenerateBA: React.FC<{ data: Peminjaman }> = ({ data }) => {
       </Page>
 
       {/* PAGE 2 */}
-      {data.foto && (
-        <Page size="A4" style={styles.page}>
-          <Text style={styles.lampiranTitle}>Lampiran Dokumentasi Barang</Text>
+      <Page size="A4" style={styles.page}>
+        <Text style={styles.lampiranTitle}>Lampiran Dokumentasi Barang</Text>
 
-          <Image src={data.foto} style={styles.lampiranImage} />
-        </Page>
-      )}
+        {/* ITEM 1 */}
+        <View style={styles.lampiranItem}>
+          <Text style={styles.lampiranText}>1. Barang Tampak Depan</Text>
+          <View style={styles.placeholderBox} />
+        </View>
+
+        {/* ITEM 2 */}
+        <View style={styles.lampiranItem}>
+          <Text style={styles.lampiranText}>2. Barang Tampak Belakang</Text>
+          <View style={styles.placeholderBox} />
+        </View>
+
+        {/* ITEM 3 */}
+        <View style={styles.lampiranItem}>
+          <Text style={styles.lampiranText}>3. Tambahan </Text>
+          <View style={styles.placeholderBox} />
+        </View>
+
+        {/* ITEM 4 — BUKTI PENYERAHAN */}
+        <View style={{ marginBottom: 12 }}>
+          <Text style={styles.lampiranText}>4. Bukti Penyerahan</Text>
+
+          {Array.isArray(data.foto) && data.foto.length > 0 ? (
+            data.foto.map((img, i) => (
+              <View key={i} style={{ marginBottom: 12 }}>
+                <Text style={{ fontSize: 10 }}></Text>
+                <Image
+                  src={img}
+                  style={styles.img}
+                />
+              </View>
+            ))
+          ) : (
+            <View style={styles.placeholderBox} />
+          )}
+        </View>
+      </Page>
     </Document>
   );
 };

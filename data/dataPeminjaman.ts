@@ -21,7 +21,7 @@ export type Peminjaman = {
   tujuan: string;
   keterangan: string | null;
   statusPeminjaman: "Aktif" | "Selesai" | "Terlambat";
-  foto?: string;
+  foto?: string[];
 };
 
 export const dataPeminjaman: Peminjaman[] = [
@@ -58,6 +58,7 @@ export const dataPeminjaman: Peminjaman[] = [
     tujuan: "Presentasi Proyek",
     keterangan: "Disertakan remote control",
     statusPeminjaman: "Aktif",
+    foto: ["https://static.independent.co.uk/2025/08/27/16/02/Best-laptops-Indybest-review.png"],
   },
   {
     idPeminjaman: 3,
