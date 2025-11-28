@@ -20,7 +20,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { FileSpreadsheet } from "lucide-react";
 import { pdf } from "@react-pdf/renderer";
-import GenerateBA from "@/components/GenerateBA"; 
+import GenerateBA from "@/components/pdf/GenerateBA"; 
 import { Download } from "lucide-react";
 
 // Format tanggal ke dd/mm/yyyy
