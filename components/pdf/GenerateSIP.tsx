@@ -8,7 +8,6 @@ import {
   Image,
 } from "@react-pdf/renderer";
 import { Peminjaman } from "@/data/dataPeminjaman";
-import { BMN } from "@/data/dataBMN";
 import { StylesSIP as styles } from "./StylesSIP";
 
 const getRomanMonth = (monthIndex: number) => {
@@ -25,7 +24,6 @@ const currentMonthRoman = getRomanMonth(new Date().getMonth());
 const formatSuratDate = (dateString: string | null) => {
   if (!dateString) return "-";
   
-  // Cek format DD/MM/YYYY
   if (dateString.includes("/")) {
     const [day, month, year] = dateString.split("/").map(Number);
     const date = new Date(year, month - 1, day);
@@ -34,7 +32,6 @@ const formatSuratDate = (dateString: string | null) => {
     return `Jakarta, ${day} ${monthName} ${year}`;
   }
 
-  // Fallback jika format valid ISO
   const date = new Date(dateString);
   if (!isNaN(date.getTime())) {
     const day = date.getDate();
@@ -46,10 +43,9 @@ const formatSuratDate = (dateString: string | null) => {
   return dateString;
 };
 
-const GenerateSIP: React.FC<{ data: Peminjaman }> = ({ data }) => {
+const GenerateSIP: React.FC<{ data: Peminjaman}> = ({ data}) => {
   return (
     <Document>
-      {/* ======================= PAGE 1 ======================= */}
       <Page size="A4" style={styles.page}>
         {/* HEADER */}
        <View>
@@ -70,7 +66,7 @@ const GenerateSIP: React.FC<{ data: Peminjaman }> = ({ data }) => {
 
         {/* TITLE */}
         <Text style={styles.title}>
-          SURAT IJIN PEMAKAIAN BARANG MILIK NEGARA{"\n"}
+          SURAT IZIN PEMAKAIAN BARANG MILIK NEGARA{"\n"}
           NOMOR: {newNumber}/SIP/DATA/{currentMonthRoman}/{currentYear}
         </Text>
 
@@ -84,8 +80,8 @@ const GenerateSIP: React.FC<{ data: Peminjaman }> = ({ data }) => {
           {[
             ["Nama", data.namaPeminjam],
             ["NIP", data.nip],
-            ["Pangkat / Golongan", data.kategori],
-            ["Jabatan", data.ikmm],
+            ["Pangkat / Golongan", data.pangkatGolongan],
+            ["Jabatan", data.jabatan],
               ].map(([label, value], i) => (
                 <View style={styles.infoRow} key={i}>
                   <Text style={styles.infoLabel}>{label}</Text>
@@ -96,7 +92,7 @@ const GenerateSIP: React.FC<{ data: Peminjaman }> = ({ data }) => {
         </View>
         
         {/* FORM 2 */}
-        <Text style={styles.diizinkan}>DIIJINKAN</Text>
+        <Text style={styles.diizinkan}>DIIZINKAN</Text>
 
         <Text style={styles.text}>
           Untuk pemakaian 1 (satu) unit Alat Pengolah Data yaitu:
@@ -106,15 +102,15 @@ const GenerateSIP: React.FC<{ data: Peminjaman }> = ({ data }) => {
           {[
             ["Nama Barang", data.namaBarang],
             ["Merek / Type", data.kategori],
-            ["Tahun Perolehan", data.tanggalPinjam],
-            ["NUP", data.unit],
-              ].map(([label, value], i) => (
-                <View style={styles.infoRow} key={i}>
-                  <Text style={styles.infoLabel}>{label}</Text>
-                  <Text style={styles.infoColon}>:</Text>
-                  <Text style={styles.infoValue}>{value}</Text>
-               </View>
-            ))}
+            ["Tahun Perolehan", data.tanggalPerolehan.split("/")[2]],
+            ["NUP", String(data.unit)],
+          ].map(([label, value], i) => (
+            <View style={styles.infoRow} key={i}>
+              <Text style={styles.infoLabel}>{label}</Text>
+              <Text style={styles.infoColon}>:</Text>
+              <Text style={styles.infoValue}>{value}</Text>
+            </View>
+          ))}
         </View>
         
         <View style={styles.ketentuancont}>
@@ -122,7 +118,7 @@ const GenerateSIP: React.FC<{ data: Peminjaman }> = ({ data }) => {
           <View style={styles.listRow}>
             <Text style={styles.listNumber}>1.</Text>
             <Text style={styles.listText}>
-              Ijin bersifat sementara dan akan disesuaikan dengan kepentingan dinas 
+              Izin bersifat sementara dan akan disesuaikan dengan kepentingan dinas 
               dan penugasan pejabat/pegawai yang bersangkutan;
             </Text>
           </View>
@@ -167,7 +163,7 @@ const GenerateSIP: React.FC<{ data: Peminjaman }> = ({ data }) => {
                       <Text></Text>
                     </View>
         
-                    {/* TANGGAL + MENERIMA */}
+                    {/* MENERIMA */}
                     <View style={styles.ttdCol}>
                       <Text>Pengguna</Text>
                       <Text>Barang Milik Negara</Text>

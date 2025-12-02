@@ -134,8 +134,7 @@ const GenerateBA: React.FC<{ data: Peminjaman }> = ({ data }) => {
         
     
         {/* TTD */}
-        <View style={styles.ttdContainer}>
-
+          <Text style={styles.tanggalRight}>{formatSuratDate(data.tanggalPinjam)}</Text>
           <View style={styles.ttdRow}>
 
             {/* MENYERAHKAN */}
@@ -148,15 +147,15 @@ const GenerateBA: React.FC<{ data: Peminjaman }> = ({ data }) => {
               <Text></Text>
             </View>
 
-            {/* TANGGAL + MENERIMA */}
+            {/* MENERIMA */}
             <View style={styles.ttdCol}>
-              <Text>{formatSuratDate(data.tanggalPinjam)}</Text>
               <Text>Yang Menerima</Text>
+              <Text>{" "}</Text>
               <View style={styles.ttdSpace} />
               <Text style={{ textDecoration: "underline" }}>{data.namaPeminjam}</Text>
               <Text>NIP. {data.nip}</Text>
             </View>
-
+            
           </View>
 
           {/* MENGETAHUI */}
@@ -167,7 +166,6 @@ const GenerateBA: React.FC<{ data: Peminjaman }> = ({ data }) => {
             <Text style={{ textDecoration: "underline" }}>Komang Sri Hartini</Text>
             <Text>NIP. 198212272005022001</Text>
           </View>
-        </View>
       
         <View style={styles.footerList}>
           <Text style={styles.footerTitle}>Keterangan:</Text>

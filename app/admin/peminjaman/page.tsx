@@ -16,11 +16,13 @@ import { useRouter } from "next/navigation";
 import imageCompression from "browser-image-compression";
 import { dataPeminjaman as initialDataPeminjaman } from "@/data/dataPeminjaman";
 import { dataLogPeminjaman } from "@/data/dataLogPeminjaman";
+import { dataBMN } from "@/data/dataBMN";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { FileSpreadsheet } from "lucide-react";
 import { pdf } from "@react-pdf/renderer";
 import GenerateBA from "@/components/pdf/GenerateBA"; 
+import GenerateSIP from "@/components/pdf/GenerateSIP";
 import { Download } from "lucide-react";
 
 // Format tanggal ke dd/mm/yyyy
@@ -123,7 +125,6 @@ export default function DataPeminjamanAdminPage() {
     );
   };
 
-  // Pindah otomatis ke log setelah 7 hari
   useEffect(() => {
     const today = new Date();
     const expired = peminjamanData.filter((item) => {
@@ -144,7 +145,6 @@ export default function DataPeminjamanAdminPage() {
     }
   }, [peminjamanData]);
 
-  // === Dialog Edit Keterangan ===
   const handleOpenEdit = (item: any) => {
     setSelectedPeminjaman(item);
     setEditKeterangan(item.keterangan || "");
@@ -168,6 +168,8 @@ export default function DataPeminjamanAdminPage() {
           "Nomor Peminjaman": item.nomorPeminjaman,
           "Nama Peminjam": item.namaPeminjam,
           "Status Pegawai": item.statusPegawai,
+          "Pangkat / Golongan": item.pangkatGolongan,
+          "Jabatan": item.jabatan,
           NIP: item.nip,
           IKMM: item.ikmm,
           "Nama Barang": item.namaBarang,
@@ -195,7 +197,7 @@ export default function DataPeminjamanAdminPage() {
         saveAs(blob, "data_peminjaman.xlsx");
       };
   
-  const handleDownloadPDF = async (item: any) => {
+  const handleDownloadPDFBA = async (item: any) => {
     try {
       const blob = await pdf(<GenerateBA data={item} />).toBlob();
       const url = URL.createObjectURL(blob);
@@ -203,6 +205,23 @@ export default function DataPeminjamanAdminPage() {
       const a = document.createElement("a");
       a.href = url;
       a.download = `BA_Peminjaman_${item.nomorPeminjaman}.pdf`;
+      a.click();
+
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Gagal download PDF:", error);
+      alert("Gagal membuat PDF");
+    }
+  };
+
+  const handleDownloadPDFSIP = async (item: any) => {
+    try {
+      const blob = await pdf(<GenerateSIP data={item} />).toBlob();
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `SIP_Peminjaman_${item.namaPeminjam}.pdf`;
       a.click();
 
       URL.revokeObjectURL(url);
@@ -290,11 +309,14 @@ export default function DataPeminjamanAdminPage() {
                 <th className="border p-2 min-w-[135px]">Nomor Peminjaman</th>
                 <th className="border p-2 min-w-[120px]">Nama Peminjam</th>
                 <th className="border p-2 min-w-[110px]">Status Pegawai</th>
+                <th className="border p-2 min-w-[135px]">Pangkat / Golongan</th>
+                <th className="border p-2 min-w-[120px]">Jabatan</th>
                 <th className="border p-2 min-w-[110px]">NIP</th>
                 <th className="border p-2">IKMM</th>
                 <th className="border p-2 min-w-[150px]">Nama / Merek / Tipe</th>
                 <th className="border p-2">NUP</th>
                 <th className="border p-2">Kategori</th>
+                <th className="border p-2 min-w-[130px] text-center">Tahun Peorlehan</th>
                 <th className="border p-2">Jumlah</th>
                 <th className="border p-2 min-w-[110px]">Tanggal Pinjam</th>
                 <th className="border p-2 min-w-[130px] text-center">Tanggal Selesai</th>
@@ -313,11 +335,14 @@ export default function DataPeminjamanAdminPage() {
                   <td className="border p-2">{item.nomorPeminjaman}</td>
                   <td className="border p-2">{item.namaPeminjam}</td>
                   <td className="border p-2">{item.statusPegawai}</td>
+                  <td className="border p-2">{item.pangkatGolongan}</td>
+                  <td className="border p-2">{item.jabatan}</td>
                   <td className="border p-2">{item.nip}</td>
                   <td className="border p-2">{item.ikmm}</td>
                   <td className="border p-2">{item.namaBarang}</td>
                   <td className="border p-2 text-center">{item.unit}</td>
                   <td className="border p-2">{item.kategori}</td>
+                  <td className="border p-2 text-center">{item.tanggalPerolehan.split("/")[2]}</td>
                   <td className="border p-2 text-center">{item.jumlahPinjam}</td>
                   <td className="border p-2 text-center">{item.tanggalPinjam}</td>
 
@@ -397,7 +422,7 @@ export default function DataPeminjamanAdminPage() {
                   <td className="border p-2 text-center">
                     <button
                       className="cursor-pointer rounded bg-blue-500 p-1 text-white hover:bg-blue-600"
-                      onClick={() => handleDownloadPDF(item)}
+                      onClick={() => handleDownloadPDFBA(item)}
                     >
                       <Download className="w-4 h-4" />
                     </button>
@@ -406,7 +431,7 @@ export default function DataPeminjamanAdminPage() {
                   <td className="border p-2 text-center">
                     <button
                       className="cursor-pointer rounded bg-blue-500 p-1 text-white hover:bg-blue-600"   
-                      onClick={() => alert("Fitur download SIP belum tersedia.")}
+                      onClick={() => handleDownloadPDFSIP(item)}
                     >
                       <Download className="w-4 h-4" />
                     </button>

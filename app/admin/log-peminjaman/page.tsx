@@ -39,6 +39,8 @@ export default function LogPeminjamanPage() {
             "Nomor Peminjaman": item.nomorPeminjaman,
             "Nama Peminjam": item.namaPeminjam,
             "Status Pegawai": item.statusPegawai,
+            "Pangkat / Golongan": item.pangkatGolongan,
+            "Jabatan": item.jabatan,
             NIP: item.nip,
             IKMM: item.ikmm,
             "Nama Barang": item.namaBarang,
@@ -123,6 +125,8 @@ export default function LogPeminjamanPage() {
                 <th className="border p-2 min-w-[135px]">Nomor Peminjaman</th>
                 <th className="border p-2 min-w-[120px]">Nama Peminjam</th>
                 <th className="border p-2 min-w-[110px]">Status Pegawai</th>
+                <th className="border p-2 min-w-[135px]">Pangkat / Golongan</th>
+                <th className="border p-2 min-w-[120px]">Jabatan</th>
                 <th className="border p-2 min-w-[110px]">NIP</th>
                 <th className="border p-2">IKMM</th>
                 <th className="border p-2 min-w-[150px]">Nama / Merek / Tipe</th>
@@ -142,6 +146,8 @@ export default function LogPeminjamanPage() {
                   <td className="border p-2">{item.nomorPeminjaman}</td>
                   <td className="border p-2">{item.namaPeminjam}</td>
                   <td className="border p-2">{item.statusPegawai}</td>
+                  <td className="border p-2">{item.pangkatGolongan}</td>
+                  <td className="border p-2">{item.jabatan}</td>
                   <td className="border p-2">{item.nip}</td>
                   <td className="border p-2">{item.ikmm}</td>
                   <td className="border p-2">{item.namaBarang}</td>

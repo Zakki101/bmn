@@ -122,6 +122,14 @@ export const StylesBA = StyleSheet.create({
     textAlign: "justify",
   },
 
+  // TANGGAL TTD
+  tanggalRight: {
+    textAlign: "center",
+    fontSize: 10,
+    width: "45%",      
+    marginLeft: "55%", 
+  },
+
   // TANDA TANGAN
   ttdContainer: {
     marginTop: 20,
