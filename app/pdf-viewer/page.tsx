@@ -1,29 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import GenerateBA from "@/components/pdf/GenerateBA";
 import { dataPeminjaman } from "@/data/dataPeminjaman";
 
-const PDFViewer = dynamic(
-  () => import("@react-pdf/renderer").then((mod) => mod.PDFViewer),
-  { ssr: false }
+const PDFViewerWrapper = dynamic(
+  () => import("@/components/pdf/PDFViewerWrapper"),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center h-screen">
+        <p>Loading PDF Viewer...</p>
+      </div>
+    )
+  }
 );
 
 export default function Page() {
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  if (!isClient) return null;
-
-  return (
-    <div style={{ width: "100vw", height: "100vh" }}>
-      <PDFViewer style={{ width: "100%", height: "100%" }}>
-        <GenerateBA data={dataPeminjaman[1]} />
-      </PDFViewer>
-    </div>
-  );
+  return <PDFViewerWrapper data={dataPeminjaman[1]} type="BA" />;
 }
