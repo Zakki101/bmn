@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,55 +18,51 @@ import { FileSpreadsheet } from "lucide-react";
 export default function LogPeminjamanPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [logData, setLogData] = useState(dataLogPeminjaman);
 
-  useEffect(() => {
-    setLogData([...dataLogPeminjaman]);
-  }, [dataLogPeminjaman.length]);
 
   // Filter + search
-  const filteredData = logData
+  const filteredData = dataLogPeminjaman
     .filter((item) => {
       const matchSearch = item.namaPeminjam.toLowerCase().includes(search.toLowerCase());
       const matchStatus = statusFilter === "all" || item.statusPeminjaman === statusFilter;
       return matchSearch && matchStatus;
     })
     .sort((a, b) => new Date(b.tanggalPinjam).getTime() - new Date(a.tanggalPinjam).getTime());
-  
+
   const handleDownloadExcel = () => {
-          const exportData = filteredData.map((item, i) => ({
-            No: i + 1,
-            "Nomor Peminjaman": item.nomorPeminjaman,
-            "Nama Peminjam": item.namaPeminjam,
-            "Status Pegawai": item.statusPegawai,
-            "Pangkat / Golongan": item.pangkatGolongan,
-            "Jabatan": item.jabatan,
-            NIP: item.nip,
-            IKMM: item.ikmm,
-            "Nama Barang": item.namaBarang,
-            NUP: item.unit,
-            Kategori: item.kategori,
-            Jumlah: item.jumlahPinjam,
-            "Tanggal Pinjam": item.tanggalPinjam,
-            "Tanggal Selesai": item.tanggalSelesai || "-",
-            Keterangan: item.keterangan || "-",
-            statusPeminjaman: item.statusPeminjaman,
-            foto: item.foto ? "Ada" : "Tidak Ada",
-          }));
-      
-          const worksheet = XLSX.utils.json_to_sheet(exportData);
-          const workbook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workbook, worksheet, "Data Peminjaman");
-      
-          const excelBuffer = XLSX.write(workbook, {
-            bookType: "xlsx",
-            type: "array",
-          });
-          const blob = new Blob([excelBuffer], {
-            type: "application/octet-stream",
-          });
-          saveAs(blob, "data_peminjaman.xlsx");
-        };
+    const exportData = filteredData.map((item, i) => ({
+      No: i + 1,
+      "Nomor Peminjaman": item.nomorPeminjaman,
+      "Nama Peminjam": item.namaPeminjam,
+      "Status Pegawai": item.statusPegawai,
+      "Pangkat / Golongan": item.pangkatGolongan,
+      "Jabatan": item.jabatan,
+      NIP: item.nip,
+      IKMM: item.ikmm,
+      "Nama Barang": item.namaBarang,
+      NUP: item.unit,
+      Kategori: item.kategori,
+      Jumlah: item.jumlahPinjam,
+      "Tanggal Pinjam": item.tanggalPinjam,
+      "Tanggal Selesai": item.tanggalSelesai || "-",
+      Keterangan: item.keterangan || "-",
+      statusPeminjaman: item.statusPeminjaman,
+      foto: item.foto ? "Ada" : "Tidak Ada",
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Data Peminjaman");
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const blob = new Blob([excelBuffer], {
+      type: "application/octet-stream",
+    });
+    saveAs(blob, "data_peminjaman.xlsx");
+  };
 
   return (
     <div className="p-2 space-y-2">
@@ -88,7 +84,7 @@ export default function LogPeminjamanPage() {
             </SelectTrigger>
             <SelectContent className="text-xs">
               <SelectItem value="all" className="text-[10px]">Semua Status</SelectItem>
-              <SelectItem value="Aktif"  className="text-[10px]">Aktif</SelectItem>
+              <SelectItem value="Aktif" className="text-[10px]">Aktif</SelectItem>
               <SelectItem value="Selesai" className="text-[10px]">Selesai</SelectItem>
               <SelectItem value="Terlambat" className="text-[10px]">Terlambat</SelectItem>
             </SelectContent>

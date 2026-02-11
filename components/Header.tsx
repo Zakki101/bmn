@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 
 type HeaderProps = {
   title: string;
@@ -21,7 +22,7 @@ export default function Header({ title, role }: HeaderProps) {
 
       {/* Logo + Subtitle */}
       <div className="flex items-center gap-2">
-        <img
+        <Image
           src="/logopu.png"
           alt="Logo PU"
           width={18}

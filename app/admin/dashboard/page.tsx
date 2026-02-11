@@ -1,8 +1,8 @@
 "use client";
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import {ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig,} from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, RadialBarChart, RadialBar, PolarRadiusAxis, Label,} from "recharts";
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig, } from "@/components/ui/chart";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, RadialBarChart, RadialBar, PolarRadiusAxis, Label, } from "recharts";
 import { ReactNode } from "react";
 
 import { dataBMN } from "@/data/dataBMN";
@@ -13,7 +13,8 @@ function parseDate(dateStr?: string | null): Date {
   const parts = dateStr.split(/[/\-\.]/).map((p) => p.trim());
   if (parts.length < 3) return new Date(0);
 
-  let [d, m, y] = parts;
+  const [d, m] = parts;
+  let [, , y] = parts;
   if (y.length === 2) y = "20" + y;
   const day = parseInt(d, 10);
   const month = parseInt(m, 10) - 1;
@@ -35,7 +36,7 @@ const kondisiData: Record<
   { name: string; value: number; color: string }[]
 > = {
   Laptop: [
-    { name: " Kondisi Baik", value: 15, color: "var(--chart-1)" }, 
+    { name: " Kondisi Baik", value: 15, color: "var(--chart-1)" },
     { name: "Dalam Perbaikan", value: 5, color: "var(--chart-2)" },
   ],
   TV: [

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -18,10 +19,11 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-blue-100">
       <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-sm">
         {/* logo */}
-        <img
+        <Image
           src="/logopu.png"
           alt="Logo Perusahaan"
-          width="40"
+          width={40}
+          height={40}
           className="mx-auto mb-3"
         />
 
@@ -38,11 +40,10 @@ export default function LoginPage() {
         <button
           onClick={handleUserClick}
           disabled={loading}
-          className={`cursor-pointer w-full text-xs flex items-center font-medium py-2 rounded-lg mb-3 flex justify-center items-center ${
-            loading
+          className={`cursor-pointer w-full text-xs flex items-center font-medium py-2 rounded-lg mb-3 flex justify-center items-center ${loading
               ? 'bg-blue-400 cursor-not-allowed'
               : 'bg-blue-600 hover:bg-blue-700 text-white'
-          }`}
+            }`}
         >
           {loading ? (
             <>

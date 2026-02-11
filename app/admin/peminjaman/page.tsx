@@ -14,31 +14,25 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { MdDeleteOutline } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import imageCompression from "browser-image-compression";
-import { dataPeminjaman as initialDataPeminjaman } from "@/data/dataPeminjaman";
+import { dataPeminjaman as initialDataPeminjaman, Peminjaman } from "@/data/dataPeminjaman";
 import { dataLogPeminjaman } from "@/data/dataLogPeminjaman";
-import { dataBMN } from "@/data/dataBMN";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { FileSpreadsheet } from "lucide-react";
 import { pdf } from "@react-pdf/renderer";
-import GenerateBA from "@/components/pdf/GenerateBA"; 
+import GenerateBA from "@/components/pdf/GenerateBA";
 import GenerateSIP from "@/components/pdf/GenerateSIP";
 import { Download } from "lucide-react";
 
 // Format tanggal ke dd/mm/yyyy
-function formatDateToDDMMYYYY(date: Date): string {
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
-}
+
 
 export default function DataPeminjamanAdminPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [kategori, setKategori] = useState("all");
   const [peminjamanData, setPeminjamanData] = useState(initialDataPeminjaman);
-  const [selectedPeminjaman, setSelectedPeminjaman] = useState<any | null>(null);
+  const [selectedPeminjaman, setSelectedPeminjaman] = useState<Peminjaman | null>(null);
   const [editKeterangan, setEditKeterangan] = useState("");
   const router = useRouter();
 
@@ -49,17 +43,17 @@ export default function DataPeminjamanAdminPage() {
 
   // Filter + sort
   const filteredData = peminjamanData
-  .filter((item) => {
-    const matchSearch = item.namaPeminjam.toLowerCase().includes(search.toLowerCase());
-    const matchStatus = statusFilter === "all" || item.statusPeminjaman === statusFilter;
-    const matchKategori = kategori === "all" || item.kategori === kategori;
-    return matchSearch && matchStatus && matchKategori;
-  })
-  .sort((a, b) => {
-    const dateA = parseDate(a.tanggalPinjam);
-    const dateB = parseDate(b.tanggalPinjam);
-    return dateB.getTime() - dateA.getTime();
-  });
+    .filter((item) => {
+      const matchSearch = item.namaPeminjam.toLowerCase().includes(search.toLowerCase());
+      const matchStatus = statusFilter === "all" || item.statusPeminjaman === statusFilter;
+      const matchKategori = kategori === "all" || item.kategori === kategori;
+      return matchSearch && matchStatus && matchKategori;
+    })
+    .sort((a, b) => {
+      const dateA = parseDate(a.tanggalPinjam);
+      const dateB = parseDate(b.tanggalPinjam);
+      return dateB.getTime() - dateA.getTime();
+    });
 
   // Hapus
   const handleDelete = (id: number) => {
@@ -88,8 +82,8 @@ export default function DataPeminjamanAdminPage() {
       });
       const previewUrl = URL.createObjectURL(compressed);
       setPeminjamanData(
-        peminjamanData.map((p) => (p.idPeminjaman === id ? {...p,foto: p.foto ? [...p.foto, previewUrl] : [previewUrl]}
- : p))
+        peminjamanData.map((p) => (p.idPeminjaman === id ? { ...p, foto: p.foto ? [...p.foto, previewUrl] : [previewUrl] }
+          : p))
       );
     } catch (err) {
       console.error("Gagal kompres gambar:", err);
@@ -113,13 +107,13 @@ export default function DataPeminjamanAdminPage() {
       prev.map((p) =>
         p.idPeminjaman === id
           ? {
-              ...p,
-              statusPeminjaman: value,
-              tanggalSelesai:
-                value === "Selesai"
-                  ? new Date().toLocaleDateString("id-ID")
-                  : "-",
-            }
+            ...p,
+            statusPeminjaman: value,
+            tanggalSelesai:
+              value === "Selesai"
+                ? new Date().toLocaleDateString("id-ID")
+                : "-",
+          }
           : p
       )
     );
@@ -145,7 +139,7 @@ export default function DataPeminjamanAdminPage() {
     }
   }, [peminjamanData]);
 
-  const handleOpenEdit = (item: any) => {
+  const handleOpenEdit = (item: Peminjaman) => {
     setSelectedPeminjaman(item);
     setEditKeterangan(item.keterangan || "");
   };
@@ -163,41 +157,41 @@ export default function DataPeminjamanAdminPage() {
   };
 
   const handleDownloadExcel = () => {
-        const exportData = filteredData.map((item, i) => ({
-          No: i + 1,
-          "Nomor Peminjaman": item.nomorPeminjaman,
-          "Nama Peminjam": item.namaPeminjam,
-          "Status Pegawai": item.statusPegawai,
-          "Pangkat / Golongan": item.pangkatGolongan,
-          "Jabatan": item.jabatan,
-          NIP: item.nip,
-          IKMM: item.ikmm,
-          "Nama Barang": item.namaBarang,
-          NUP: item.unit,
-          Kategori: item.kategori,
-          Jumlah: item.jumlahPinjam,
-          "Tanggal Pinjam": item.tanggalPinjam,
-          "Tanggal Selesai": item.tanggalSelesai || "-",
-          Keterangan: item.keterangan || "-",
-          statusPeminjaman: item.statusPeminjaman,
-          foto: item.foto ? "Ada" : "Tidak Ada",
-        }));
-    
-        const worksheet = XLSX.utils.json_to_sheet(exportData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Data Peminjaman");
-    
-        const excelBuffer = XLSX.write(workbook, {
-          bookType: "xlsx",
-          type: "array",
-        });
-        const blob = new Blob([excelBuffer], {
-          type: "application/octet-stream",
-        });
-        saveAs(blob, "data_peminjaman.xlsx");
-      };
-  
-  const handleDownloadPDFBA = async (item: any) => {
+    const exportData = filteredData.map((item, i) => ({
+      No: i + 1,
+      "Nomor Peminjaman": item.nomorPeminjaman,
+      "Nama Peminjam": item.namaPeminjam,
+      "Status Pegawai": item.statusPegawai,
+      "Pangkat / Golongan": item.pangkatGolongan,
+      "Jabatan": item.jabatan,
+      NIP: item.nip,
+      IKMM: item.ikmm,
+      "Nama Barang": item.namaBarang,
+      NUP: item.unit,
+      Kategori: item.kategori,
+      Jumlah: item.jumlahPinjam,
+      "Tanggal Pinjam": item.tanggalPinjam,
+      "Tanggal Selesai": item.tanggalSelesai || "-",
+      Keterangan: item.keterangan || "-",
+      statusPeminjaman: item.statusPeminjaman,
+      foto: item.foto ? "Ada" : "Tidak Ada",
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Data Peminjaman");
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const blob = new Blob([excelBuffer], {
+      type: "application/octet-stream",
+    });
+    saveAs(blob, "data_peminjaman.xlsx");
+  };
+
+  const handleDownloadPDFBA = async (item: Peminjaman) => {
     try {
       const blob = await pdf(<GenerateBA data={item} />).toBlob();
       const url = URL.createObjectURL(blob);
@@ -214,7 +208,7 @@ export default function DataPeminjamanAdminPage() {
     }
   };
 
-  const handleDownloadPDFSIP = async (item: any) => {
+  const handleDownloadPDFSIP = async (item: Peminjaman) => {
     try {
       const blob = await pdf(<GenerateSIP data={item} />).toBlob();
       const url = URL.createObjectURL(blob);
@@ -256,7 +250,7 @@ export default function DataPeminjamanAdminPage() {
               <SelectItem value="Terlambat" className="text-[10px]">Terlambat</SelectItem>
             </SelectContent>
           </Select>
-          
+
           <Select onValueChange={setKategori} defaultValue="all">
             <SelectTrigger className="cursor-pointer text-xs !h-[24px] w-[140px] px-2 !bg-gray-50">
               <SelectValue placeholder="Kategori" />
@@ -325,7 +319,7 @@ export default function DataPeminjamanAdminPage() {
                 <th className="border p-2 min-w-[100px] text-center">Bukti Foto</th>
                 <th className="border p-2 text-center">Hapus</th>
                 <th className="border p-2 text-center min-w-[100px]">Download BA</th>
-               <th className="border p-2 text-center min-w-[100px]">Download SIP</th>
+                <th className="border p-2 text-center min-w-[100px]">Download SIP</th>
               </tr>
             </thead>
             <tbody>
@@ -430,7 +424,7 @@ export default function DataPeminjamanAdminPage() {
 
                   <td className="border p-2 text-center">
                     <button
-                      className="cursor-pointer rounded bg-blue-500 p-1 text-white hover:bg-blue-600"   
+                      className="cursor-pointer rounded bg-blue-500 p-1 text-white hover:bg-blue-600"
                       onClick={() => handleDownloadPDFSIP(item)}
                     >
                       <Download className="w-4 h-4" />

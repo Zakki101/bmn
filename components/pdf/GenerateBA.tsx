@@ -23,7 +23,7 @@ const formatDate = (date: string | null) => {
 
 const formatSuratDate = (dateString: string | null) => {
   if (!dateString) return "-";
-  
+
   // Cek format DD/MM/YYYY
   if (dateString.includes("/")) {
     const [day, month, year] = dateString.split("/").map(Number);
@@ -41,7 +41,7 @@ const formatSuratDate = (dateString: string | null) => {
     const year = date.getFullYear();
     return `Jakarta, ${day} ${monthName} ${year}`;
   }
-  
+
   return dateString;
 };
 
@@ -51,8 +51,9 @@ const GenerateBA: React.FC<{ data: Peminjaman }> = ({ data }) => {
       {/* ======================= PAGE 1 ======================= */}
       <Page size="A4" style={styles.page}>
         {/* HEADER */}
-       <View>
+        <View>
           <View style={styles.headerRow}>
+            {/* eslint-disable-next-line jsx-a11y/alt-text */}
             <Image src="/logopu.png" style={styles.logoBox} />
 
             <View style={styles.kopSuratContainer}>
@@ -131,42 +132,42 @@ const GenerateBA: React.FC<{ data: Peminjaman }> = ({ data }) => {
           4. Saat pengembalian barang, segala kelengkapan dan kondisi barang
           harus sesuai dengan pada saat barang diterima.
         </Text>
-        
-    
+
+
         {/* TTD */}
-          <Text style={styles.tanggalRight}>{formatSuratDate(data.tanggalPinjam)}</Text>
-          <View style={styles.ttdRow}>
+        <Text style={styles.tanggalRight}>{formatSuratDate(data.tanggalPinjam)}</Text>
+        <View style={styles.ttdRow}>
 
-            {/* MENYERAHKAN */}
-            <View style={styles.ttdCol}>
-              <Text>Yang Menyerahkan</Text>
-              <Text>Petugas BMN Bidang Data dan Informasi </Text>
-              <View style={styles.ttdSpace} />
-              <Text style={{ textDecoration: "underline" }}>Gama Ilmy Hartanto</Text>
-              <Text>NIP. 19820626 201012 1 004</Text>
-              <Text></Text>
-            </View>
-
-            {/* MENERIMA */}
-            <View style={styles.ttdCol}>
-              <Text>Yang Menerima</Text>
-              <Text>{" "}</Text>
-              <View style={styles.ttdSpace} />
-              <Text style={{ textDecoration: "underline" }}>{data.namaPeminjam}</Text>
-              <Text>NIP. {data.nip}</Text>
-            </View>
-            
-          </View>
-
-          {/* MENGETAHUI */}
-          <View style={styles.ttdMengetahui}>
-            <Text style={{ fontWeight: 700, textDecoration: "underline" }}>Mengetahui</Text>
-            <Text>Kepala Bidang Data dan Informasi</Text>
+          {/* MENYERAHKAN */}
+          <View style={styles.ttdCol}>
+            <Text>Yang Menyerahkan</Text>
+            <Text>Petugas BMN Bidang Data dan Informasi </Text>
             <View style={styles.ttdSpace} />
-            <Text style={{ textDecoration: "underline" }}>Komang Sri Hartini</Text>
-            <Text>NIP. 198212272005022001</Text>
+            <Text style={{ textDecoration: "underline" }}>Gama Ilmy Hartanto</Text>
+            <Text>NIP. 19820626 201012 1 004</Text>
+            <Text></Text>
           </View>
-      
+
+          {/* MENERIMA */}
+          <View style={styles.ttdCol}>
+            <Text>Yang Menerima</Text>
+            <Text>{" "}</Text>
+            <View style={styles.ttdSpace} />
+            <Text style={{ textDecoration: "underline" }}>{data.namaPeminjam}</Text>
+            <Text>NIP. {data.nip}</Text>
+          </View>
+
+        </View>
+
+        {/* MENGETAHUI */}
+        <View style={styles.ttdMengetahui}>
+          <Text style={{ fontWeight: 700, textDecoration: "underline" }}>Mengetahui</Text>
+          <Text>Kepala Bidang Data dan Informasi</Text>
+          <View style={styles.ttdSpace} />
+          <Text style={{ textDecoration: "underline" }}>Komang Sri Hartini</Text>
+          <Text>NIP. 198212272005022001</Text>
+        </View>
+
         <View style={styles.footerList}>
           <Text style={styles.footerTitle}>Keterangan:</Text>
           <Text style={styles.footerItem}>
@@ -211,6 +212,7 @@ const GenerateBA: React.FC<{ data: Peminjaman }> = ({ data }) => {
             data.foto.map((img, i) => (
               <View key={i} style={{ marginBottom: 12 }}>
                 <Text style={{ fontSize: 10 }}></Text>
+                {/* eslint-disable-next-line jsx-a11y/alt-text */}
                 <Image
                   src={img}
                   style={styles.img}

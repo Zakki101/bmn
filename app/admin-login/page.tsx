@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function AdminLoginPage() {
   const [username, setUsername] = useState('');
@@ -27,10 +28,11 @@ export default function AdminLoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-blue-100">
       <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-sm">
         {/* logo */}
-        <img
+        <Image
           src="/logopu.png"
           alt="Logo Perusahaan"
-          width="40"
+          width={40}
+          height={40}
           className="mx-auto mb-3"
         />
 

@@ -1,0 +1,63 @@
+﻿
+> bmn-dashboard@0.1.0 build
+> next build
+
+   Γû▓ Next.js 15.5.2
+
+   Creating an optimized production build ...
+node.exe : Failed to 
+compile.
+At C:\Program Files\no
+dejs\npm.ps1:29 char:3
++   & $NODE_EXE 
+$NPM_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
+    + CategoryInfo    
+          : NotSpeci  
+  fied: (Failed to    
+ compile.:String)     
+[], RemoteExcepti    
+on
+    + FullyQualifiedE 
+   rrorId : NativeCo  
+  mmandError
+ 
+
+./app/pdf-viewerSIP/pa
+ge.tsx
+Module not found: ESM 
+packages 
+(@react-pdf/renderer) 
+need to be imported. 
+Use 'import' to 
+reference the package 
+instead. https://nextj
+s.org/docs/messages/im
+port-esm-externals
+
+https://nextjs.org/doc
+s/messages/module-not-
+found
+
+./app/pdf-viewer/page.
+tsx
+Module not found: ESM 
+packages 
+(@react-pdf/renderer) 
+need to be imported. 
+Use 'import' to 
+reference the package 
+instead. https://nextj
+s.org/docs/messages/im
+port-esm-externals
+
+https://nextjs.org/doc
+s/messages/module-not-
+found
+
+
+> Build failed 
+because of webpack 
+errors
+

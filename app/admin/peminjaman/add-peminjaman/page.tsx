@@ -22,6 +22,9 @@ export default function AddPeminjamanPage() {
   const [tanggalPinjam, setTanggalPinjam] = useState("");
   const [tujuan, setTujuan] = useState("");
   const [keterangan, setKeterangan] = useState("");
+  const [pangkatGolongan, setPangkatGolongan] = useState("");
+  const [jabatan, setJabatan] = useState("");
+  const [tanggalPerolehan, setTanggalPerolehan] = useState("");
 
   // mapping kategori - IKMM
   const kategoriToIkmm: Record<string, number> = {
@@ -52,7 +55,10 @@ export default function AddPeminjamanPage() {
       !unit ||
       !jumlahPinjam ||
       !tanggalPinjam ||
-      !tujuan
+      !tujuan ||
+      !pangkatGolongan ||
+      !jabatan ||
+      !tanggalPerolehan
     ) {
       alert("Semua field wajib diisi (kecuali keterangan)");
       return;
@@ -82,6 +88,9 @@ export default function AddPeminjamanPage() {
       keterangan: keterangan || null,
       statusPeminjaman: "Aktif",
       unit: Number(unit),
+      pangkatGolongan,
+      jabatan,
+      tanggalPerolehan: formatDate(tanggalPerolehan),
     };
 
     dataPeminjaman.push(newPeminjaman);
@@ -123,6 +132,28 @@ export default function AddPeminjamanPage() {
             className="text-xs w-full border px-3 py-2 rounded"
             value={nip}
             onChange={(e) => setNip(e.target.value)}
+          />
+        </div>
+
+        {/* Pangkat / Golongan */}
+        <div>
+          <label className="block text-xs font-medium mb-1">Pangkat / Golongan *</label>
+          <input
+            type="text"
+            className="text-xs w-full border px-3 py-2 rounded"
+            value={pangkatGolongan}
+            onChange={(e) => setPangkatGolongan(e.target.value)}
+          />
+        </div>
+
+        {/* Jabatan */}
+        <div>
+          <label className="block text-xs font-medium mb-1">Jabatan *</label>
+          <input
+            type="text"
+            className="text-xs w-full border px-3 py-2 rounded"
+            value={jabatan}
+            onChange={(e) => setJabatan(e.target.value)}
           />
         </div>
 
@@ -176,7 +207,7 @@ export default function AddPeminjamanPage() {
             readOnly
           />
         </div>
-        
+
         {/* Jumlah Pinjam */}
         <div>
           <label className="block text-xs font-medium mb-1">Jumlah Pinjam *</label>
@@ -192,7 +223,7 @@ export default function AddPeminjamanPage() {
             }
           />
         </div>
-        
+
         {/* Unit */}
         <div>
           <label className="block text-xs font-medium mb-1">Unit *</label>
@@ -204,6 +235,17 @@ export default function AddPeminjamanPage() {
             onChange={(e) =>
               setUnit(e.target.value === "" ? "" : Math.max(1, Number(e.target.value)))
             }
+          />
+        </div>
+
+        {/* Tanggal Perolehan */}
+        <div>
+          <label className="block text-xs font-medium mb-1">Tanggal Perolehan *</label>
+          <input
+            type="date"
+            className="text-xs w-full border px-3 py-2 rounded"
+            value={tanggalPerolehan}
+            onChange={(e) => setTanggalPerolehan(e.target.value)}
           />
         </div>
 

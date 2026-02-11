@@ -13,6 +13,7 @@ export default function AddBMNPage() {
   const [tanggalPerolehan, setTanggalPerolehan] = useState("");
   const [ikmm, setIkmm] = useState("");
   const [jumlahBarang, setJumlahBarang] = useState<number>(1);
+  const [bidang, setBidang] = useState<BMN["bidang"] | "">("");
 
   // mapping kategori - IKMM
   const kategoriToIkmm: Record<string, string> = {
@@ -29,39 +30,41 @@ export default function AddBMNPage() {
     return `${day}/${month}/${year}`;
   };
 
-const generateNUP = (
-  existingData: BMN[],
-  namaBarang: string,
-  jumlahBaru: number,
-  kategori: BMN["kategori"],
-  ikmm: string,
-  tanggalPerolehan: string
-): BMN[] => {
-  // cari data BMN yang sama berdasarkan namaBarang
-  const sameItems = existingData.filter((item) => item.namaBarang === namaBarang);
+  const generateNUP = (
+    existingData: BMN[],
+    namaBarang: string,
+    jumlahBaru: number,
+    kategori: BMN["kategori"],
+    ikmm: string,
+    tanggalPerolehan: string,
+    bidang: BMN["bidang"]
+  ): BMN[] => {
+    // cari data BMN yang sama berdasarkan namaBarang
+    const sameItems = existingData.filter((item) => item.namaBarang === namaBarang);
 
-  // cari NUP terakhir
-  const lastNUP = sameItems.length > 0 ? Math.max(...sameItems.map((i) => i.unit)) : 0;
+    // cari NUP terakhir
+    const lastNUP = sameItems.length > 0 ? Math.max(...sameItems.map((i) => i.unit)) : 0;
 
-  // buat array baru sesuai jumlah yang ditambahkan
-  return Array.from({ length: jumlahBaru }, (_, i) => ({
-    idBMN: existingData.length + i + 1,
-    akun: 132111, // ✅ angka, bukan string
-    ikmm,
-    unit: lastNUP + i + 1,
-    namaBarang,
-    kategori,
-    tanggalPerolehan: formatDate(tanggalPerolehan),
-    kondisiBarang: "Baik",
-    dipinjam: "Tersedia", // ✅ sesuai tipe union
-  }));
-};
+    // buat array baru sesuai jumlah yang ditambahkan
+    return Array.from({ length: jumlahBaru }, (_, i) => ({
+      idBMN: existingData.length + i + 1,
+      akun: 132111, // ✅ angka, bukan string
+      ikmm,
+      unit: lastNUP + i + 1,
+      namaBarang,
+      kategori,
+      tanggalPerolehan: formatDate(tanggalPerolehan),
+      kondisiBarang: "Baik",
+      dipinjam: "Tersedia", // ✅ sesuai tipe union
+      bidang: bidang,
+    }));
+  };
 
   // submit
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!namaBarang || !kategori || !tanggalPerolehan) {
+    if (!namaBarang || !kategori || !tanggalPerolehan || !bidang) {
       alert("Semua field wajib diisi!");
       return;
     }
@@ -77,7 +80,8 @@ const generateNUP = (
       jumlahBarang,
       kategori,
       ikmm,
-      tanggalPerolehan
+      tanggalPerolehan,
+      bidang as BMN["bidang"]
     );
 
     dataBMN.push(...newItems);
@@ -136,6 +140,22 @@ const generateNUP = (
             value={ikmm}
             readOnly
           />
+        </div>
+
+        {/* bidang */}
+        <div>
+          <label className="mb-1 block text-xs font-medium">Bidang *</label>
+          <select
+            className="w-full rounded border px-3 py-2 text-xs"
+            value={bidang}
+            onChange={(e) => setBidang(e.target.value as BMN["bidang"])}
+            required
+          >
+            <option value="">Pilih bidang</option>
+            <option value="MTI">MTI</option>
+            <option value="BDI">BDI</option>
+            <option value="TU">TU</option>
+          </select>
         </div>
 
         {/* jumlah barang */}

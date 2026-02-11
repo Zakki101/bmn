@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FileSpreadsheet } from "lucide-react";
@@ -22,25 +22,17 @@ import {
   dataUsulanHapus as initialData,
   UsulanHapus,
 } from "@/data/dataUsulanHapus";
-import { dataBMN as initialBMN } from "@/data/dataBMN";
-import { dataLogBMN as initialLog } from "@/data/dataLogBMN";
-import { LogBMN } from "@/data/dataLogBMN";
+
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
 export default function UsulanHapusPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [hapusData, setHapusData] = useState<UsulanHapus[]>([]);
+  const [hapusData, setHapusData] = useState<UsulanHapus[]>(initialData);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [disetujuiOleh, setDisetujuiOleh] = useState("");
-  const [bmnData, setBmnData] = useState(initialBMN);
-  const [logBMN, setLogBMN] = useState<LogBMN[]>(initialLog);
-
-  useEffect(() => {
-    setHapusData(initialData);
-  }, []);
 
   const handleStatusChange = async (
     id: number,
@@ -56,26 +48,6 @@ export default function UsulanHapusPage() {
 
       if (confirmDelete) {
         setHapusData((prev) => prev.filter((x) => x.idUsulan !== id));
-        setBmnData((prev) => prev.filter((b) => b.ikmm !== item.ikmm));
-
-        const logBaru: LogBMN = {
-          idBMN: item.idUsulan,
-          ikmm: item.ikmm.toString(),
-          akun: item.akun,
-          unit: item.unit,
-          bidang: item.bidang,
-          namaBarang: item.namaBarang,
-          kategori: item.kategori,
-          kondisiBarang: item.kondisiBarang,
-          tanggalPerolehan: new Date().toISOString().split("T")[0],
-          dipinjam: "Tidak Tersedia",
-          foto : [],
-          tanggalPenghapusan: new Date().toISOString().split("T")[0],
-          alasanPenghapusan: item.alasan,
-          disetujuiOleh: item.disetujuiOleh || "-",
-        };
-
-        setLogBMN((prev) => [...prev, logBaru]);
 
         alert(
           `Data "${item.namaBarang}" berhasil dihapus dari tabel BMN dan dipindahkan ke Log BMN.`
@@ -89,10 +61,10 @@ export default function UsulanHapusPage() {
       prev.map((i) =>
         i.idUsulan === id
           ? {
-              ...i,
-              statusUsulan: newStatus,
-              disetujuiOleh: newStatus === "Disetujui" ? i.disetujuiOleh : "",
-            }
+            ...i,
+            statusUsulan: newStatus,
+            disetujuiOleh: newStatus === "Disetujui" ? i.disetujuiOleh : "",
+          }
           : i
       )
     );
@@ -212,14 +184,14 @@ export default function UsulanHapusPage() {
             Reset
           </Button>
 
-        {/* Tombol Download Excel */}
-        <Button
-          className="cursor-pointer text-xs h-[24px] px-3"
-          variant="default"
-          onClick={handleDownloadExcel}
-        >
-          <FileSpreadsheet className="w-3.5 h-3.5" />
-        </Button>
+          {/* Tombol Download Excel */}
+          <Button
+            className="cursor-pointer text-xs h-[24px] px-3"
+            variant="default"
+            onClick={handleDownloadExcel}
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5" />
+          </Button>
         </div>
 
       </div>

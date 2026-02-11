@@ -1,3 +1,3 @@
 import { Peminjaman } from "./dataPeminjaman";
 
-export let dataLogPeminjaman: Peminjaman[] = [];
+export const dataLogPeminjaman: Peminjaman[] = [];

@@ -12,7 +12,7 @@ export default function DataBMNUserPage() {
   const [search, setSearch] = useState("");
   const [kategori, setKategori] = useState("all");
 
-// filter + sort
+  // filter + sort
   const sortedData = [...dataBMN].sort((a, b) => {
     const [dayA, monthA, yearA] = a.tanggalPerolehan.split("/");
     const [dayB, monthB, yearB] = b.tanggalPerolehan.split("/");
@@ -20,9 +20,9 @@ export default function DataBMNUserPage() {
     const dateA = new Date(`${yearA}-${monthA}-${dayA}`);
     const dateB = new Date(`${yearB}-${monthB}-${dayB}`);
 
-    return dateB.getTime() - dateA.getTime(); 
+    return dateB.getTime() - dateA.getTime();
   });
- 
+
   const filteredData = sortedData.filter((item) => {
     const matchSearch = item.namaBarang.toLowerCase().includes(search.toLowerCase());
     const matchKategori = kategori === "all" || item.kategori === kategori;
@@ -77,7 +77,7 @@ export default function DataBMNUserPage() {
             <thead className="bg-blue-100 text-left sticky top-0 z-10">
               <tr>
                 <th className="border p-2">No</th>
-                <th className="border p-2">IKMMa</th>
+                <th className="border p-2">IKMM</th>
                 <th className="border p-2">Nama</th>
                 <th className="border p-2">Kategori</th>
                 <th className="border p-2">Jumlah</th>
@@ -94,11 +94,11 @@ export default function DataBMNUserPage() {
                   <td className="border p-2">{item.ikmm}</td>
                   <td className="border p-2">{item.namaBarang}</td>
                   <td className="border p-2">{item.kategori}</td>
-                  <td className="border p-2">{item.jumlahBarang}</td>
+                  <td className="border p-2">1</td>
                   <td className="border p-2">{item.tanggalPerolehan}</td>
-                  <td className="border p-2">{item.kondisiBaik}</td>
-                  <td className="border p-2">{item.kondisiRusak}</td>
-                  <td className="border p-2">{item.kondisiBaik - item.dipinjam}</td>
+                  <td className="border p-2 text-center">{item.kondisiBarang === "Baik" ? "✅" : "-"}</td>
+                  <td className="border p-2 text-center">{item.kondisiBarang === "Dalam Perbaikan" ? "🔧" : "-"}</td>
+                  <td className="border p-2 text-center">{item.dipinjam === "Tersedia" ? "Ready" : "Not Ready"}</td>
                 </tr>
               ))}
             </tbody>
