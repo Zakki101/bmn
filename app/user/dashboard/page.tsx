@@ -2,8 +2,9 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList, Pie, PieChart } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Pie, PieChart } from "recharts";
 import { ReactNode } from "react";
+import { CalendarClock, ChartBarStacked, CheckCheck, Warehouse } from "lucide-react";
 
 const kategoriData = [
   { name: "Laptop", total: 20 },
@@ -25,19 +26,19 @@ type SmallCardProps = {
 };
 
 const SmallCard = ({ children, className = "" }: SmallCardProps) => (
-  <Card className={`p-1 text-xs ${className}`}>{children}</Card>
+  <Card className={`p-1 text-[12px] ${className}`}>{children}</Card>
 );
 
 export default function Dashboard() {
   return (
-  <div className="grid grid-cols-5 grid-rows-3 gap-3 p-3">
+  <div className="grid grid-cols-6 grid-rows-5 gap-3 p-3">
   {/* total BMN */}
-  <SmallCard className="col-span-1 row-span-2">
-    <CardHeader className="p-2 pb-0">
-      <CardTitle className="text-sm">Total Unit BMN</CardTitle>
+  <SmallCard className="col-span-2 row-span-1 bg-primary text-primary-foreground">
+    <CardHeader className="p-2">
+      <CardTitle className="text-[18px] text ml-1">Total Unit BMN</CardTitle>
     </CardHeader>
     <CardContent className="relative p-2 h-full">
-      <p className="absolute bottom-2 right-2 text-3xl font-bold">
+      <p className="absolute bottom-2 right-2 text-[40px] font-bold mr-1">
         {totalBMN}
       </p>
     </CardContent>
@@ -47,84 +48,107 @@ export default function Dashboard() {
   {kategoriData.map((stat, i) => (
     <SmallCard key={i} className="col-span-1 row-span-1">
       <CardHeader className="p-2">
-        <CardTitle className="text-xs">{stat.name}</CardTitle>
+        <CardTitle className="text-[18px] ml-1">{stat.name}</CardTitle>
       </CardHeader>
-      <CardContent className="p-2 pt-1">
-        <p className="text-sm font-bold">{stat.total}</p>
+      <CardContent className="p-2 h-full flex items-end justify-end">
+        <p className="text-[30px] justify-self-end font-bold mr-1">{stat.total}</p>
       </CardContent>
     </SmallCard>
   ))}
 
   {/* total BMN di gudang */}
-  <SmallCard className="col-span-1 row-span-1">
+  <SmallCard className="col-span-3 row-span-1">
     <CardHeader className="p-2">
-      <CardTitle className="text-xs">Jumlah BMN dalam Gudang</CardTitle>
+      <CardTitle className="flex items-center px-1 py-1">
+        <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center mr-2">
+          <Warehouse className="w-6 h-6 text-primary-foreground" strokeWidth={2.5}/>
+        </div>
+        <span className="text-[16px]">Jumlah BMN dalam Gudang</span>
+      </CardTitle>
     </CardHeader>
     <CardContent className="p-2 pt-1">
-      <p className="text-sm font-bold">
+      <p className="text-[40px] font-bold justify-self-end mr-2">
         {ketersediaanData.find((d) => d.name === "Gudang")?.total}
       </p>
     </CardContent>
   </SmallCard>
 
   {/* total BMN yang dipinjam */}
-  <SmallCard className="col-span-1 row-span-1">
+  <SmallCard className="col-span-3 row-span-1">
     <CardHeader className="p-2">
-      <CardTitle className="text-xs">Jumlah BMN Dipinjam</CardTitle>
+      <CardTitle className="flex items-center text-[16px] px-1 py-1">
+        <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center mr-2">
+          <CalendarClock className="w-6 h-6 text-primary-foreground" strokeWidth={2.5}/>
+        </div>
+        <span>Jumlah BMN Dipinjam</span>
+      </CardTitle>
     </CardHeader>
     <CardContent className="p-2 pt-1">
-      <p className="text-sm font-bold">
+      <p className="text-[40px] font-bold ml-2 justify-self-end mr-2">
         {ketersediaanData.find((d) => d.name === "Dipinjam")?.total}
       </p>
     </CardContent>
   </SmallCard>
 
   {/* pie chart */}
-  <SmallCard className="col-start-2 col-span-2 row-start-2 row-span-3">
+  <SmallCard className="col-start-1 col-span-3 row-start-3 row-span-3">
     <CardHeader className="p-2 pb-0">
-      <CardTitle className="text-xs">Ketersediaan BMN</CardTitle>
+    <CardTitle className="flex items-center px-1 py-1">
+        <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center mr-2">
+          <CheckCheck className="w-6 h-6 text-primary-foreground" strokeWidth={2.5}/>
+        </div>
+        <span className="text-[16px]">Ketersediaan BMN</span>
+      </CardTitle>
     </CardHeader>
-    <CardContent className="h-full pt-0">
+    <CardContent className="h-full flex flex-col">
       <ChartContainer
         config={{
           total: { label: "Total" },
           Gudang: { label: "Gudang", color: "var(--chart-1)" },
           Dipinjam: { label: "Dipinjam", color: "var(--chart-2)" },
         }}
-        className="[&_.recharts-text]:fill-background mx-auto aspect-square max-h-[250px]"
+        className="[&_.recharts-text]:fill-background flex-1 flex items-center justify-center"
       >
         <PieChart>
           <ChartTooltip
             content={<ChartTooltipContent nameKey="total" hideLabel />}
           />
-          <Pie data={ketersediaanData} dataKey="total" nameKey="name">
-            <LabelList
-              dataKey="name"
-              className="fill-background"
-              stroke="none"
-              fontSize={12}
-              formatter={(value: string) =>
-              value === "Gudang" ? "Tersedia" : value === "Dipinjam" ? "Tidak Tersedia" : value
-              }
-            />
-          </Pie>
+          <Pie data={ketersediaanData} dataKey="total" nameKey="name" innerRadius={70} outerRadius={100} />
         </PieChart>
       </ChartContainer>
+      {/* Legend */}
+      <div className="flex flex-col gap-2 mx-35 mt-2 mb-5">
+        {ketersediaanData.map((item, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <div 
+              className="w-3 h-3 rounded-sm flex-shrink-0"
+              style={{ backgroundColor: item.fill }}
+            />
+            <span className="text-[14px] flex-1">{item.name === "Gudang" ? "Tersedia" : "Tidak Tersedia"}</span>
+            <span className="text-[14px] font-bold">{item.total}</span>
+          </div>
+        ))}
+      </div>
     </CardContent>
   </SmallCard>
 
   {/* bar chart */}
-  <SmallCard className="col-start-4 col-span-2 row-start-2 row-span-3">
-    <CardHeader className="p-2 pb-0">
-      <CardTitle className="text-xs">Kategori BMN</CardTitle>
+  <SmallCard className="col-start-4 col-span-3 row-start-3 row-span-3">
+    <CardHeader className="p-2 pb-3">
+      <CardTitle className="flex items-center px-1 py-1">
+        <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center mr-2">
+          <ChartBarStacked className="w-6 h-6 text-primary-foreground" strokeWidth={2.5}/>
+        </div>
+        <span className="text-[16px]">Kategori BMN</span>
+      </CardTitle>
     </CardHeader>
     <CardContent className="h-full">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={kategoriData}>
-          <XAxis dataKey="name" />
+          <XAxis dataKey="name" tick={{ fill: "var(--foreground)" }} />
           <YAxis />
           <Tooltip />
-          <Bar dataKey="total" fill="#8884d8" radius={[2, 2, 0, 0]} />
+          <Bar dataKey="total" fill="var(--chart-1)" radius={[2, 2, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </CardContent>

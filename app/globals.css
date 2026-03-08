@@ -1,6 +1,5 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -36,6 +35,7 @@
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -54,9 +54,9 @@
   --card-foreground: #111827;
   --popover: #ffffff;
   --popover-foreground: #111827;
-  --primary: #1d4ed8;
+  --primary: #142B6F;
+  --secondary: #FFD739;
   --primary-foreground: #ffffff;
-  --secondary: #e5e7eb;
   --secondary-foreground: #111827;
   --muted: #f3f4f6;
   --muted-foreground: #6b7280;
@@ -66,8 +66,8 @@
   --border: #d1d5db;
   --input: #d1d5db; 
   --ring: #2563eb;
-  --chart-1: #9ac6f5;
-  --chart-2: #3b82f6;
+  --chart-1: #142B6F;
+  --chart-2: #FFD739;
   --chart-3: #6366f1;
   --chart-4: #10b981;
   --chart-5: #ef4444;
@@ -87,7 +87,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-inter);
   }
 }
 

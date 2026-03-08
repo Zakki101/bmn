@@ -6,12 +6,12 @@ import Header from "@/components/Header";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen bg-gray-100 font-inter">
+    <div className="min-h-screen bg-gray-100 font-inter">
       {/* Sidebar */}
       <Sidebar role="admin" />
 
       {/* Konten */}
-      <div className="flex-1 flex flex-col">
+      <div className="ml-60 flex flex-col">
         <Header
           role="admin"
           title="Dashboard Monitoring Barang Milik Negara (BMN)"

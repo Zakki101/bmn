@@ -9,6 +9,7 @@ import {
   ClipboardList,
   ChevronDown,
   ChevronUp,
+  LogOut,
 } from "lucide-react";
 import { MdDashboard } from "react-icons/md";
 
@@ -18,7 +19,7 @@ export default function Sidebar({ role }: { role: "admin" | "user" }) {
   const [openPeminjaman, setOpenPeminjaman] = useState(false);
 
   const activeColor =
-    role === "admin" ? "bg-purple-500 text-white" : "bg-blue-500 text-white";
+    role === "admin" ? "bg-purple-500 text-white" : "bg-primary text-white";
 
   const borderColor = role === "admin" ? "border-purple-500" : "border-blue-500";
   const textColor = role === "admin" ? "text-purple-600" : "text-blue-600";
@@ -30,11 +31,11 @@ export default function Sidebar({ role }: { role: "admin" | "user" }) {
   }, [pathname]);
 
   return (
-    <aside className="w-44 h-screen bg-white flex flex-col">
+    <aside className="fixed left-0 top-0 w-60 h-screen bg-white flex flex-col border-r border-gray-200 z-40">
       {/* HEADER */}
-      <div className="flex items-center gap-2 px-5 py-6">
-        <MdDashboard className="w-4 h-4 text-blue-950" />
-        <span className="text-sm font-bold">E-BMN</span>
+      <div className="flex items-center gap-5 px-5 py-6">
+        <MdDashboard className="w-10 h-12 text-blue-950" />
+        <span className="text-[25px] font-bold">E-BMN</span>
       </div>
 
       {/* MENU */}
@@ -44,13 +45,13 @@ export default function Sidebar({ role }: { role: "admin" | "user" }) {
           <li>
             <Link
               href={`/${role}/dashboard`}
-              className={`flex items-center gap-2 py-2 px-3 rounded-md transition-all ${
+              className={`flex items-center gap-2 py-2 px-3 text-[14px] rounded-md transition-all ${
                 pathname.startsWith(`/${role}/dashboard`)
                   ? activeColor + " shadow-sm"
                   : "bg-gray-100 hover:bg-gray-200"
               }`}
             >
-              <Home className="w-4 h-4" />
+              <Home className="w-5 h-5" strokeWidth={2.5} />
               Dashboard
             </Link>
           </li>
@@ -184,19 +185,34 @@ export default function Sidebar({ role }: { role: "admin" | "user" }) {
             <li>
               <Link
                 href="/user/bmn"
-                className={`flex items-center gap-2 py-2 px-3 rounded-md transition-all ${
+                className={`flex items-center gap-2 py-2 text-[14px] px-3 rounded-md transition-all ${
                   pathname.startsWith("/user/bmn")
                     ? activeColor + " shadow-sm"
                     : "bg-gray-100 hover:bg-gray-200"
                 }`}
               >
-                <Box className="w-4 h-4" />
+                <Box className="w-5 h-5" />
                 Data BMN
-              </Link>
+              </Link> 
             </li>
           )}
         </ul>
       </nav>
+
+      {/* Logout */}
+      <div className="px-4 py-4 border-t border-gray-200">
+        <Link
+          href="/"
+          className={`flex items-center justify-center gap-4 py-2 text-[16px] rounded-md transition-all ${
+            pathname.startsWith("/logout")
+              ? activeColor + " shadow-sm"
+              : "bg-primary text-primary-foreground hover:bg-secondary hover:text-primary"
+          }`}
+        >
+          <LogOut className="w-5 h-5" strokeWidth={2.5} />
+          Logout
+        </Link>
+      </div>
     </aside>
   );
 }
