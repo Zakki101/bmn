@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { StatTooltip } from "@/components/ui/stat-tooltip";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { ReactNode } from "react";
-import { ChartLine } from "lucide-react";
+import { ChartLine, ChartNoAxesColumn } from "lucide-react";
 
 import { dataBMN } from "@/data/dataBMN";
 import { dataPeminjaman } from "@/data/dataPeminjaman";
@@ -157,9 +157,12 @@ export default function Dashboard() {
       {/* Bar Chart */}
       <SmallCard className="row-span-2 col-span-2">
         <CardHeader className="p-2 pb-5">
-          <CardTitle className="text-[18px] flex items-center px-2 py-4">
-            Visualisasi Kategori Barang
-          </CardTitle>
+          <div className="flex items-center px-1 py-1">
+            <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center mr-2">
+              <ChartNoAxesColumn className="w-6 h-6 text-secondary-foreground" strokeWidth={2.5}/>
+            </div>
+            <CardTitle className="text-[18px]"> Visualisasi Kategori Barang</CardTitle>
+          </div>
         </CardHeader>
         <CardContent className="h-[250px] p-2 pb-0 text-[9px]">
           <ResponsiveContainer width="90%" height="100%">

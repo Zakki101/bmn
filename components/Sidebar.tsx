@@ -19,15 +19,15 @@ export default function Sidebar({ role }: { role: "admin" | "user" }) {
   const [openPeminjaman, setOpenPeminjaman] = useState(false);
 
   const activeColor =
-    role === "admin" ? "bg-secondary text-secondary-foreground" : "bg-primary text-white";
+    role === "admin" ? "bg-primary text-white" : "bg-primary text-white";
 
-  const textColorLogOut = role === "admin" ? "text-secondary-foreground" : "text-white";
-  const hoverBg = role === "admin" ? "hover:bg-primary" : "hover:bg-secondary";
-  const hoverText = role === "admin" ? "hover:text-primary-foreground" : "hover:text-primary";
-  const borderColor = role === "admin" ? "border-yellow-500" : "border-blue-500";
-  const textColor = role === "admin" ? "text-yellow-600" : "text-blue-600";
-  const bgSubActive = role === "admin" ? "bg-yellow-50" : "bg-blue-50"; 
-  const bgColor = role === "admin" ? "bg-secondary" : "bg-primary";
+  const textColorLogOut = role === "admin" ? "text-white" : "text-white";
+  const hoverBg = role === "admin" ? "hover:bg-secondary" : "hover:bg-secondary";
+  const hoverText = role === "admin" ? "hover:text-primary" : "hover:text-primary";
+  const borderColor = role === "admin" ? "border-primary" : "border-primary";
+  const textColor = role === "admin" ? "text-black" : "text-black";
+  const bgSubActive = role === "admin" ? "bg-blue-50" : "bg-blue-50"; 
+  const bgColor = role === "admin" ? "bg-primary" : "bg-primary";
 
   useEffect(() => {
     if (pathname.includes("/bmn")) setOpenBMN(true);

@@ -8,8 +8,8 @@ type HeaderProps = {
 
 export default function Header({ title, role }: HeaderProps) {
   const isAdmin = role === "admin";
-  const bgColor = isAdmin ? "bg-secondary" : "bg-primary";
-  const textColor = isAdmin ? "text-secondary-foreground" : "text-primary-foreground";
+  const bgColor = isAdmin ? "bg-primary" : "bg-primary";
+  const textColor = isAdmin ? "text-primary-foreground" : "text-primary-foreground";
 
   const headerTitle = isAdmin ? `Admin ${title}` : title;
   const subtitle = "Pusat Data dan Teknologi Informasi";
