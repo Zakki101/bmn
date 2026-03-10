@@ -19,11 +19,15 @@ export default function Sidebar({ role }: { role: "admin" | "user" }) {
   const [openPeminjaman, setOpenPeminjaman] = useState(false);
 
   const activeColor =
-    role === "admin" ? "bg-purple-500 text-white" : "bg-primary text-white";
+    role === "admin" ? "bg-secondary text-secondary-foreground" : "bg-primary text-white";
 
-  const borderColor = role === "admin" ? "border-purple-500" : "border-blue-500";
-  const textColor = role === "admin" ? "text-purple-600" : "text-blue-600";
-  const bgSubActive = role === "admin" ? "bg-purple-50" : "bg-blue-50";
+  const textColorLogOut = role === "admin" ? "text-secondary-foreground" : "text-white";
+  const hoverBg = role === "admin" ? "hover:bg-primary" : "hover:bg-secondary";
+  const hoverText = role === "admin" ? "hover:text-primary-foreground" : "hover:text-primary";
+  const borderColor = role === "admin" ? "border-yellow-500" : "border-blue-500";
+  const textColor = role === "admin" ? "text-yellow-600" : "text-blue-600";
+  const bgSubActive = role === "admin" ? "bg-yellow-50" : "bg-blue-50"; 
+  const bgColor = role === "admin" ? "bg-secondary" : "bg-primary";
 
   useEffect(() => {
     if (pathname.includes("/bmn")) setOpenBMN(true);
@@ -33,13 +37,13 @@ export default function Sidebar({ role }: { role: "admin" | "user" }) {
   return (
     <aside className="fixed left-0 top-0 w-60 h-screen bg-white flex flex-col border-r border-gray-200 z-40">
       {/* HEADER */}
-      <div className="flex items-center gap-5 px-5 py-6">
-        <MdDashboard className="w-10 h-12 text-blue-950" />
-        <span className="text-[25px] font-bold">E-BMN</span>
+      <div className="flex items-center gap-3 px-5 py-6 justify-center border-b border-gray-200">
+        <MdDashboard className="w-12 h-14 text-blue-950" />
+        <span className="text-[30px] font-bold">E-BMN</span>
       </div>
 
       {/* MENU */}
-      <nav className="px-4 flex-1 overflow-y-auto">
+      <nav className="px-4 py-5 flex-1 overflow-y-auto">
         <ul className="text-[11px] font-semibold space-y-2">
           {/* DASHBOARD */}
           <li>
@@ -69,14 +73,14 @@ export default function Sidebar({ role }: { role: "admin" | "user" }) {
                       : "bg-gray-100 hover:bg-gray-200"
                   }`}
                 >
-                  <span className="flex items-center gap-2">
-                    <Box className="w-4 h-4" />
+                  <span className="flex items-center gap-2 text-[14px]">
+                    <Box className="w-5 h-5" />
                     BMN
                   </span>
                   {openBMN ? (
-                    <ChevronUp className="w-4 h-4" />
+                    <ChevronUp className="w-5 h-5" />
                   ) : (
-                    <ChevronDown className="w-4 h-4" />
+                    <ChevronDown className="w-5 h-5" />
                   )}
                 </button>
 
@@ -88,9 +92,9 @@ export default function Sidebar({ role }: { role: "admin" | "user" }) {
                   <li>
                     <Link
                       href="/admin/bmn"
-                      className={`block py-1.5 px-2 border-l-4 ${borderColor} transition-all ${
+                      className={`block py-1.5 px-2 border-l-4 text-[12px] transition-all ${
                         pathname.startsWith("/admin/bmn")
-                          ? `${bgSubActive} ${textColor} font-semibold border-opacity-100`
+                          ? `${bgSubActive} ${textColor} ${borderColor} font-semibold border-opacity-100`
                           : "border-transparent rounded-md hover:bg-gray-100"
                       }`}
                     >
@@ -100,9 +104,9 @@ export default function Sidebar({ role }: { role: "admin" | "user" }) {
                   <li>
                     <Link
                       href="/admin/rencana-penghapusan"
-                      className={`block py-1.5 px-2 border-l-4 ${borderColor} transition-all ${
+                      className={`block py-1.5 px-2 border-l-4 text-[12px] transition-all ${
                         pathname.startsWith("/admin/rencana-penghapusan")
-                          ? `${bgSubActive} ${textColor} font-semibold border-opacity-100`
+                          ? `${bgSubActive} ${textColor} ${borderColor} font-semibold border-opacity-100`
                           : "border-transparent rounded-md hover:bg-gray-100" 
                       }`}
                     >
@@ -112,13 +116,13 @@ export default function Sidebar({ role }: { role: "admin" | "user" }) {
                   <li>
                     <Link
                       href="/admin/log-bmn"
-                      className={`block py-1.5 px-2 border-l-4 ${borderColor} transition-all ${
+                      className={`block py-1.5 px-2 border-l-4 text-[12px] transition-all ${
                         pathname.startsWith("/admin/log-bmn")
-                          ? `${bgSubActive} ${textColor} font-semibold border-opacity-100`
+                          ? `${bgSubActive} ${textColor} ${borderColor} font-semibold border-opacity-100`
                           : "border-transparent rounded-md hover:bg-gray-100"
                       }`}
                     >
-                      Log BMN
+                      Log Penghapusan
                     </Link>
                   </li>
                 </ul>
@@ -135,14 +139,14 @@ export default function Sidebar({ role }: { role: "admin" | "user" }) {
                       : "bg-gray-100 hover:bg-gray-200"
                   }`}
                 >
-                  <span className="flex items-center gap-2">
-                    <ClipboardList className="w-4 h-4" />
+                  <span className="flex items-center gap-2 text-[14px]">
+                    <ClipboardList className="w-5 h-5" />
                     Peminjaman
                   </span>
                   {openPeminjaman ? (
-                    <ChevronUp className="w-4 h-4" />
+                    <ChevronUp className="w-5 h-5" />
                   ) : (
-                    <ChevronDown className="w-4 h-4" />
+                    <ChevronDown className="w-5 h-5" />
                   )}
                 </button>
 
@@ -154,9 +158,9 @@ export default function Sidebar({ role }: { role: "admin" | "user" }) {
                   <li>
                     <Link
                       href="/admin/peminjaman"
-                      className={`block py-1.5 px-2 border-l-4 ${borderColor} transition-all ${
+                      className={`block py-1.5 px-2 border-l-4 text-[12px] transition-all ${
                         pathname.startsWith("/admin/peminjaman")
-                          ? `${bgSubActive} ${textColor} font-semibold border-opacity-100`
+                          ? `${bgSubActive} ${textColor} ${borderColor} font-semibold border-opacity-100`
                           : "border-transparent rounded-md hover:bg-gray-100"
                       }`}
                     >
@@ -166,9 +170,9 @@ export default function Sidebar({ role }: { role: "admin" | "user" }) {
                   <li>
                     <Link
                       href="/admin/log-peminjaman"
-                      className={`block py-1.5 px-2 border-l-4 ${borderColor} transition-all ${
+                      className={`block py-1.5 px-2 border-l-4 text-[12px] transition-all ${
                         pathname.startsWith("/admin/log-peminjaman")
-                          ? `${bgSubActive} ${textColor} font-semibold border-opacity-100`
+                          ? `${bgSubActive} ${textColor} ${borderColor} font-semibold border-opacity-100`
                           : "border-transparent rounded-md hover:bg-gray-100"
                       }`}
                     >
@@ -205,8 +209,8 @@ export default function Sidebar({ role }: { role: "admin" | "user" }) {
           href="/"
           className={`flex items-center justify-center gap-4 py-2 text-[16px] rounded-md transition-all ${
             pathname.startsWith("/logout")
-              ? activeColor + " shadow-sm"
-              : "bg-primary text-primary-foreground hover:bg-secondary hover:text-primary"
+              ? `${bgColor} ${textColorLogOut} shadow-sm`
+              : `${bgColor} ${textColorLogOut} ${hoverBg} ${hoverText}`
           }`}
         >
           <LogOut className="w-5 h-5" strokeWidth={2.5} />

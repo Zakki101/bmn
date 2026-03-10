@@ -12,7 +12,7 @@ import imageCompression from "browser-image-compression";
 import { dataBMN as initialDataBMN } from "@/data/dataBMN";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import { FileSpreadsheet } from "lucide-react";
+import { FolderDown, Plus } from "lucide-react";
 
 export default function DataBMNAdminPage() {
   const [search, setSearch] = useState("");
@@ -20,6 +20,8 @@ export default function DataBMNAdminPage() {
   const [kategori, setKategori] = useState("all");
   const [bmnData, setBmnData] = useState(initialDataBMN);
   const [kondisi, setKondisi] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const router = useRouter();
 
   const parseDate = (d: string): Date => {
@@ -36,6 +38,12 @@ export default function DataBMNAdminPage() {
       return matchSearch && matchStatus && matchKategori && matchKondisi;
     })
     .sort((a, b) => parseDate(b.tanggalPerolehan).getTime() - parseDate(a.tanggalPerolehan).getTime());
+
+  // pagination
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedData = filteredData.slice(startIndex, endIndex);
 
   const handleDelete = (id: number) => {
     if (!confirm("Apakah Anda yakin ingin menghapus data ini?")) return;
@@ -112,7 +120,7 @@ export default function DataBMNAdminPage() {
 
   return (
     <div className="p-2 space-y-2">
-      <h1 className="pt-0 pb-0 text-xs font-bold">Data BMN</h1>
+      <h1 className="pt-0 pb-0 text-[20px] font-bold">Data BMN</h1>
 
       {/* Search + Filter + Add */}
       <div className="flex items-center justify-between">
@@ -121,37 +129,37 @@ export default function DataBMNAdminPage() {
             placeholder="Cari barang..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="text-[10px] placeholder:text-xs h-[24px] w-[200px] px-2 !bg-gray-50"
+            className="text-[14px] placeholder:text-[14px] h-[35px] w-[200px] px-2"
           />
           <Select onValueChange={setStatus} defaultValue="all">
-            <SelectTrigger className="cursor-pointer text-xs !h-[24px] w-[130px] px-2 !bg-gray-50">
+            <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[180px] px-2">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
-            <SelectContent className="text-xs">
-              <SelectItem value="all" className="text-[10px]">Semua Status</SelectItem>
-              <SelectItem value="Dipinjam" className="text-[10px]">Dipinjam</SelectItem>
-              <SelectItem value="Tersedia" className="text-[10px]">Tersedia</SelectItem>
-              <SelectItem value="Tidak Tersedia" className="text-[10px]">Tidak Tersedia</SelectItem>
+            <SelectContent className="text-[14px]">
+              <SelectItem value="all" className="text-[14px]">Semua Status</SelectItem>
+              <SelectItem value="Dipinjam" className="text-[14px]">Dipinjam</SelectItem>
+              <SelectItem value="Tersedia" className="text-[14px]">Tersedia</SelectItem>
+              <SelectItem value="Tidak Tersedia" className="text-[14px]">Tidak Tersedia</SelectItem>
             </SelectContent>
           </Select>
           <Select onValueChange={setKondisi} defaultValue="all">
-            <SelectTrigger className="cursor-pointer text-xs !h-[24px] w-[130px] px-2 !bg-gray-50">
+            <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[180px] px-2">
               <SelectValue placeholder="Kondisi" />
             </SelectTrigger>
-            <SelectContent className="text-xs">
-              <SelectItem value="all" className="text-[10px]">Semua Kondisi</SelectItem>
-              <SelectItem value="Baik" className="text-[10px]">Baik</SelectItem>
-              <SelectItem value="Rusak" className="text-[10px]">Rusak</SelectItem>  
-              <SelectItem value="Dalam Perbaikan" className="text-[10px]">Dalam Perbaikan</SelectItem>
+            <SelectContent className="text-[14px]">
+              <SelectItem value="all" className="text-[14px]">Semua Kondisi</SelectItem>
+              <SelectItem value="Baik" className="text-[14px]">Baik</SelectItem>
+              <SelectItem value="Rusak" className="text-[14px]">Rusak</SelectItem>  
+              <SelectItem value="Dalam Perbaikan" className="text-[14px]">Dalam Perbaikan</SelectItem>
             </SelectContent>
           </Select>
           <Select onValueChange={setKategori} defaultValue="all">
-            <SelectTrigger className="cursor-pointer text-xs !h-[24px] w-[140px] px-2 !bg-gray-50">
+            <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[180px] px-2">
               <SelectValue placeholder="Kategori" />
             </SelectTrigger>
-            <SelectContent className="text-xs">
+            <SelectContent className="text-[14px]">
               {["all", "Laptop", "Monitor", "Printer", "TV", "Peripheral", "Lainnya"].map((k) => (
-                <SelectItem key={k} value={k} className="text-[10px]">
+                <SelectItem key={k} value={k} className="text-[14px]">
                   {k === "all" ? "Semua Kategori" : k}
                 </SelectItem>
               ))}
@@ -159,36 +167,41 @@ export default function DataBMNAdminPage() {
           </Select>
            <Button
             variant="outline"
-            className="cursor-pointer text-xs h-[24px] px-3 !bg-gray-50"
+            className="cursor-pointer text-[14px] h-[35px] px-3"
             onClick={() => {
               setSearch("");
               setKategori("all");
+              setStatus("all");
+              setKondisi("all");
+              setCurrentPage(1);
             }}
           >Reset
           </Button>
-
-          <Button
-            className="cursor-pointer text-xs h-[24px] px-3"
-            variant="default"
-            onClick={handleDownloadExcel}
-          >
-            <FileSpreadsheet className="w-3.5 h-3.5" />
-          </Button>
-
         </div>
-        <Button
-          className="bg-blue-500 hover:bg-blue-600 cursor-pointer text-xs h-[24px] px-3"
-          onClick={() => router.push("/admin/bmn/add-bmn")}
-        >
-          + Tambah
-        </Button>
+
+        {/* export + tambah data */}
+          <div className="flex gap-2 ml-auto">
+            <Button
+              className="cursor-pointer text-[12px] h-[35px] s bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground"
+              onClick={() => handleDownloadExcel()}>
+              <FolderDown className="mr-1 h-4 w-4" />
+              Eksport Data
+            </Button>
+
+            <Button
+              className="cursor-pointer text-[12px] h-[35px] px-4 bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground"
+              onClick={() => router.push("/admin/bmn/add-bmn")}>
+              <Plus className="h-4 w-4" />
+              Tambah
+            </Button>
+          </div>
       </div>
 
       {/* Tabel */}
       <div className="bg-white pb-0 rounded-lg shadow border overflow-x-auto">
-        <div className="max-h-[400px] max-w-[1035px] overflow-y-auto">
-          <table className="w-full text-xs border-collapse">
-            <thead className="bg-blue-100 text-left sticky top-0 z-10">
+        <div className="max-w-auto overflow-y-auto">
+          <table className="w-full border-collapse">
+            <thead className="bg-blue-100 text-[13px] text-left sticky top-0 z-10">
               <tr>
                 <th className="border p-2">No</th>
                 <th className="border p-2 min-w-[140px]">IKMM / Kode Barang</th>
@@ -200,17 +213,18 @@ export default function DataBMNAdminPage() {
                 <th className="border p-2 min-w-[140px]">Tanggal Perolehan</th>
                 <th className="border p-2 text-center">Kondisi</th>
                 <th className="border p-2 text-center">Status</th>
-                <th className="border p-2 min-w-[100px] text-center">Bukti Foto</th>
+                <th className="border p-2 min-w-[120px] text-center">Bukti Foto</th>
                 <th className="border p-2 text-center min-w-[170px]">Usulkan Penghapusan</th>
                 <th className="border p-2 text-center">Hapus</th>
               </tr>
             </thead>
 
-            <tbody>
-              {filteredData.map((item, index) => (
-                <tr key={item.idBMN} className="hover:bg-gray-50">
-                  <td className="border p-2">{index + 1}</td>
-                  <td className="border p-2">{item.ikmm}</td>
+            <tbody className="text-[12px]">
+              {paginatedData.length > 0 ? (
+                paginatedData.map((item, index) => (
+                  <tr key={item.idBMN} className="hover:bg-gray-50">
+                    <td className="border p-2">{startIndex + index + 1}</td>
+                    <td className="border p-2">{item.ikmm}</td>
                   <td className="border p-2">{item.akun}</td>
                   <td className="border p-2">{item.bidang}</td>
                   <td className="border p-2">{item.namaBarang}</td>
@@ -226,13 +240,13 @@ export default function DataBMNAdminPage() {
                         handleKondisiChange(item.idBMN, v as "Baik" | "Rusak" | "Dalam Perbaikan")
                       }
                     >
-                      <SelectTrigger className="justify-center mx-auto cursor-pointer text-xs !h-[22px] w-[95px] px-2">
+                      <SelectTrigger className="justify-between mx-auto cursor-pointer text-[12px] !h-[28px] min-w-[140px] px-2">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Baik" className="text-[10px]">Baik</SelectItem>
-                        <SelectItem value="Rusak" className="text-[10px]">Rusak</SelectItem>
-                        <SelectItem value="Dalam Perbaikan" className="text-[10px]">Dalam Perbaikan</SelectItem>
+                        <SelectItem value="Baik" className="text-[12px]">Baik</SelectItem>
+                        <SelectItem value="Rusak" className="text-[12px]">Rusak</SelectItem>
+                        <SelectItem value="Dalam Perbaikan" className="text-[12px]">Dalam Perbaikan</SelectItem>
                       </SelectContent>
                     </Select>
                   </td>
@@ -251,13 +265,13 @@ export default function DataBMNAdminPage() {
                         )
                       }
                     >
-                      <SelectTrigger className="justify-center mx-auto cursor-pointer text-xs !h-[22px] w-[95px] px-2">
+                      <SelectTrigger className="justify-between mx-auto cursor-pointer text-[12px] !h-[28px] min-w-[120px] px-2">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Dipinjam" className="text-[10px]">Dipinjam</SelectItem>
-                        <SelectItem value="Tersedia" className="text-[10px]">Tersedia</SelectItem>
-                        <SelectItem value="Tidak Tersedia" className="text-[10px]">Tidak Tersedia</SelectItem>
+                        <SelectItem value="Dipinjam" className="text-[12px]">Dipinjam</SelectItem>
+                        <SelectItem value="Tersedia" className="text-[12px]">Tersedia</SelectItem>
+                        <SelectItem value="Tidak Tersedia" className="text-[12px]">Tidak Tersedia</SelectItem>
                       </SelectContent>
                     </Select>
                   </td>
@@ -267,7 +281,7 @@ export default function DataBMNAdminPage() {
                     {item.foto && item.foto.length > 0 ? (
                       <button
                         onClick={() => window.open(item.foto![0], "_blank")}
-                        className="bg-blue-500 text-white text-[10px] py-1 px-2 rounded hover:bg-blue-600"
+                        className="bg-blue-500 text-white text-[12px] py-1 px-2 rounded hover:bg-blue-600"
                       >
                         Lihat Foto
                       </button>
@@ -275,7 +289,7 @@ export default function DataBMNAdminPage() {
                       <>
                         <label
                           htmlFor={`upload-${item.idBMN}`}
-                          className="cursor-pointer bg-green-500 text-white text-[10px] py-1 px-2 rounded hover:bg-green-600"
+                          className="cursor-pointer bg-green-500 text-white text-[12px] py-1 px-2 rounded hover:bg-green-600"
                         >
                           Tambah Foto
                         </label>
@@ -295,7 +309,7 @@ export default function DataBMNAdminPage() {
                   <td className="border p-2 text-center">
                     <button
                       onClick={() => handleAjukanPenghapusan(item.idBMN)}
-                      className="cursor-pointer bg-yellow-500 text-white text-[10px] py-1 px-2 rounded hover:bg-yellow-600"
+                      className="cursor-pointer bg-yellow-500 text-white text-[12px] py-1 px-2 rounded hover:bg-yellow-600"
                     >
                       Usulkan 
                     </button>
@@ -311,13 +325,64 @@ export default function DataBMNAdminPage() {
                     </button>
                   </td>
 
-                  
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={12} className="border p-4 text-center bg-red-100">
+                    <span className="text-red-800 font-semibold text-[14px]">Data tidak ada</span>
+                  </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
       </div>
+
+      {/* pagination */}
+      <div className="flex items-center justify-between gap-2 bg-white p-4 rounded-lg shadow border">
+        <div className="flex items-center gap-2">
+          {/* items per page */}
+          <Select value={String(itemsPerPage)} onValueChange={(value) => {
+            setItemsPerPage(Number(value));
+            setCurrentPage(1);
+          }}>
+            <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[100px] px-2">
+              <SelectValue placeholder="Items per page" />
+            </SelectTrigger>
+            <SelectContent className="text-[14px]">
+              <SelectItem value="10" className="text-[12px]">10 Data</SelectItem>
+              <SelectItem value="20" className="text-[12px]">20 Data</SelectItem>
+              <SelectItem value="100" className="text-[12px]">100 Data</SelectItem>
+            </SelectContent>
+          </Select>
+          <div className="text-[14px] text-black">
+            Menampilkan {filteredData.length === 0 ? 0 : startIndex + 1} - {Math.min(endIndex, filteredData.length)} dari {filteredData.length} data
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            className="cursor-pointer text-[14px] h-[35px] px-3"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(currentPage - 1)}
+          >
+            ← Sebelumnya
+          </Button>
+          <div className="text-[14px] text-gray-600 px-3">
+            Halaman {currentPage} dari {totalPages}
+          </div>
+          <Button
+            variant="outline"
+            className="cursor-pointer text-[14px] h-[35px] px-3"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(currentPage + 1)}
+          >
+            Berikutnya →
+          </Button>
+        </div>
+      </div>
+
     </div>
   );
 }

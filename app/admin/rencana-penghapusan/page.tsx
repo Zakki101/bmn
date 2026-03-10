@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { FileSpreadsheet } from "lucide-react";
+import { FileSpreadsheet, PenLine, FolderDown } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -33,6 +33,8 @@ export default function UsulanHapusPage() {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [disetujuiOleh, setDisetujuiOleh] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const handleStatusChange = async (
     id: number,
@@ -108,6 +110,12 @@ export default function UsulanHapusPage() {
         new Date(a.tanggalUsulan).getTime()
     );
 
+  // Pagination
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedData = filteredData.slice(startIndex, endIndex);
+
   // Download Excel
   const handleDownloadExcel = () => {
     const exportData = filteredData.map((item, i) => ({
@@ -141,7 +149,7 @@ export default function UsulanHapusPage() {
 
   return (
     <div className="p-2 space-y-2">
-      <h1 className="text-xs font-bold">Usulan Penghapusan BMN</h1>
+      <h1 className="text-[20px] font-bold">Usulan Penghapusan BMN</h1>
 
       {/* Search + Filter + Download */}
       <div className="flex items-center justify-between">
@@ -150,24 +158,24 @@ export default function UsulanHapusPage() {
             placeholder="Cari nama barang..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="text-xs placeholder:text-xs h-[24px] w-[200px] px-2 !bg-gray-50"
+            className="text-[14px] placeholder:text-[14px] h-[35px] w-[200px] px-2"
           />
 
           <Select onValueChange={setStatusFilter} defaultValue="all">
-            <SelectTrigger className="cursor-pointer text-xs !h-[24px] w-[160px] px-2 !bg-gray-50">
+            <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[160px] px-2">
               <SelectValue placeholder="Status Usulan" />
             </SelectTrigger>
-            <SelectContent className="text-xs">
-              <SelectItem value="all" className="text-[10px]">
+            <SelectContent className="text-[14px]">
+              <SelectItem value="all" className="text-[12px]">
                 Semua Status
               </SelectItem>
-              <SelectItem value="Menunggu" className="text-[10px]">
+              <SelectItem value="Menunggu" className="text-[12px]">
                 Menunggu
               </SelectItem>
-              <SelectItem value="Disetujui" className="text-[10px]">
+              <SelectItem value="Disetujui" className="text-[12px]">
                 Disetujui
               </SelectItem>
-              <SelectItem value="Ditolak" className="text-[10px]">
+              <SelectItem value="Ditolak" className="text-[12px]">
                 Ditolak
               </SelectItem>
             </SelectContent>
@@ -175,32 +183,33 @@ export default function UsulanHapusPage() {
 
           <Button
             variant="outline"
-            className="text-xs h-[24px] px-3 !bg-gray-50"
+            className="text-[14px] h-[35px] px-3"
             onClick={() => {
               setSearch("");
               setStatusFilter("all");
+              setCurrentPage(1);
             }}
           >
             Reset
           </Button>
-
-          {/* Tombol Download Excel */}
-          <Button
-            className="cursor-pointer text-xs h-[24px] px-3"
-            variant="default"
-            onClick={handleDownloadExcel}
-          >
-            <FileSpreadsheet className="w-3.5 h-3.5" />
-          </Button>
         </div>
-
+        
+        {/* eksport data */}
+        <div className="flex gap-2 ml-auto">
+            <Button
+              className="cursor-pointer text-[12px] h-[35px] s bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground"
+              onClick={() => handleDownloadExcel()}>
+              <FolderDown className="mr-1 h-4 w-4" />
+              Eksport Data
+            </Button>
+        </div>
       </div>
 
       {/* Table */}
       <div className="bg-white rounded-lg shadow border overflow-x-auto">
-        <div className="max-h-[400px] max-w-[1035px] overflow-y-auto">
-          <table className="w-full text-xs border-collapse">
-            <thead className="bg-blue-100 text-left sticky top-0 z-10">
+        <div className="max-h-[400px] max-w-auto overflow-y-auto">
+          <table className="w-full border-collapse">
+            <thead className="bg-blue-100 text-[13px] text-left sticky top-0 z-10">
               <tr>
                 <th className="border p-2">No</th>
                 <th className="border p-2 min-w-[140px]">IKMM / Kode Barang</th>
@@ -220,62 +229,114 @@ export default function UsulanHapusPage() {
                 </th>
               </tr>
             </thead>
-            <tbody>
-              {filteredData.map((item, index) => (
-                <tr key={item.idUsulan} className="hover:bg-gray-50">
-                  <td className="border p-2">{index + 1}</td>
-                  <td className="border p-2">{item.ikmm}</td>
-                  <td className="border p-2">{item.akun}</td>
-                  <td className="border p-2">{item.bidang}</td>
-                  <td className="border p-2">{item.namaBarang}</td>
-                  <td className="border p-2">{item.unit}</td>
-                  <td className="border p-2">{item.kategori}</td>
-                  <td className="border p-2">{item.kondisiBarang}</td>
-                  <td className="border p-2">{item.tanggalUsulan}</td>
-                  <td className="border p-2">{item.alasan}</td>
+            <tbody className="text-[12px]">
+              {paginatedData.length > 0 ? (
+                paginatedData.map((item, index) => (
+                  <tr key={item.idUsulan} className="hover:bg-gray-50">
+                    <td className="border p-2">{startIndex + index + 1}</td>
+                    <td className="border p-2">{item.ikmm}</td>
+                    <td className="border p-2">{item.akun}</td>
+                    <td className="border p-2">{item.bidang}</td>
+                    <td className="border p-2">{item.namaBarang}</td>
+                    <td className="border p-2">{item.unit}</td>
+                    <td className="border p-2">{item.kategori}</td>
+                    <td className="border p-2">{item.kondisiBarang}</td>
+                    <td className="border p-2">{item.tanggalUsulan}</td>
+                    <td className="border p-2">{item.alasan}</td>
 
-                  {/* Status */}
-                  <td className="border p-2 text-center">
-                    <Select
-                      value={item.statusUsulan}
-                      onValueChange={(v) =>
-                        handleStatusChange(
-                          item.idUsulan,
-                          v as "Menunggu" | "Disetujui" | "Ditolak"
-                        )
+                    {/* Status */}
+                    <td className="border p-2 text-center">
+                      <Select
+                        value={item.statusUsulan}
+                        onValueChange={(v) =>
+                          handleStatusChange(
+                            item.idUsulan,
+                            v as "Menunggu" | "Disetujui" | "Ditolak"
+                          )
+                        }
+                      >
+                        <SelectTrigger className="justify-between mx-auto cursor-pointer text-[12px] !h-[30px] w-[125px] px-2">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Menunggu" className="text-[12px]">
+                            Menunggu
+                          </SelectItem>
+                          <SelectItem value="Disetujui" className="text-[12px]">
+                            Disetujui
+                          </SelectItem>
+                          <SelectItem value="Ditolak" className="text-[12px]">
+                            Ditolak
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </td>
+
+                    <td
+                      className="border p-2 text-center text-blue-600 hover:underline cursor-pointer"
+                      onClick={() =>
+                        handleOpenDialog(item.idUsulan, item.disetujuiOleh ?? "")
                       }
                     >
-                      <SelectTrigger className="justify-center mx-auto cursor-pointer text-xs !h-[22px] w-[105px] px-2">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Menunggu" className="text-[10px]">
-                          Menunggu
-                        </SelectItem>
-                        <SelectItem value="Disetujui" className="text-[10px]">
-                          Disetujui
-                        </SelectItem>
-                        <SelectItem value="Ditolak" className="text-[10px]">
-                          Ditolak
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </td>
-
-                  <td
-                    className="border p-2 text-center text-blue-600 hover:underline cursor-pointer"
-                    onClick={() =>
-                      handleOpenDialog(item.idUsulan, item.disetujuiOleh ?? "")
-                    }
-                  >
-                    {item.disetujuiOleh || (
-                      <span className="text-gray-400">-</span>
-                    )}
+                      {item.disetujuiOleh || (
+                        <span className="text-gray-400">-</span>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={12} className="border p-4 text-center bg-red-100">
+                    <span className="text-red-800 font-semibold text-[14px]">Data tidak ada</span>
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      {/* Pagination */}
+      <div className="flex items-center justify-between gap-2 bg-white p-4 rounded-lg shadow border">
+        <div className="flex items-center gap-2">
+          {/* items per page */}
+          <Select value={String(itemsPerPage)} onValueChange={(value) => {
+            setItemsPerPage(Number(value));
+            setCurrentPage(1);
+          }}>
+            <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[100px] px-2">
+              <SelectValue placeholder="Items per page" />
+            </SelectTrigger>
+            <SelectContent className="text-[14px]">
+              <SelectItem value="10" className="text-[14px]">10 Data</SelectItem>
+              <SelectItem value="20" className="text-[14px]">20 Data</SelectItem>
+              <SelectItem value="100" className="text-[14px]">100 Data</SelectItem>
+            </SelectContent>
+          </Select>
+          <div className="text-[14px] text-black">
+            Menampilkan {filteredData.length === 0 ? 0 : startIndex + 1} - {Math.min(endIndex, filteredData.length)} dari {filteredData.length} data
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            className="cursor-pointer text-[14px] h-[35px] px-3"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(currentPage - 1)}
+          >
+            ← Sebelumnya
+          </Button>
+          <div className="text-[14px] text-gray-600 px-3">
+            Halaman {currentPage} dari {totalPages}
+          </div>
+          <Button
+            variant="outline"
+            className="cursor-pointer text-[14px] h-[35px] px-3"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(currentPage + 1)}
+          >
+            Berikutnya →
+          </Button>
         </div>
       </div>
 
@@ -283,7 +344,7 @@ export default function UsulanHapusPage() {
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-sm font-medium">
+            <DialogTitle className="text-[14px] font-medium">
               Usulan hapus disetujui oleh:
             </DialogTitle>
           </DialogHeader>
@@ -292,19 +353,19 @@ export default function UsulanHapusPage() {
               placeholder="Masukkan nama penyetuju..."
               value={disetujuiOleh}
               onChange={(e) => setDisetujuiOleh(e.target.value)}
-              className="text-sm"
+              className="text-[14px] h-[35px] w-full px-2"
             />
           </div>
           <DialogFooter>
             <Button
               variant="outline"
-              className="text-xs h-[26px]"
+              className="text-[14px] h-[35px] px-3"
               onClick={() => setOpenDialog(false)}
             >
               Batal
             </Button>
             <Button
-              className="text-xs h-[26px]"
+              className="text-[14px] h-[35px] px-3"
               onClick={handleSaveDisetujuiOleh}
             >
               Simpan

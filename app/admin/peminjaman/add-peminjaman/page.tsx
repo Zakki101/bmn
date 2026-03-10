@@ -99,15 +99,15 @@ export default function AddPeminjamanPage() {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow max-h-[calc(100vh-100px)] overflow-y-auto">
-      <h2 className="text-sm font-bold mb-4">Tambah Data Peminjaman</h2>
+      <h2 className="text-[20px] font-bold mb-4">Tambah Data Peminjaman</h2>
 
       <form className="grid grid-cols-2 gap-4" onSubmit={handleSubmit}>
         {/* Nama Peminjam */}
         <div>
-          <label className="block text-xs font-medium mb-1">Nama Peminjam *</label>
+          <label className="block text-[14px] font-medium mb-1">Nama Peminjam *</label>
           <input
             type="text"
-            className="text-xs w-full border px-3 py-2 rounded"
+            className="text-[14px] w-full border px-3 py-2 rounded"
             value={namaPeminjam}
             onChange={(e) => setNamaPeminjam(e.target.value)}
           />
@@ -115,10 +115,10 @@ export default function AddPeminjamanPage() {
 
         {/* Nama Barang */}
         <div>
-          <label className="block text-xs font-medium mb-1">Nama Barang *</label>
+          <label className="block text-[14px] font-medium mb-1">Nama Barang *</label>
           <input
             type="text"
-            className="text-xs w-full border px-3 py-2 rounded"
+            className="text-[14px] w-full border px-3 py-2 rounded"
             value={namaBarang}
             onChange={(e) => setNamaBarang(e.target.value)}
           />
@@ -126,10 +126,10 @@ export default function AddPeminjamanPage() {
 
         {/* NIP */}
         <div>
-          <label className="block text-xs font-medium mb-1">NIP *</label>
+          <label className="block text-[14px] font-medium mb-1">NIP *</label>
           <input
             type="text"
-            className="text-xs w-full border px-3 py-2 rounded"
+            className="text-[14px] w-full border px-3 py-2 rounded"
             value={nip}
             onChange={(e) => setNip(e.target.value)}
           />
@@ -137,10 +137,10 @@ export default function AddPeminjamanPage() {
 
         {/* Pangkat / Golongan */}
         <div>
-          <label className="block text-xs font-medium mb-1">Pangkat / Golongan *</label>
+          <label className="block text-[14px] font-medium mb-1">Pangkat / Golongan *</label>
           <input
             type="text"
-            className="text-xs w-full border px-3 py-2 rounded"
+            className="text-[14px] w-full border px-3 py-2 rounded"
             value={pangkatGolongan}
             onChange={(e) => setPangkatGolongan(e.target.value)}
           />
@@ -148,10 +148,10 @@ export default function AddPeminjamanPage() {
 
         {/* Jabatan */}
         <div>
-          <label className="block text-xs font-medium mb-1">Jabatan *</label>
+          <label className="block text-[14px] font-medium mb-1">Jabatan *</label>
           <input
             type="text"
-            className="text-xs w-full border px-3 py-2 rounded"
+            className="text-[14px] w-full border px-3 py-2 rounded"
             value={jabatan}
             onChange={(e) => setJabatan(e.target.value)}
           />
@@ -159,9 +159,9 @@ export default function AddPeminjamanPage() {
 
         {/* Kategori */}
         <div>
-          <label className="block text-xs font-medium mb-1">Kategori *</label>
+          <label className="block text-[14px] font-medium mb-1">Kategori *</label>
           <select
-            className="text-xs w-full border px-3 py-2 rounded"
+            className="text-[14px] w-full border px-3 py-2 rounded"
             value={kategori}
             onChange={(e) => {
               const val = e.target.value as Peminjaman["kategori"] | "";
@@ -182,9 +182,9 @@ export default function AddPeminjamanPage() {
 
         {/* Status Pegawai */}
         <div>
-          <label className="block text-xs font-medium mb-1">Status Pegawai *</label>
+          <label className="block text-[14px] font-medium mb-1">Status Pegawai *</label>
           <select
-            className="text-xs w-full border px-3 py-2 rounded"
+            className="text-[14px] w-full border px-3 py-2 rounded"
             value={statusPegawai}
             onChange={(e) =>
               setStatusPegawai(e.target.value as "PPPK" | "KI" | "PNS" | "Magang")
@@ -199,10 +199,10 @@ export default function AddPeminjamanPage() {
 
         {/* Kode IKMM */}
         <div>
-          <label className="block text-xs font-medium mb-1">Kode IKMM</label>
+          <label className="block text-[14px] font-medium mb-1">Kode IKMM</label>
           <input
             type="text"
-            className="text-xs w-full border px-3 py-2 rounded bg-gray-100"
+            className="text-[14px] w-full border px-3 py-2 rounded bg-gray-100"
             value={ikmm}
             readOnly
           />
@@ -210,11 +210,11 @@ export default function AddPeminjamanPage() {
 
         {/* Jumlah Pinjam */}
         <div>
-          <label className="block text-xs font-medium mb-1">Jumlah Pinjam *</label>
+          <label className="block text-[14px] font-medium mb-1">Jumlah Pinjam *</label>
           <input
             type="number"
             min={1}
-            className="text-xs w-full border px-3 py-2 rounded"
+            className="text-[14px] w-full border px-3 py-2 rounded"
             value={jumlahPinjam}
             onChange={(e) =>
               setJumlahPinjam(
@@ -226,11 +226,11 @@ export default function AddPeminjamanPage() {
 
         {/* Unit */}
         <div>
-          <label className="block text-xs font-medium mb-1">Unit *</label>
+          <label className="block text-[14px] font-medium mb-1">Unit *</label>
           <input
             type="number"
             min={1}
-            className="text-xs w-full border px-3 py-2 rounded"
+            className="text-[14px] w-full border px-3 py-2 rounded"
             value={unit}
             onChange={(e) =>
               setUnit(e.target.value === "" ? "" : Math.max(1, Number(e.target.value)))
@@ -240,10 +240,10 @@ export default function AddPeminjamanPage() {
 
         {/* Tanggal Perolehan */}
         <div>
-          <label className="block text-xs font-medium mb-1">Tanggal Perolehan *</label>
+          <label className="block text-[14px] font-medium mb-1">Tanggal Perolehan *</label>
           <input
             type="date"
-            className="text-xs w-full border px-3 py-2 rounded"
+            className="text-[14px] w-full border px-3 py-2 rounded"
             value={tanggalPerolehan}
             onChange={(e) => setTanggalPerolehan(e.target.value)}
           />
@@ -251,10 +251,10 @@ export default function AddPeminjamanPage() {
 
         {/* Tanggal Pinjam */}
         <div>
-          <label className="block text-xs font-medium mb-1">Tanggal Pinjam *</label>
+          <label className="block text-[14px] font-medium mb-1">Tanggal Pinjam *</label>
           <input
             type="date"
-            className="text-xs w-full border px-3 py-2 rounded"
+            className="text-[14px] w-full border px-3 py-2 rounded"
             value={tanggalPinjam}
             onChange={(e) => setTanggalPinjam(e.target.value)}
           />
@@ -262,10 +262,10 @@ export default function AddPeminjamanPage() {
 
         {/* Tujuan */}
         <div>
-          <label className="block text-xs font-medium mb-1">Tujuan *</label>
+          <label className="block text-[14px] font-medium mb-1">Tujuan *</label>
           <input
             type="text"
-            className="text-xs w-full border px-3 py-2 rounded"
+            className="text-[12px] w-full border px-3 py-2 rounded"
             value={tujuan}
             onChange={(e) => setTujuan(e.target.value)}
           />
@@ -273,10 +273,10 @@ export default function AddPeminjamanPage() {
 
         {/* Keterangan */}
         <div className="col-span-2">
-          <label className="block text-xs font-medium mb-1">Keterangan</label>
+          <label className="block text-[14px] font-medium mb-1">Keterangan</label>
           <input
             type="text"
-            className="text-xs w-full border px-3 py-2 rounded"
+            className="text-[12px] w-full border px-3 py-2 rounded"
             value={keterangan}
             onChange={(e) => setKeterangan(e.target.value)}
           />
@@ -285,17 +285,16 @@ export default function AddPeminjamanPage() {
         {/* Buttons */}
         <div className="col-span-2 flex gap-2 justify-end mt-4">
           <button
-            type="submit"
-            className="cursor-pointer text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-          >
-            Simpan
-          </button>
-          <button
             type="button"
-            className="cursor-pointer text-xs bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-            onClick={() => router.push("/admin/peminjaman")}
-          >
+            className="cursor-pointer text-[14px] bg-red-500 font-bold text-white px-2 py-1 rounded hover:bg-red-800"
+            onClick={() => router.push("/admin/peminjaman")}>
             Kembali
+          </button>
+
+          <button
+            type="submit"
+            className="cursor-pointer text-[14px] bg-secondary text-secondary-foreground font-medium px-2 py-1 rounded hover:bg-primary hover:text-primary-foreground">
+            Simpan
           </button>
         </div>
       </form>

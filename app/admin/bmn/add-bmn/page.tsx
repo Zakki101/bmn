@@ -90,15 +90,15 @@ export default function AddBMNPage() {
 
   return (
     <div className="rounded-lg bg-white p-6 shadow">
-      <h2 className="mb-4 text-sm font-bold">Tambah Data BMN</h2>
+      <h2 className="mb-4 text-[20px] font-bold">Tambah Data BMN</h2>
 
       <form className="space-y-4" onSubmit={handleSubmit}>
         {/* nama barang */}
         <div>
-          <label className="mb-1 block text-xs font-medium">Nama Barang *</label>
+          <label className="mb-1 block text-[14px] font-medium">Nama Barang *</label>
           <input
             type="text"
-            className="w-full rounded border px-3 py-2 text-xs"
+            className="w-full rounded border px-3 py-2 text-[14px]"
             placeholder="Masukkan nama barang"
             value={namaBarang}
             onChange={(e) => setNamaBarang(e.target.value)}
@@ -108,9 +108,9 @@ export default function AddBMNPage() {
 
         {/* kategori */}
         <div>
-          <label className="mb-1 block text-xs font-medium">Kategori *</label>
+          <label className="mb-1 block text-[14px] font-medium">Kategori *</label>
           <select
-            className="w-full rounded border px-3 py-2 text-xs"
+            className="w-full rounded border px-3 py-2 text-[14px]"
             value={kategori}
             onChange={(e) => {
               const val = e.target.value as BMN["kategori"];
@@ -133,10 +133,10 @@ export default function AddBMNPage() {
 
         {/* IKMM */}
         <div>
-          <label className="mb-1 block text-xs font-medium">Kode IKMM</label>
+          <label className="mb-1 block text-[14px] font-medium">Kode IKMM</label>
           <input
             type="text"
-            className="w-full text-gray-700 rounded border bg-gray-100 px-3 py-2 text-xs"
+            className="w-full text-gray-700 rounded border bg-gray-100 px-3 py-2 text-[14px]"
             value={ikmm}
             readOnly
           />
@@ -144,9 +144,9 @@ export default function AddBMNPage() {
 
         {/* bidang */}
         <div>
-          <label className="mb-1 block text-xs font-medium">Bidang *</label>
+          <label className="mb-1 block text-[14px] font-medium">Bidang *</label>
           <select
-            className="w-full rounded border px-3 py-2 text-xs"
+            className="w-full rounded border px-3 py-2 text-[14px]"
             value={bidang}
             onChange={(e) => setBidang(e.target.value as BMN["bidang"])}
             required
@@ -160,11 +160,11 @@ export default function AddBMNPage() {
 
         {/* jumlah barang */}
         <div>
-          <label className="mb-1 block text-xs font-medium">Jumlah Barang *</label>
+          <label className="mb-1 block text-[14px] font-medium">Jumlah Barang *</label>
           <input
             type="number"
             min={1}
-            className="w-full rounded border px-3 py-2 text-xs"
+            className="w-full rounded border px-3 py-2 text-[14px]"
             placeholder="Masukkan jumlah barang"
             value={jumlahBarang}
             onChange={(e) => setJumlahBarang(Number(e.target.value))}
@@ -174,30 +174,29 @@ export default function AddBMNPage() {
 
         {/* tanggal perolehan */}
         <div>
-          <label className="mb-1 block text-xs font-medium">Tanggal Perolehan *</label>
+          <label className="mb-1 block text-[14px] font-medium">Tanggal Perolehan *</label>
           <input
             type="date"
-            className="w-full rounded border px-3 py-2 text-xs"
+            className="w-full rounded border px-3 py-2 text-[14px]"
             value={tanggalPerolehan}
             onChange={(e) => setTanggalPerolehan(e.target.value)}
             required
           />
         </div>
 
-        {/* tombol */}
+        {/* Buttons */}
         <div className="flex justify-end gap-2">
           <button
-            type="submit"
-            className="cursor-pointer rounded bg-blue-500 px-2 py-1 text-xs text-white hover:bg-blue-600"
-          >
-            Simpan
-          </button>
-          <button
             type="button"
-            className="cursor-pointer rounded bg-red-500 px-2 py-1 text-xs text-white hover:bg-red-600"
-            onClick={() => router.push("/admin/bmn")}
-          >
+            className="cursor-pointer text-[14px] bg-red-500 font-bold text-white px-2 py-1 rounded hover:bg-red-800"
+            onClick={() => router.push("/admin/bmn")}>
             Kembali
+          </button>
+
+          <button
+            type="submit"
+            className="cursor-pointer text-[14px] bg-primary text-primary-foreground font-medium px-2 py-1 rounded hover:bg-secondary hover:text-secondary-foreground">
+            Tambah
           </button>
         </div>
       </form>

@@ -1,9 +1,10 @@
 "use client";
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig, } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, RadialBarChart, RadialBar, PolarRadiusAxis, Label, } from "recharts";
+import { StatTooltip } from "@/components/ui/stat-tooltip";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { ReactNode } from "react";
+import { ChartLine } from "lucide-react";
 
 import { dataBMN } from "@/data/dataBMN";
 import { dataPeminjaman } from "@/data/dataPeminjaman";
@@ -82,181 +83,174 @@ export default function Dashboard() {
     .slice(0, 4);
 
   return (
-    <div className="grid grid-cols-5 gap-2 p-0">
-      {/* total BMN */}
-      <SmallCard className="col-span-1 h-[140px] flex flex-col">
+    <div className="grid grid-cols-4 grid-rows-4 gap-2 p-0">
+      {/* Total Unit + Statistik */}
+      <SmallCard className="row-span-2 col-span-2">
         <CardHeader className="p-2 pb-0">
-          <CardTitle className="text-xs">Total Unit BMN</CardTitle>
+          <div className="flex items-center px-1 py-1">
+            <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center mr-2">
+              <ChartLine className="w-6 h-6 text-secondary-foreground" strokeWidth={2.5}/>
+            </div>
+            <CardTitle className="text-[18px]">Statistik BMN</CardTitle>
+          </div>
         </CardHeader>
-        <CardContent className="flex-1 flex items-end justify-end p-2">
-          <span className="text-2xl font-bold">{totalBMN}</span>
+        <CardContent className="p-3">
+          <div className="space-y-4">
+            {/* Total Unit */}
+            <div className="flex items-center justify-between pb-2 border-b">
+              <span className="text-[14px] font-medium">Total Unit BMN</span>
+              <span className="text-[20px] font-bold">{totalBMN} Unit</span>
+            </div>
+            
+            {/* Kategori dengan stacked progress bar */}
+            {kategoriData.map((stat, i) => {
+              const baik =
+                kondisiData[stat.name].find((d) =>
+                  d.name.includes("Kondisi Baik")
+                )?.value || 0;
+              const perbaikan =
+                kondisiData[stat.name].find((d) =>
+                  d.name.includes("Dalam Perbaikan")
+                )?.value || 0;
+              const total = baik + perbaikan;
+              const baikPercent = total > 0 ? Math.round((baik / total) * 100) : 0;
+              const perbaikanPercent = total > 0 ? Math.round((perbaikan / total) * 100) : 0;
+
+              return (
+                <div key={i} className="group relative cursor-pointer hover:bg-gray-200 rounded transition-colors">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[14px]">{stat.name}</span>
+                    <span className="text-[14px] font-semibold">{total} Unit</span>
+                  </div>
+                  {/* Stacked Progress Bar with Tooltip */}
+                  <StatTooltip titlebarang={stat.name} baikValue={baik} perbaikanValue={perbaikan}>
+                    <div className="w-full bg-gray-200 rounded h-2 flex overflow-hidden group-hover:opacity-80 transition-opacity">
+                      <div
+                        className="bg-primary h-2 transition-all"
+                        style={{ width: `${baikPercent}%` }}
+                      />
+                      <div
+                        className="bg-secondary h-2 transition-all"
+                        style={{ width: `${perbaikanPercent}%` }}
+                      />
+                    </div>
+                  </StatTooltip>
+                </div>
+              );
+            })}
+
+            {/* Legend */}
+            <div className="flex items-center justify-center gap-4 pt-2 mt-2 border-t text-[10px]">
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 bg-primary rounded-sm" />
+                <span className="text-[12px]">Baik</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 bg-secondary rounded-sm" />
+                <span className="text-[12px]">Perbaikan</span>
+              </div>
+            </div>
+          </div>
         </CardContent>
       </SmallCard>
 
-      {/* radial chart per kategori */}
-      {kategoriData.map((stat, i) => {
-        const chartConfig = {
-          kondisiBaik: { label: "Kondisi Baik", color: "var(--chart-1)" },
-          dalamPerbaikan: { label: "Dalam Perbaikan", color: "var(--chart-2)" },
-        } satisfies ChartConfig;
+      {/* Bar Chart */}
+      <SmallCard className="row-span-2 col-span-2">
+        <CardHeader className="p-2 pb-5">
+          <CardTitle className="text-[18px] flex items-center px-2 py-4">
+            Visualisasi Kategori Barang
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="h-[250px] p-2 pb-0 text-[9px]">
+          <ResponsiveContainer width="90%" height="100%">
+            <BarChart data={kategoriData}>
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="total" fill="#142B6F" radius={[2, 2, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </SmallCard>
 
-        const total =
-          kondisiData[stat.name].reduce((s, d) => s + d.value, 0) || 0;
+      {/* Tabel Perolehan BMN */}
+      <SmallCard className="row-span-1 col-span-4">
+        <CardHeader className="px-3 pt-2 pb-0">
+          <CardTitle className="text-[18px]">
+            Perolehan BMN Terbaru
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="px-3 pt-0 pb-2">
+          <div className="max-h-32 overflow-y-auto">
+            <table className="w-full border border-gray-200 border-collapse text-[7px]">
+              <thead className="bg-gray-100 sticky top-0 z-10">
+                <tr>
+                  <th className="text-left py-1 px-2 border text-[14px]">Nama Barang</th>
+                  <th className="text-left py-1 px-2 border text-[14px]">Tanggal</th>
+                </tr>
+              </thead>
+              <tbody>
+                {perolehanBMN.map((item) => (
+                  <tr
+                    key={item.idBMN}
+                    className="hover:bg-gray-50 even:bg-gray-50/50"
+                  >
+                    <td className="py-1 px-2 border text-[12px]">
+                      {item.namaBarang}
+                    </td>
+                    <td className="py-1 px-2 border text-[12px]">
+                      {item.tanggalPerolehan}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </SmallCard>
 
-        return (
-          <SmallCard key={i} className="col-span-1 h-[140px] flex flex-col">
-            <CardHeader className="flex justify-between items-center p-2 pb-0">
-              <CardTitle className="text-xs">{stat.name}</CardTitle>
-            </CardHeader>
-            <CardContent className="rounded-none flex-1 flex items-center justify-center">
-              <ChartContainer
-                config={chartConfig}
-                className="aspect-square w-[90px] h-[90px]"
-              >
-                <RadialBarChart
-                  data={[
-                    Object.fromEntries(
-                      kondisiData[stat.name].map((d) => [d.name, d.value])
-                    ),
-                  ]}
-                  endAngle={180}
-                  innerRadius={40}
-                  outerRadius={65}
-                >
-                  <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent hideLabel />}
-                  />
-                  <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
-                    <Label
-                      content={({ viewBox }) => {
-                        if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                          return (
-                            <text
-                              x={viewBox.cx}
-                              y={viewBox.cy}
-                              textAnchor="middle"
-                            >
-                              <tspan
-                                x={viewBox.cx}
-                                y={(viewBox.cy || 0) - 2}
-                                className="fill-foreground text-base font-bold"
-                              >
-                                {total}
-                              </tspan>
-                            </text>
-                          );
-                        }
-                      }}
-                    />
-                  </PolarRadiusAxis>
-                  {kondisiData[stat.name].map((entry) => (
-                    <RadialBar
-                      key={entry.name}
-                      dataKey={entry.name}
-                      stackId="a"
-                      fill={entry.color}
-                      className="stroke-transparent stroke-2"
-                    />
-                  ))}
-                </RadialBarChart>
-              </ChartContainer>
-            </CardContent>
-          </SmallCard>
-        );
-      })}
-
-      {/* bar chart + tabel */}
-      <div className="col-span-5 grid grid-cols-5 gap-2 items-start">
-        <SmallCard className="col-span-2 h-full">
-          <CardHeader className="p-2 pb-0">
-            <CardTitle className="text-xs">
-              Visualisasi Kategori Barang
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="h-[250px] p-2 pb-0 text-[9px]">
-            <ResponsiveContainer width="90%" height="100%">
-              <BarChart data={kategoriData}>
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="total" fill="#8884d8" radius={[2, 2, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </SmallCard>
-
-        <div className="col-span-3 flex flex-col gap-2">
-          {/* perolehan BMN terbaru */}
-          <SmallCard>
-            <CardHeader className="px-3 pt-2 pb-0">
-              <CardTitle className="text-xs">
-                Perolehan BMN Terbaru
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="px-3 pt-0 pb-2">
-              <div className="max-h-32 overflow-y-auto">
-                <table className="w-full border border-gray-200 border-collapse text-[7px]">
-                  <thead className="bg-gray-100 sticky top-0 z-10">
-                    <tr>
-                      <th className="text-left py-1 px-2 border">Nama Barang</th>
-                      <th className="text-left py-1 px-2 border">Tanggal</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {perolehanBMN.map((item) => (
-                      <tr
-                        key={item.idBMN}
-                        className="hover:bg-gray-50 even:bg-gray-50/50"
-                      >
-                        <td className="py-1 px-2 border">{item.namaBarang}</td>
-                        <td className="py-1 px-2 border">
-                          {item.tanggalPerolehan}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </SmallCard>
-
-          {/* peminjaman BMN terbsru*/}
-          <SmallCard>
-            <CardHeader className="px-3 pt-2 pb-0">
-              <CardTitle className="text-xs">
-                Peminjaman BMN Terbaru
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="px-3 pt-0 pb-2">
-              <div className="max-h-32 overflow-y-auto">
-                <table className="w-full border-collapse text-[7px]">
-                  <thead>
-                    <tr className="bg-gray-100 sticky top-0 z-10">
-                      <th className="text-left py-1 px-2 border">
-                        Nama Peminjam
-                      </th>
-                      <th className="text-left py-1 px-2 border">
-                        Nama Barang
-                      </th>
-                      <th className="text-left py-1 px-2 border">Tanggal</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {peminjamanBMN.map((item) => (
-                      <tr key={item.idPeminjaman} className="hover:bg-gray-50">
-                        <td className="py-1 px-2 border">{item.namaPeminjam}</td>
-                        <td className="py-1 px-2 border">{item.namaBarang}</td>
-                        <td className="py-1 px-2 border">{item.tanggalPinjam}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </SmallCard>
-        </div>
-      </div>
+      {/* Tabel Peminjaman BMN */}
+      <SmallCard className="row-span-1 col-span-4">
+        <CardHeader className="px-3 pt-2 pb-0">
+          <CardTitle className="text-[18px]">
+            Peminjaman BMN Terbaru
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="px-3 pt-0 pb-2">
+          <div className="max-h-32 overflow-y-auto">
+            <table className="w-full border-collapse text-[7px]">
+              <thead>
+                <tr className="bg-gray-100 sticky top-0 z-10">
+                  <th className="text-left py-1 px-2 border text-[14px]">
+                    Nama Peminjam
+                  </th>
+                  <th className="text-left py-1 px-2 border text-[14px]">
+                    Nama Barang
+                  </th>
+                  <th className="text-left py-1 px-2 border text-[14px]">
+                    Tanggal
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {peminjamanBMN.map((item) => (
+                  <tr key={item.idPeminjaman} className="hover:bg-gray-50">
+                    <td className="py-1 px-2 border text-[12px]">
+                      {item.namaPeminjam}
+                    </td>
+                    <td className="py-1 px-2 border text-[12px]">
+                      {item.namaBarang}
+                    </td>
+                    <td className="py-1 px-2 border text-[12px]">
+                      {item.tanggalPinjam}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </SmallCard>
     </div>
   );
 }

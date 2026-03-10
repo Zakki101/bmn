@@ -13,11 +13,13 @@ import {
 import { dataLogPeminjaman } from "@/data/dataLogPeminjaman";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import { FileSpreadsheet } from "lucide-react";
+import { FolderDown, Plus } from "lucide-react";
 
 export default function LogPeminjamanPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
 
   // Filter + search
@@ -28,6 +30,12 @@ export default function LogPeminjamanPage() {
       return matchSearch && matchStatus;
     })
     .sort((a, b) => new Date(b.tanggalPinjam).getTime() - new Date(a.tanggalPinjam).getTime());
+
+  // pagination
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedData = filteredData.slice(startIndex, endIndex);
 
   const handleDownloadExcel = () => {
     const exportData = filteredData.map((item, i) => ({
@@ -66,7 +74,7 @@ export default function LogPeminjamanPage() {
 
   return (
     <div className="p-2 space-y-2">
-      <h1 className="text-xs font-bold">Log Peminjaman</h1>
+      <h1 className="text-[20px] font-bold">Log Peminjaman</h1>
 
       {/* Search + Filter */}
       <div className="flex items-center justify-between">
@@ -75,47 +83,50 @@ export default function LogPeminjamanPage() {
             placeholder="Cari peminjam..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="text-xs placeholder:text-xs h-[24px] w-[200px] px-2 !bg-gray-50"
+            className="text-[14px] placeholder:text-[14px] h-[35px] w-[200px] px-2"
           />
 
           <Select onValueChange={setStatusFilter} defaultValue="all">
-            <SelectTrigger className="cursor-pointer text-xs !h-[24px] w-[140px] px-2 !bg-gray-50">
+            <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[140px] px-2">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
-            <SelectContent className="text-xs">
-              <SelectItem value="all" className="text-[10px]">Semua Status</SelectItem>
-              <SelectItem value="Aktif" className="text-[10px]">Aktif</SelectItem>
-              <SelectItem value="Selesai" className="text-[10px]">Selesai</SelectItem>
-              <SelectItem value="Terlambat" className="text-[10px]">Terlambat</SelectItem>
+            <SelectContent className="text-[14px]">
+              <SelectItem value="all" className="text-[12px]">Semua Status</SelectItem>
+              <SelectItem value="Aktif" className="text-[12px]">Aktif</SelectItem>
+              <SelectItem value="Selesai" className="text-[12px]">Selesai</SelectItem>
+              <SelectItem value="Terlambat" className="text-[12px]">Terlambat</SelectItem>
             </SelectContent>
           </Select>
 
           <Button
             variant="outline"
-            className="text-xs h-[24px] px-3 !bg-gray-50"
+            className="text-[14px] h-[35px] px-3"
             onClick={() => {
               setSearch("");
               setStatusFilter("all");
+              setCurrentPage(1);
             }}
           >
             Reset
           </Button>
+        </div>
 
+        {/* eksport */}
+        <div className="flex gap-2 ml-auto">
           <Button
-            className="cursor-pointer text-xs h-[24px] px-3"
-            variant="default"
-            onClick={handleDownloadExcel}
-          >
-            <FileSpreadsheet className="w-3.5 h-3.5" />
+            className="cursor-pointer text-[12px] h-[35px] s bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground"
+            onClick={() => handleDownloadExcel()}>
+            <FolderDown className="mr-1 h-4 w-4" />
+            Eksport Data
           </Button>
         </div>
       </div>
 
       {/* Table */}
       <div className="bg-white rounded-lg shadow border overflow-x-auto">
-        <div className="max-h-[400px] max-w-[1035px] overflow-y-auto">
-          <table className="w-full text-xs border-collapse">
-            <thead className="bg-blue-100 text-left sticky top-0 z-10">
+        <div className="max-h-[400px] max-w-auto overflow-y-auto">
+          <table className="w-full border-collapse">
+            <thead className="bg-blue-100 text-[13px] text-left sticky top-0 z-10">
               <tr>
                 <th className="border p-2">No</th>
                 <th className="border p-2 min-w-[135px]">Nomor Peminjaman</th>
@@ -135,29 +146,81 @@ export default function LogPeminjamanPage() {
                 <th className="border p-2 text-center">Status</th>
               </tr>
             </thead>
-            <tbody>
-              {filteredData.map((item, index) => (
-                <tr key={item.idPeminjaman} className="hover:bg-gray-50">
-                  <td className="border p-2">{index + 1}</td>
-                  <td className="border p-2">{item.nomorPeminjaman}</td>
-                  <td className="border p-2">{item.namaPeminjam}</td>
-                  <td className="border p-2">{item.statusPegawai}</td>
-                  <td className="border p-2">{item.pangkatGolongan}</td>
-                  <td className="border p-2">{item.jabatan}</td>
-                  <td className="border p-2">{item.nip}</td>
-                  <td className="border p-2">{item.ikmm}</td>
-                  <td className="border p-2">{item.namaBarang}</td>
-                  <td className="border p-2 text-center">{item.unit}</td>
-                  <td className="border p-2">{item.kategori}</td>
-                  <td className="border p-2 text-center">{item.jumlahPinjam}</td>
-                  <td className="border p-2 text-center">{item.tanggalPinjam}</td>
-                  <td className="border p-2 text-center">{item.tanggalSelesai || "-"}</td>
-                  <td className="border p-2 text-center">{item.keterangan || "-"}</td>
-                  <td className="border p-2 text-center">{item.statusPeminjaman}</td>
+            <tbody className="text-[12px]">
+              {paginatedData.length > 0 ? (
+                paginatedData.map((item, index) => (
+                  <tr key={item.idPeminjaman} className="hover:bg-gray-50">
+                    <td className="border p-2">{startIndex + index + 1}</td>
+                    <td className="border p-2">{item.nomorPeminjaman}</td>
+                    <td className="border p-2">{item.namaPeminjam}</td>
+                    <td className="border p-2">{item.statusPegawai}</td>
+                    <td className="border p-2">{item.pangkatGolongan}</td>
+                    <td className="border p-2">{item.jabatan}</td>
+                    <td className="border p-2">{item.nip}</td>
+                    <td className="border p-2">{item.ikmm}</td>
+                    <td className="border p-2">{item.namaBarang}</td>
+                    <td className="border p-2 text-center">{item.unit}</td>
+                    <td className="border p-2">{item.kategori}</td>
+                    <td className="border p-2 text-center">{item.jumlahPinjam}</td>
+                    <td className="border p-2 text-center">{item.tanggalPinjam}</td>
+                    <td className="border p-2 text-center">{item.tanggalSelesai || "-"}</td>
+                    <td className="border p-2 text-center">{item.keterangan || "-"}</td>
+                    <td className="border p-2 text-center">{item.statusPeminjaman}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={16} className="border p-4 text-center bg-red-100">
+                    <span className="text-red-800 font-semibold text-[14px]">Data tidak ada</span>
+                  </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      {/* pagination */}
+      <div className="flex items-center justify-between gap-2 bg-white p-4 rounded-lg shadow border">
+        <div className="flex items-center gap-2">
+          {/* items per page */}
+          <Select value={String(itemsPerPage)} onValueChange={(value) => {
+            setItemsPerPage(Number(value));
+            setCurrentPage(1);
+          }}>
+            <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[100px] px-2">
+              <SelectValue placeholder="Items per page" />
+            </SelectTrigger>
+            <SelectContent className="text-[14px]">
+              <SelectItem value="10" className="text-[14px]">10 Data</SelectItem>
+              <SelectItem value="20" className="text-[14px]">20 Data</SelectItem>
+              <SelectItem value="100" className="text-[14px]">100 Data</SelectItem>
+            </SelectContent>
+          </Select>
+          <div className="text-[14px] text-black">
+            Menampilkan {filteredData.length === 0 ? 0 : startIndex + 1} - {Math.min(endIndex, filteredData.length)} dari {filteredData.length} data
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            className="cursor-pointer text-[14px] h-[35px] px-3"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(currentPage - 1)}
+          >
+            ← Sebelumnya
+          </Button>
+          <div className="text-[14px] text-gray-600 px-3">
+            Halaman {currentPage} dari {totalPages}
+          </div>
+          <Button
+            variant="outline"
+            className="cursor-pointer text-[14px] h-[35px] px-3"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(currentPage + 1)}
+          >
+            Berikutnya →
+          </Button>
         </div>
       </div>
     </div>

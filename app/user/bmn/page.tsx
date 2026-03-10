@@ -223,14 +223,14 @@ export default function DataBMNUserPage() {
           placeholder="Cari barang..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="text-[14px] placeholder:text-[14px ] h-[35px] w-[250px] px-2"/>
+          className="text-[14px] placeholder:text-[14px] h-[35px] w-[250px] px-2"/>
 
         {/* filter kategori */}
         <Select onValueChange={setKategori} defaultValue="all">
           <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[200px] px-2">
             <SelectValue placeholder="Kategori" />
           </SelectTrigger>
-          <SelectContent className="text-xs">
+          <SelectContent className="text-[14px]">
             <SelectItem value="all" className="text-[12px]">Semua Kategori</SelectItem>
             <SelectItem value="Laptop" className="text-[12px]">Laptop</SelectItem>
             <SelectItem value="TV" className="text-[12px]">TV</SelectItem>
@@ -398,8 +398,8 @@ export default function DataBMNUserPage() {
       {/* tabel */}
       <div className="bg-white pb-0 rounded-lg shadow border overflow-x-auto">
         <div className="max-h-auto overflow-y-auto">
-          <table className="w-full text-[14px] border-collapse">
-            <thead className="bg-blue-100 text-left sticky top-0 z-10">
+          <table className="w-full border-collapse">
+            <thead className="bg-blue-100 text-[13px] text-left sticky top-0 z-10">
               <tr>
                 <th className="border p-2">No</th>
                 <th className="border p-2">IKMM</th>
@@ -411,7 +411,7 @@ export default function DataBMNUserPage() {
                 <th className="border p-2">Ketersediaan</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="text-[12px]">
               {paginatedData.length > 0 ? (
                 paginatedData.map((item, index) => (
                   <tr key={item.idBMN} className="hover:bg-gray-100">
@@ -423,30 +423,30 @@ export default function DataBMNUserPage() {
                     <td className="border p-2">{item.tanggalPerolehan}</td>
                     <td className="border p-2 text-center">
                       {item.kondisiBarang === "Baik" ? (
-                        <span className="inline-block bg-green-200 text-green-800 px-3 py-1 rounded text-[12px] font-semibold">
+                        <span className="inline-block bg-green-200 text-green-800 px-3 py-1 rounded text-[12px] font-semibold min-w-[70px]">
                           Baik
                         </span>
                       ) : item.kondisiBarang === "Rusak" ? (
-                        <span className="inline-block bg-red-200 text-red-800 px-3 py-1 rounded text-[12px] font-semibold">
+                        <span className="inline-block bg-red-200 text-red-800 px-3 py-1 rounded text-[12px] font-semibold min-w-[70px]">
                           Rusak
                         </span>
                       ) : (
-                        <span className="inline-block bg-yellow-200 text-yellow-800 px-3 py-1 rounded text-[12px] font-semibold">
+                        <span className="inline-block bg-yellow-200 text-yellow-800 px-3 py-1 rounded text-[12px] font-semibold min-w-[70px]">
                           Perbaikan
                         </span>
                       )}
                     </td>
                     <td className="border p-2 text-center">
                       {item.dipinjam === "Tersedia" ? (
-                        <span className="inline-block bg-green-200 text-green-800 px-3 py-1 rounded text-[12px] font-semibold">
+                        <span className="inline-block bg-green-200 text-green-800 px-3 py-1 rounded text-[12px] font-semibold min-w-[120px]">
                           Tersedia
                         </span>
                       ) : item.dipinjam === "Dipinjam" ? (
-                        <span className="inline-block bg-blue-200 text-blue-800 px-3 py-1 rounded text-[12px] font-semibold">
+                        <span className="inline-block bg-blue-200 text-blue-800 px-3 py-1 rounded text-[12px] font-semibold min-w-[120px]">
                           Dipinjam
                         </span>
                       ) : (
-                        <span className="inline-block bg-gray-300 text-gray-800 px-3 py-1 rounded text-[12px] font-semibold">
+                        <span className="inline-block bg-gray-300 text-gray-800 px-3 py-1 rounded text-[12px] font-semibold min-w-[120px]">
                           Tidak Tersedia
                         </span>
                       )}
