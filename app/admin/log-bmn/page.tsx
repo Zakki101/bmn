@@ -31,7 +31,8 @@ export default function LogBMNPage() {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedData = filteredData.slice(startIndex, endIndex);
-
+  
+  // function download excel
   const handleDownloadExcel = () => {
         const exportData = filteredData.map((item, i) => ({
           No: i + 1,
