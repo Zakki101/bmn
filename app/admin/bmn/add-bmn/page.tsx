@@ -61,7 +61,7 @@ export default function AddBMNPage() {
   };
 
   // submit
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!namaBarang || !kategori || !tanggalPerolehan || !bidang) {
@@ -74,18 +74,27 @@ export default function AddBMNPage() {
       return;
     }
 
-    const newItems = generateNUP(
-      dataBMN,
-      namaBarang,
-      jumlahBarang,
-      kategori,
-      ikmm,
-      tanggalPerolehan,
-      bidang as BMN["bidang"]
-    );
+    try {
+      const res = await fetch("/api/bmn", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          namaBarang,
+          kategori,
+          ikmm,
+          bidang,
+          jumlahBarang,
+          tanggalPerolehan,
+        }),
+      });
 
-    dataBMN.push(...newItems);
-    router.push("/admin/bmn");
+      if (!res.ok) throw new Error("Failed to create BMN");
+      
+      router.push("/admin/bmn");
+    } catch (err) {
+      console.error(err);
+      alert("Gagal menambahkan data BMN");
+    }
   };
 
   return (
