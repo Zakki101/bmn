@@ -18,7 +18,6 @@ The BMN (Barang Milik Negara) Dashboard is a web application designed for monito
   - `Sidebar.tsx`: Role-based navigation (Admin/User).
 - **Naming Conventions**: Use PascalCase for components and camelCase for functions/variables.
 - **Responsiveness**: Ensure all UI elements are fully responsive across desktop, tablet, and mobile.
-//iuhih
 
 ## Design System (Pusdatin PU Branding)
 - **Primary Color**: `#142B6F` (Deep Blue)
