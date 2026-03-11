@@ -234,8 +234,8 @@ export default function DataPeminjamanAdminPage() {
   };
 
   return (
-    <div className="p-2 space-y-2">
-      <h1 className="pt-0 pb-0 text-[20px] font-bold">Data Peminjaman</h1>
+    <div className="space-y-2">
+      <h1 className="pt-0 pb-0 text-[25px] font-bold">Data Peminjaman</h1>
 
       {/* Search + Filter + Tambah */}
       <div className="flex items-center justify-between">

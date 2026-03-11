@@ -211,10 +211,10 @@ export default function DataBMNUserPage() {
   };
 
   return (
-    <div className="p-1 space-y-2">
+    <div className="space-y-2">
       {/* header */}
       <div className="flex items-center justify-between">
-        <h1 className="pt-0 pb-0 text-[20px] font-bold">Data BMN</h1>
+        <h1 className="pt-0 pb-0 text-[25px] font-bold">Data BMN</h1>
       </div>
 
       <div className="flex flex-wrap items-center gap-1">
@@ -397,7 +397,7 @@ export default function DataBMNUserPage() {
 
       {/* tabel */}
       <div className="bg-white pb-0 rounded-lg shadow border overflow-x-auto">
-        <div className="max-h-auto overflow-y-auto">
+        <div className="max-h-[400px] overflow-y-auto">
           <table className="w-full border-collapse">
             <thead className="bg-blue-100 text-[13px] text-left sticky top-0 z-10">
               <tr>
