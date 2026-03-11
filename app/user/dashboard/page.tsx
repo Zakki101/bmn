@@ -31,7 +31,7 @@ const SmallCard = ({ children, className = "" }: SmallCardProps) => (
 
 export default function Dashboard() {
   return (
-    <div className="grid grid-cols-6 grid-rows-5 gap-3 p-3">
+    <div className="grid grid-cols-6 grid-rows-5 gap-3">
       {/* total BMN */}
       <SmallCard className="col-span-2 row-span-1 bg-primary text-primary-foreground">
         <CardHeader className="p-2">

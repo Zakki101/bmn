@@ -24,7 +24,7 @@ export default function Header({ role }: HeaderProps) {
   const [openBMNMenu, setOpenBMNMenu] = useState(false);
   const [openPeminjamanMenu, setOpenPeminjamanMenu] = useState(false);
 
-  const subtitle = "PUSDATIN Kemeterian PUPR";
+  const subtitle = "PUSDATIN Kementerian PUPR";
   const userName = "Nama Akun"; // Sesuaikan dengan actual user
   const userRole = role === "admin" ? "Administrator" : "User";
 
