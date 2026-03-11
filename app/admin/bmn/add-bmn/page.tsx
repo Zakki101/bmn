@@ -89,7 +89,7 @@ export default function AddBMNPage() {
   };
 
   return (
-    <div className="rounded-lg bg-white p-6 shadow">
+    <div className="rounded-lg bg-white p -6 shadow">
       <h2 className="mb-4 text-[20px] font-bold">Tambah Data BMN</h2>
 
       <form className="space-y-4" onSubmit={handleSubmit}>

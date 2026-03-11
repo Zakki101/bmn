@@ -148,8 +148,8 @@ export default function UsulanHapusPage() {
   };
 
   return (
-    <div className="p-2 space-y-2">
-      <h1 className="text-[20px] font-bold">Usulan Penghapusan BMN</h1>
+    <div className="space-y-2">
+      <h1 className="text-[25px] font-bold">Usulan Penghapusan BMN</h1>
 
       {/* Search + Filter + Download */}
       <div className="flex items-center justify-between">

@@ -83,7 +83,7 @@ export default function Dashboard() {
     .slice(0, 4);
 
   return (
-    <div className="grid grid-cols-4 grid-rows-4 gap-2 p-0">
+    <div className="grid grid-cols-4 grid-rows-4 gap-2">
       {/* Total Unit + Statistik */}
       <SmallCard className="row-span-2 col-span-2">
         <CardHeader className="p-2 pb-0">

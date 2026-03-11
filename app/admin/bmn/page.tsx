@@ -119,8 +119,8 @@ export default function DataBMNAdminPage() {
         };
 
   return (
-    <div className="p-2 space-y-2">
-      <h1 className="pt-0 pb-0 text-[20px] font-bold">Data BMN</h1>
+    <div className="space-y-2">
+      <h1 className="pt-0 pb-0 text-[25px] font-bold">Data BMN</h1>
 
       {/* Search + Filter + Add */}
       <div className="flex items-center justify-between">
