@@ -1,108 +1,123 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { dataPeminjaman, Peminjaman } from "@/data/dataPeminjaman";
 
 export default function AddPeminjamanPage() {
   const router = useRouter();
 
   // state
+  const [bmns, setBmns] = useState<any[]>([]);
+  const [selectedBmnId, setSelectedBmnId] = useState<string>("");
   const [namaPeminjam, setNamaPeminjam] = useState("");
-  const [statusPegawai, setStatusPegawai] =
-    useState<"PPPK" | "KI" | "PNS" | "Magang">("Magang");
+  const [statusPegawai, setStatusPegawai] = useState<"PPPK" | "KI" | "PNS" | "Magang">("Magang");
   const [nip, setNip] = useState("");
-  const [kategori, setKategori] = useState<
-    "Laptop" | "Monitor" | "Printer" | "TV" | "Peripheral" | "Internet" | "Lainnya" | ""
-  >("");
-  const [ikmm, setIkmm] = useState<number | "">("");
-  const [namaBarang, setNamaBarang] = useState("");
-  const [unit, setUnit] = useState<number | "">("");
-  const [jumlahPinjam, setJumlahPinjam] = useState<number | "">("");
-  const [tanggalPinjam, setTanggalPinjam] = useState("");
-  const [tujuan, setTujuan] = useState("");
-  const [keterangan, setKeterangan] = useState("");
   const [pangkatGolongan, setPangkatGolongan] = useState("");
   const [jabatan, setJabatan] = useState("");
-  const [tanggalPerolehan, setTanggalPerolehan] = useState("");
+  const [jumlahPinjam, setJumlahPinjam] = useState<number>(1);
+  const [tanggalPinjam, setTanggalPinjam] = useState(new Date().toISOString().split("T")[0]);
+  const [tujuan, setTujuan] = useState("");
+  const [keterangan, setKeterangan] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // mapping kategori - IKMM
-  const kategoriToIkmm: Record<string, number> = {
-    Laptop: 3100106002,
-    TV: 3100103002,
-    Monitor: 3100106002,
-    Printer: 3100104002,
-    Peripheral: 3100105002,
-  };
+  useEffect(() => {
+    const fetchBmns = async () => {
+      try {
+        const res = await fetch("/api/bmn");
+        const data = await res.json();
+        setBmns(data.filter((item: any) => item.dipinjam === "Tersedia"));
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchBmns();
+  }, []);
 
-  // format tanggal
-  const formatDate = (isoDate: string): string => {
-    const [year, month, day] = isoDate.split("-");
-    return `${day}/${month}/${year}`;
-  };
-
-  // submit
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (
-      !namaPeminjam ||
-      !statusPegawai ||
-      !nip ||
-      !kategori ||
-      !ikmm ||
-      !namaBarang ||
-      !unit ||
-      !jumlahPinjam ||
-      !tanggalPinjam ||
-      !tujuan ||
-      !pangkatGolongan ||
-      !jabatan ||
-      !tanggalPerolehan
-    ) {
-      alert("Semua field wajib diisi (kecuali keterangan)");
+    if (!selectedBmnId || !namaPeminjam || !nip || !tanggalPinjam) {
+      alert("Field wajib diisi: Barang, Nama Peminjam, NIP, Tanggal Pinjam");
       return;
     }
 
-    // nomor peminjaman (auto increment)
-    const last = dataPeminjaman[dataPeminjaman.length - 1];
-    const lastNomor = last
-      ? parseInt(last.nomorPeminjaman.split("/")[0])
-      : 69;
-    const nextNomor = lastNomor + 1;
-    const nomorPeminjaman = `${nextNomor}/BDI-TB/I/2024`;
+    setLoading(true);
+    try {
+      // Generate dummy nomor peminjaman for now
+      const nextNomor = Math.floor(Math.random() * 1000); 
+      const nomorPeminjaman = `${nextNomor}/BDI-TB/I/${new Date().getFullYear()}`;
 
-    const newPeminjaman: Peminjaman = {
-      idPeminjaman: dataPeminjaman.length + 1,
-      nomorPeminjaman,
-      namaPeminjam,
-      statusPegawai,
-      nip,
-      ikmm: Number(ikmm),
-      namaBarang,
-      kategori: kategori as Peminjaman["kategori"],
-      jumlahPinjam: Number(jumlahPinjam),
-      tanggalPinjam: formatDate(tanggalPinjam),
-      tanggalSelesai: null, // default null
-      tujuan,
-      keterangan: keterangan || null,
-      statusPeminjaman: "Aktif",
-      unit: Number(unit),
-      pangkatGolongan,
-      jabatan,
-      tanggalPerolehan: formatDate(tanggalPerolehan),
-    };
+      const body = {
+        nomorPeminjaman,
+        namaPeminjam,
+        statusPegawai,
+        nip,
+        bmnId: parseInt(selectedBmnId),
+        jumlahPinjam,
+        tanggalPinjam,
+        tujuan,
+        keterangan,
+        pangkatGolongan,
+        jabatan,
+        statusPeminjaman: "Aktif",
+      };
 
-    dataPeminjaman.push(newPeminjaman);
-    router.push("/admin/peminjaman");
+      const res = await fetch("/api/peminjaman", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) throw new Error("Failed to save loan");
+
+      // Update BMN status to "Dipinjam"
+      await fetch(`/api/bmn/${selectedBmnId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dipinjam: "Dipinjam" }),
+      });
+
+      router.push("/admin/peminjaman");
+    } catch (err) {
+      console.error(err);
+      alert("Gagal menyimpan data peminjaman");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const selectedBmn = bmns.find(b => b.id === parseInt(selectedBmnId));
 
   return (
     <div className="bg-white p-6 rounded-lg shadow max-h-[calc(100vh-100px)] overflow-y-auto">
       <h2 className="text-[20px] font-bold mb-4">Tambah Data Peminjaman</h2>
 
       <form className="grid grid-cols-2 gap-4" onSubmit={handleSubmit}>
-        {/* Nama Peminjam */}
+        <div className="col-span-2">
+          <label className="block text-[14px] font-medium mb-1">Pilih Barang BMN (Tersedia) *</label>
+          <select
+            className="text-[14px] w-full border px-3 py-2 rounded"
+            value={selectedBmnId}
+            onChange={(e) => setSelectedBmnId(e.target.value)}
+          >
+            <option value="">-- Pilih Barang --</option>
+            {bmns.map((b) => (
+              <option key={b.id} value={b.id}>
+                [{b.ikmm}] {b.namaBarang} - NUP: {b.unit}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {selectedBmn && (
+            <div className="col-span-2 bg-blue-50 p-2 rounded text-[12px] grid grid-cols-2 gap-2">
+                <div><span className="font-bold">IKMM:</span> {selectedBmn.ikmm}</div>
+                <div><span className="font-bold">Unit (NUP):</span> {selectedBmn.unit}</div>
+                <div><span className="font-bold">Kategori:</span> {selectedBmn.kategori}</div>
+                <div><span className="font-bold">Kondisi:</span> {selectedBmn.kondisiBarang}</div>
+            </div>
+        )}
+
         <div>
           <label className="block text-[14px] font-medium mb-1">Nama Peminjam *</label>
           <input
@@ -113,18 +128,6 @@ export default function AddPeminjamanPage() {
           />
         </div>
 
-        {/* Nama Barang */}
-        <div>
-          <label className="block text-[14px] font-medium mb-1">Nama Barang *</label>
-          <input
-            type="text"
-            className="text-[14px] w-full border px-3 py-2 rounded"
-            value={namaBarang}
-            onChange={(e) => setNamaBarang(e.target.value)}
-          />
-        </div>
-
-        {/* NIP */}
         <div>
           <label className="block text-[14px] font-medium mb-1">NIP *</label>
           <input
@@ -135,60 +138,12 @@ export default function AddPeminjamanPage() {
           />
         </div>
 
-        {/* Pangkat / Golongan */}
-        <div>
-          <label className="block text-[14px] font-medium mb-1">Pangkat / Golongan *</label>
-          <input
-            type="text"
-            className="text-[14px] w-full border px-3 py-2 rounded"
-            value={pangkatGolongan}
-            onChange={(e) => setPangkatGolongan(e.target.value)}
-          />
-        </div>
-
-        {/* Jabatan */}
-        <div>
-          <label className="block text-[14px] font-medium mb-1">Jabatan *</label>
-          <input
-            type="text"
-            className="text-[14px] w-full border px-3 py-2 rounded"
-            value={jabatan}
-            onChange={(e) => setJabatan(e.target.value)}
-          />
-        </div>
-
-        {/* Kategori */}
-        <div>
-          <label className="block text-[14px] font-medium mb-1">Kategori *</label>
-          <select
-            className="text-[14px] w-full border px-3 py-2 rounded"
-            value={kategori}
-            onChange={(e) => {
-              const val = e.target.value as Peminjaman["kategori"] | "";
-              setKategori(val);
-              setIkmm(kategoriToIkmm[val] || "");
-            }}
-          >
-            <option value="">Pilih kategori</option>
-            <option value="Laptop">Laptop</option>
-            <option value="TV">TV</option>
-            <option value="Monitor">Monitor</option>
-            <option value="Printer">Printer</option>
-            <option value="Peripheral">Peripheral</option>
-            <option value="Internet">Internet</option>
-            <option value="Lainnya">Lainnya</option>
-          </select>
-        </div>
-
-        {/* Status Pegawai */}
         <div>
           <label className="block text-[14px] font-medium mb-1">Status Pegawai *</label>
           <select
             className="text-[14px] w-full border px-3 py-2 rounded"
             value={statusPegawai}
-            onChange={(e) =>
-              setStatusPegawai(e.target.value as "PPPK" | "KI" | "PNS" | "Magang")
-            }
+            onChange={(e) => setStatusPegawai(e.target.value as any)}
           >
             <option value="PPPK">PPPK</option>
             <option value="KI">KI</option>
@@ -197,18 +152,26 @@ export default function AddPeminjamanPage() {
           </select>
         </div>
 
-        {/* Kode IKMM */}
         <div>
-          <label className="block text-[14px] font-medium mb-1">Kode IKMM</label>
+          <label className="block text-[14px] font-medium mb-1">Pangkat / Golongan</label>
           <input
             type="text"
-            className="text-[14px] w-full border px-3 py-2 rounded bg-gray-100"
-            value={ikmm}
-            readOnly
+            className="text-[14px] w-full border px-3 py-2 rounded"
+            value={pangkatGolongan}
+            onChange={(e) => setPangkatGolongan(e.target.value)}
           />
         </div>
 
-        {/* Jumlah Pinjam */}
+        <div>
+          <label className="block text-[14px] font-medium mb-1">Jabatan</label>
+          <input
+            type="text"
+            className="text-[14px] w-full border px-3 py-2 rounded"
+            value={jabatan}
+            onChange={(e) => setJabatan(e.target.value)}
+          />
+        </div>
+
         <div>
           <label className="block text-[14px] font-medium mb-1">Jumlah Pinjam *</label>
           <input
@@ -216,40 +179,10 @@ export default function AddPeminjamanPage() {
             min={1}
             className="text-[14px] w-full border px-3 py-2 rounded"
             value={jumlahPinjam}
-            onChange={(e) =>
-              setJumlahPinjam(
-                e.target.value === "" ? "" : Math.max(1, Number(e.target.value))
-              )
-            }
+            onChange={(e) => setJumlahPinjam(parseInt(e.target.value))}
           />
         </div>
 
-        {/* Unit */}
-        <div>
-          <label className="block text-[14px] font-medium mb-1">Unit *</label>
-          <input
-            type="number"
-            min={1}
-            className="text-[14px] w-full border px-3 py-2 rounded"
-            value={unit}
-            onChange={(e) =>
-              setUnit(e.target.value === "" ? "" : Math.max(1, Number(e.target.value)))
-            }
-          />
-        </div>
-
-        {/* Tanggal Perolehan */}
-        <div>
-          <label className="block text-[14px] font-medium mb-1">Tanggal Perolehan *</label>
-          <input
-            type="date"
-            className="text-[14px] w-full border px-3 py-2 rounded"
-            value={tanggalPerolehan}
-            onChange={(e) => setTanggalPerolehan(e.target.value)}
-          />
-        </div>
-
-        {/* Tanggal Pinjam */}
         <div>
           <label className="block text-[14px] font-medium mb-1">Tanggal Pinjam *</label>
           <input
@@ -260,41 +193,41 @@ export default function AddPeminjamanPage() {
           />
         </div>
 
-        {/* Tujuan */}
-        <div>
+        <div className="col-span-2">
           <label className="block text-[14px] font-medium mb-1">Tujuan *</label>
           <input
             type="text"
-            className="text-[12px] w-full border px-3 py-2 rounded"
+            className="text-[14px] w-full border px-3 py-2 rounded"
             value={tujuan}
             onChange={(e) => setTujuan(e.target.value)}
           />
         </div>
 
-        {/* Keterangan */}
         <div className="col-span-2">
           <label className="block text-[14px] font-medium mb-1">Keterangan</label>
-          <input
-            type="text"
-            className="text-[12px] w-full border px-3 py-2 rounded"
+          <textarea
+            className="text-[14px] w-full border px-3 py-2 rounded"
             value={keterangan}
             onChange={(e) => setKeterangan(e.target.value)}
           />
         </div>
 
-        {/* Buttons */}
         <div className="col-span-2 flex gap-2 justify-end mt-4">
           <button
             type="button"
-            className="cursor-pointer text-[14px] bg-red-500 font-bold text-white px-2 py-1 rounded hover:bg-red-800"
-            onClick={() => router.push("/admin/peminjaman")}>
-            Kembali
+            className="cursor-pointer text-[14px] bg-red-500 font-bold text-white px-4 py-2 rounded hover:bg-red-800"
+            onClick={() => router.push("/admin/peminjaman")}
+            disabled={loading}
+          >
+            Batal
           </button>
 
           <button
             type="submit"
-            className="cursor-pointer text-[14px] bg-secondary text-secondary-foreground font-medium px-2 py-1 rounded hover:bg-primary hover:text-primary-foreground">
-            Simpan
+            className="cursor-pointer text-[14px] bg-secondary text-secondary-foreground font-medium px-4 py-2 rounded hover:bg-primary hover:text-primary-foreground disabled:opacity-50"
+            disabled={loading}
+          >
+            {loading ? "Menyimpan..." : "Simpan"}
           </button>
         </div>
       </form>
