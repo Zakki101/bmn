@@ -199,7 +199,7 @@ export default function DataBMNAdminPage() {
 
       {/* Tabel */}
       <div className="bg-white pb-0 rounded-lg shadow border overflow-x-auto">
-        <div className="max-w-auto overflow-y-auto">
+        <div className="max-h-[400px] max-w-auto overflow-y-auto">
           <table className="w-full border-collapse">
             <thead className="bg-blue-100 text-[13px] text-left sticky top-0 z-10">
               <tr>
