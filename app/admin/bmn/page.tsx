@@ -61,17 +61,11 @@ export default function DataBMNAdminPage() {
     return new Date(d);
   };
 
-  const sortedData = [...bmnData].sort((a, b) => {
-    const dateA = a.updatedAt ? new Date(a.updatedAt) : parseDate(a.tanggalPerolehan);
-    const dateB = b.updatedAt ? new Date(b.updatedAt) : parseDate(b.tanggalPerolehan);
-    return dateB.getTime() - dateA.getTime();
-  });
-
   // pagination
-  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
+  const totalPages = Math.ceil(bmnData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const paginatedData = sortedData.slice(startIndex, endIndex);
+  const paginatedData = bmnData.slice(startIndex, endIndex);
 
   const handleDelete = async (id: number) => {
     if (!confirm("Apakah Anda yakin ingin menghapus data ini?")) return;
@@ -136,7 +130,7 @@ export default function DataBMNAdminPage() {
       const res = await fetch(`/api/bmn/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ dipinjam: statusValue }),
+        body: JSON.stringify({ status: statusValue }),
       });
       if (!res.ok) throw new Error("Update failed");
       fetchBMN();
@@ -147,25 +141,29 @@ export default function DataBMNAdminPage() {
   };
 
   const handleAjukanPenghapusan = (id: number) => {
-    const item = bmnData.find((b) => b.id === id || b.idBMN === id);
+    const item = bmnData.find((b) => b.id === id);
     if (!item) return;
-    if (confirm(`Ajukan penghapusan untuk ${item.namaBarang} (NUP: ${item.unit})?`)) {
+    if (confirm(`Ajukan penghapusan untuk ${item.namaBarang} (NUP: ${item.nup})?`)) {
       alert(`Usulan penghapusan untuk "${item.namaBarang}" berhasil diajukan!`);
     }
   };
 
   const handleDownloadExcel = () => {
-    const exportData = sortedData.map((item, i) => ({
+    const exportData = bmnData.map((item, i) => ({
       No: i + 1,
+      "Kode Satker": item.kodeSatker,
       IKMM: item.ikmm,
-      Akun: item.akun,
+      "Kode Akun": item.kodeAkun,
       Bidang: item.bidang,
+      NUP: item.nup,
       "Nama Barang": item.namaBarang,
-      NUP: item.unit,
+      "Merk / Type": item.merkType,
+      Kuantitas: item.kuantitas,
+      Satuan: item.satuan,
       Kategori: item.kategori,
       "Tanggal Perolehan": item.tanggalPerolehan,
       "Kondisi Barang": item.kondisiBarang,
-      "Status": item.dipinjam,
+      "Status": item.status,
       Foto: item.foto ? "Ada" : "Tidak Ada",
     }));
 
@@ -269,11 +267,15 @@ export default function DataBMNAdminPage() {
             <thead className="bg-blue-100 text-[14px] text-left sticky top-0 z-10">
               <tr>
                 <th className="border p-2">No</th>
+                <th className="border p-2 min-w-[120px]">Kode Satker</th>
                 <th className="border p-2 min-w-[140px]">IKMM / Kode Barang</th>
-                <th className="border p-2">Akun</th>
+                <th className="border p-2 min-w-[120px]">Kode Akun</th>
                 <th className="border p-2">Bidang</th>
-                <th className="border p-2 min-w-[200px]">Nama / Merek / Tipe</th>
                 <th className="border p-2">NUP</th>
+                <th className="border p-2 min-w-[200px]">Nama Barang</th>
+                <th className="border p-2 min-w-[150px]">Merk / Type</th>
+                <th className="border p-2">Qty</th>
+                <th className="border p-2">Satuan</th>
                 <th className="border p-2">Kategori</th>
                 <th className="border p-2 min-w-[140px]">Tanggal Perolehan</th>
                 <th className="border p-2">Kondisi</th>
@@ -298,11 +300,15 @@ export default function DataBMNAdminPage() {
                 paginatedData.map((item, index) => (
                   <tr key={item.id} className="hover:bg-gray-50">
                     <td className="border p-2">{startIndex + index + 1}</td>
+                    <td className="border p-2">{item.kodeSatker}</td>
                     <td className="border p-2">{item.ikmm}</td>
-                    <td className="border p-2">{item.akun}</td>
+                    <td className="border p-2">{item.kodeAkun}</td>
                     <td className="border p-2">{item.bidang}</td>
+                    <td className="border p-2">{item.nup}</td>
                     <td className="border p-2">{item.namaBarang}</td>
-                    <td className="border p-2">{item.unit}</td>
+                    <td className="border p-2">{item.merkType}</td>
+                    <td className="border p-2 text-center">{item.kuantitas}</td>
+                    <td className="border p-2">{item.satuan}</td>
                     <td className="border p-2">{item.kategori}</td>
                     <td className="border p-2">{item.tanggalPerolehan}</td>
 
@@ -328,7 +334,7 @@ export default function DataBMNAdminPage() {
                     {/* status */}
                     <td className="border p-2 text-center">
                       <Select
-                        value={item.dipinjam}
+                        value={item.status}
                         onValueChange={(v) => handleStatusChange(item.id, v)}
                       >
                         <SelectTrigger className="justify-between mx-auto cursor-pointer text-[14px] !h-[28px] min-w-[120px] px-2">
@@ -423,7 +429,7 @@ export default function DataBMNAdminPage() {
             </SelectContent>
           </Select>
           <div className="text-[14px] text-black">
-            Menampilkan {sortedData.length === 0 ? 0 : startIndex + 1} - {Math.min(endIndex, sortedData.length)} dari {sortedData.length} data
+            Menampilkan {bmnData.length === 0 ? 0 : startIndex + 1} - {Math.min(endIndex, bmnData.length)} dari {bmnData.length} data
           </div>
         </div>
         <div className="flex items-center gap-2">

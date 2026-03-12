@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (status && status !== "all") {
-      filters.push(eq(bmn.dipinjam, status));
+      filters.push(eq(bmn.status, status));
     }
 
     if (kategori && kategori !== "all") {
@@ -73,23 +73,23 @@ export async function POST(req: NextRequest) {
 
     // Find last NUP for the same item name to increment
     const lastItems = await db
-      .select({ unit: bmn.unit })
+      .select({ nup: bmn.nup })
       .from(bmn)
       .where(eq(bmn.namaBarang, namaBarang))
-      .orderBy(bmn.unit);
-    
-    const lastNUP = lastItems.length > 0 ? Math.max(...lastItems.map(i => i.unit)) : 0;
+      .orderBy(bmn.nup);
+
+    const lastNUP = lastItems.length > 0 ? Math.max(...lastItems.map(i => i.nup as number)) : 0;
 
     const itemsToInsert = Array.from({ length: jumlahBarang }, (_, i) => ({
       ikmm,
-      akun: 132111,
+      kodeAkun: "132111",
       bidang,
-      unit: lastNUP + i + 1,
+      nup: lastNUP + i + 1,
       namaBarang,
       kategori,
       tanggalPerolehan,
       kondisiBarang: "Baik" as const,
-      dipinjam: "Tersedia" as const,
+      status: "Tersedia" as const,
     }));
 
     const result = await db.insert(bmn).values(itemsToInsert).returning();

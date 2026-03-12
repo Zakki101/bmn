@@ -18,14 +18,14 @@ export async function PATCH(
     }
 
     const body = await req.json();
-    const { kondisiBarang, dipinjam, foto } = body;
+    const { kondisiBarang, status: statusValue, foto } = body;
 
     const updateData: Partial<typeof bmn.$inferInsert> = {
       updatedAt: new Date(),
     };
 
     if (kondisiBarang) updateData.kondisiBarang = kondisiBarang;
-    if (dipinjam) updateData.dipinjam = dipinjam;
+    if (statusValue) updateData.status = statusValue;
     if (foto) updateData.foto = JSON.stringify(foto);
 
     const result = await db

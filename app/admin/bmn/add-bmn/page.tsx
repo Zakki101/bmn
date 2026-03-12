@@ -17,11 +17,17 @@ export default function AddBMNPage() {
 
   // mapping kategori - IKMM
   const kategoriToIkmm: Record<string, string> = {
-    Laptop: "3100106002",
-    TV: "3100103002",
-    Monitor: "3100106002",
-    Printer: "3100104002",
-    Peripheral: "3100203017",
+    Laptop: "3100101002",
+    "PC / Server": "3100102001",
+    "Printer / Scanner": "3100102005",
+    Furniture: "3080101001",
+    Multimedia: "3100102010",
+    Elektronik: "3080105001",
+    Telekomunikasi: "3100101001",
+    Jaringan: "3100203001",
+    Kendaraan: "3020101001",
+    "Peralatan Kantor": "3080104001",
+    Lainnya: "0",
   };
 
   // format tanggal
@@ -43,19 +49,19 @@ export default function AddBMNPage() {
     const sameItems = existingData.filter((item) => item.namaBarang === namaBarang);
 
     // cari NUP terakhir
-    const lastNUP = sameItems.length > 0 ? Math.max(...sameItems.map((i) => i.unit)) : 0;
+    const lastNUP = sameItems.length > 0 ? Math.max(...sameItems.map((i) => i.nup)) : 0;
 
     // buat array baru sesuai jumlah yang ditambahkan
     return Array.from({ length: jumlahBaru }, (_, i) => ({
       idBMN: existingData.length + i + 1,
-      akun: 132111, // ✅ angka, bukan string
+      kodeAkun: "132111", // ✅ angka, bukan string
       ikmm,
-      unit: lastNUP + i + 1,
+      nup: lastNUP + i + 1,
       namaBarang,
       kategori,
       tanggalPerolehan: formatDate(tanggalPerolehan),
       kondisiBarang: "Baik",
-      dipinjam: "Tersedia", // ✅ sesuai tipe union
+      status: "Tersedia", // ✅ sesuai tipe union
       bidang: bidang,
     }));
   };
@@ -89,7 +95,7 @@ export default function AddBMNPage() {
       });
 
       if (!res.ok) throw new Error("Failed to create BMN");
-      
+
       router.push("/admin/bmn");
     } catch (err) {
       console.error(err);
@@ -130,11 +136,15 @@ export default function AddBMNPage() {
           >
             <option value="">Pilih kategori</option>
             <option value="Laptop">Laptop</option>
-            <option value="TV">TV</option>
-            <option value="Monitor">Monitor</option>
-            <option value="Printer">Printer</option>
-            <option value="Peripheral">Peripheral</option>
-            <option value="Internet">Internet</option>
+            <option value="PC / Server">PC / Server</option>
+            <option value="Printer / Scanner">Printer / Scanner</option>
+            <option value="Furniture">Furniture</option>
+            <option value="Multimedia">Multimedia</option>
+            <option value="Elektronik">Elektronik</option>
+            <option value="Telekomunikasi">Telekomunikasi</option>
+            <option value="Jaringan">Jaringan</option>
+            <option value="Kendaraan">Kendaraan</option>
+            <option value="Peralatan Kantor">Peralatan Kantor</option>
             <option value="Lainnya">Lainnya</option>
           </select>
 
