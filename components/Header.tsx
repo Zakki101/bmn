@@ -48,11 +48,11 @@ export default function Header({ role }: HeaderProps) {
           </div>
 
           {/* Navigation */}
-          <nav className="flex items-center gap-3">
+          <nav className="flex items-center gap-3 border rounded-[20px] px-2 py-2">
             {/* Dashboard */}
             <Link
               href={`/${role}/dashboard`}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md text-[14px] font-medium transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-[20px] text-[14px] font-medium transition-all ${
                 isMenuActive(`/${role}/dashboard`)
                   ? "bg-white text-primary"
                   : "hover:bg-white hover:text-primary"
@@ -67,7 +67,7 @@ export default function Header({ role }: HeaderProps) {
               <div className="relative group">
                 <button
                   onClick={() => setOpenBMNMenu(!openBMNMenu)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-md text-[14px] font-medium transition-all ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-[20px] text-[14px] font-medium transition-all ${
                     pathname.includes("/admin/bmn") ||
                     pathname.includes("/admin/rencana-penghapusan") ||
                     pathname.includes("/admin/log-bmn")
@@ -128,7 +128,7 @@ export default function Header({ role }: HeaderProps) {
               <div className="relative group">
                 <button
                   onClick={() => setOpenPeminjamanMenu(!openPeminjamanMenu)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-md text-[14px] font-medium transition-all ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-[20px] text-[14px] font-medium transition-all ${
                     pathname.includes("/admin/peminjaman") ||
                     pathname.includes("/admin/log-peminjaman")
                       ? "bg-white text-primary"
@@ -177,7 +177,7 @@ export default function Header({ role }: HeaderProps) {
             {role === "user" && (
               <Link
                 href="/user/bmn"
-                className={`flex items-center gap-2 px-4 py-2 rounded-md text-[14px] font-medium transition-all ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-[20px] text-[14px] font-medium transition-all ${
                   isMenuActive("/user/bmn")
                     ? "bg-white text-primary"
                     : "hover:bg-white hover:text-primary"
@@ -193,7 +193,7 @@ export default function Header({ role }: HeaderProps) {
           <div className="relative">
             <button
               onClick={() => setOpenUserMenu(!openUserMenu)}
-              className="flex items-center gap-3 px-4 py-2 rounded-md hover:bg-white hover:text-primary transition-all"
+              className="flex items-center gap-3 px-4 py-2 rounded-[20px] hover:bg-white hover:text-primary transition-all"
             >
               <div className="text-right">
                 <div className="text-[14px] font-semibold">{userName}</div>
