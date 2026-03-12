@@ -193,12 +193,14 @@ export default function UsulanHapusPage() {
         </div>
         
         <div className="flex gap-2 ml-auto">
-            <Button className="h-[35px]" onClick={handleDownloadExcel}>
-              <FolderDown className="mr-1 h-4 w-4" />
-              Eksport
+            <Button className="h-[35px] text-[14px] bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground" 
+              onClick={handleDownloadExcel}>
+              <FolderDown className="h-4 w-4" />
+              Eksport Data
             </Button>
-            <Button className="h-[35px]" onClick={() => { fetchBmns(); setOpenAddDialog(true); }}>
-              <Plus className="mr-1 h-4 w-4" />
+            <Button className="h-[35px] text-[14px] bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground" 
+              onClick={() => { fetchBmns(); setOpenAddDialog(true); }}>
+              <Plus className="h-4 w-4" />
               Tambah Usulan
             </Button>
         </div>
@@ -206,7 +208,7 @@ export default function UsulanHapusPage() {
 
       <div className="bg-white rounded-lg shadow border overflow-x-auto">
         <table className="w-full border-collapse">
-          <thead className="bg-blue-100 text-[13px] text-left italic">
+          <thead className="bg-blue-100 text-[14px] text-left">
             <tr>
               <th className="border p-2">No</th>
               <th className="border p-2">IKMM</th>
@@ -214,11 +216,11 @@ export default function UsulanHapusPage() {
               <th className="border p-2">NUP</th>
               <th className="border p-2">Tanggal Usulan</th>
               <th className="border p-2">Alasan</th>
-              <th className="border p-2 text-center">Status</th>
-              <th className="border p-2">Penyetuju</th>
+              <th className="border p-2 max-w-[100px]">Status</th>
+              <th className="border p-2 max-w-[150px]">Penyetuju</th>
             </tr>
           </thead>
-          <tbody className="text-[12px]">
+          <tbody className="text-[14px]">
             {loading ? (
               <tr><td colSpan={8} className="p-4 text-center"><Loader2 className="animate-spin h-6 w-6 mx-auto" /></td></tr>
             ) : paginatedData.length > 0 ? (
@@ -245,7 +247,7 @@ export default function UsulanHapusPage() {
                       </SelectContent>
                     </Select>
                   </td>
-                  <td className="border p-2">{item.disetujuiOleh || "-"}</td>
+                  <td className="border p-2 text-center">{item.disetujuiOleh || "-"}</td>
                 </tr>
               ))
             ) : (
@@ -255,7 +257,49 @@ export default function UsulanHapusPage() {
         </table>
       </div>
 
-      {/* Pagination UI ... shortened for brevity but same logic as before */}
+      {/* pagination */}
+      <div className="flex items-center justify-between gap-2 bg-white p-4 rounded-lg shadow border">
+        <div className="flex items-center gap-2">
+          {/* items per page */}
+          <Select value={String(itemsPerPage)} onValueChange={(value) => {
+            setItemsPerPage(Number(value));
+            setCurrentPage(1);
+          }}>
+            <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[100px] px-2">
+              <SelectValue placeholder="Items per page" />
+            </SelectTrigger>
+            <SelectContent className="text-[14px]">
+              <SelectItem value="10" className="text-[14px]">10 Data</SelectItem>
+              <SelectItem value="20" className="text-[14px]">20 Data</SelectItem>
+              <SelectItem value="100" className="text-[14px]">100 Data</SelectItem>
+            </SelectContent>
+          </Select>
+          <div className="text-[14px] text-black">
+            Menampilkan {filteredData.length === 0 ? 0 : startIndex + 1} - {Math.min(endIndex, filteredData.length)} dari {filteredData.length} data
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            className="cursor-pointer text-[14px] h-[35px] px-3"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(currentPage - 1)}
+          >
+            ← Sebelumnya
+          </Button>
+          <div className="text-[14px] text-gray-600 px-3">
+            Halaman {currentPage} dari {totalPages}
+          </div>
+          <Button
+            variant="outline"
+            className="cursor-pointer text-[14px] h-[35px] px-3"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(currentPage + 1)}
+          >
+            Berikutnya →
+          </Button>
+        </div>
+      </div>
 
       {/* Add Dialog */}
       <Dialog open={openAddDialog} onOpenChange={setOpenAddDialog}>

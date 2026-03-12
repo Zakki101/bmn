@@ -247,17 +247,17 @@ export default function DataBMNAdminPage() {
         {/* export + tambah data */}
         <div className="flex gap-2 ml-auto">
           <Button
-            className="cursor-pointer text-[12px] h-[35px] s bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground"
+            className="cursor-pointer text-[14px] h-[35px] s bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground"
             onClick={() => handleDownloadExcel()}>
             <FolderDown className="mr-1 h-4 w-4" />
             Eksport Data
           </Button>
 
           <Button
-            className="cursor-pointer text-[12px] h-[35px] px-4 bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground"
+            className="cursor-pointer text-[14px] h-[35px] px-4 bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground"
             onClick={() => router.push("/admin/bmn/add-bmn")}>
             <Plus className="h-4 w-4" />
-            Tambah
+            Tambah Data
           </Button>
         </div>
       </div>
@@ -266,25 +266,25 @@ export default function DataBMNAdminPage() {
       <div className="bg-white pb-0 rounded-lg shadow border overflow-x-auto">
         <div className="max-h-[400px] max-w-auto overflow-y-auto">
           <table className="w-full border-collapse">
-            <thead className="bg-blue-100 text-[13px] text-left sticky top-0 z-10">
+            <thead className="bg-blue-100 text-[14px] text-left sticky top-0 z-10">
               <tr>
                 <th className="border p-2">No</th>
                 <th className="border p-2 min-w-[140px]">IKMM / Kode Barang</th>
                 <th className="border p-2">Akun</th>
                 <th className="border p-2">Bidang</th>
-                <th className="border p-2 min-w-[150px]">Nama / Merek / Tipe</th>
+                <th className="border p-2 min-w-[200px]">Nama / Merek / Tipe</th>
                 <th className="border p-2">NUP</th>
                 <th className="border p-2">Kategori</th>
                 <th className="border p-2 min-w-[140px]">Tanggal Perolehan</th>
-                <th className="border p-2 text-center">Kondisi</th>
-                <th className="border p-2 text-center">Status</th>
-                <th className="border p-2 min-w-[120px] text-center">Bukti Foto</th>
-                <th className="border p-2 text-center min-w-[170px]">Usulkan Penghapusan</th>
-                <th className="border p-2 text-center">Hapus</th>
+                <th className="border p-2">Kondisi</th>
+                <th className="border p-2">Status</th>
+                <th className="border p-2 min-w-[120px]">Bukti Foto</th>
+                <th className="border p-2 min-w-[170px]">Usulkan Penghapusan</th>
+                <th className="border p-2">Hapus</th>
               </tr>
             </thead>
 
-            <tbody className="text-[12px]">
+            <tbody className="text-[14px]">
               {loading ? (
                 <tr>
                   <td colSpan={13} className="border p-8 text-center bg-gray-50">
@@ -314,13 +314,13 @@ export default function DataBMNAdminPage() {
                           handleKondisiChange(item.id, v)
                         }
                       >
-                        <SelectTrigger className="justify-between mx-auto cursor-pointer text-[12px] !h-[28px] min-w-[140px] px-2">
+                        <SelectTrigger className="justify-between mx-auto cursor-pointer text-[14px] !h-[28px] min-w-[140px] px-2">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Baik" className="text-[12px]">Baik</SelectItem>
-                          <SelectItem value="Rusak" className="text-[12px]">Rusak</SelectItem>
-                          <SelectItem value="Dalam Perbaikan" className="text-[12px]">Dalam Perbaikan</SelectItem>
+                          <SelectItem value="Baik" className="text-[14px]">Baik</SelectItem>
+                          <SelectItem value="Rusak" className="text-[14px]">Rusak</SelectItem>
+                          <SelectItem value="Dalam Perbaikan" className="text-[14px]">Dalam Perbaikan</SelectItem>
                         </SelectContent>
                       </Select>
                     </td>
@@ -331,13 +331,13 @@ export default function DataBMNAdminPage() {
                         value={item.dipinjam}
                         onValueChange={(v) => handleStatusChange(item.id, v)}
                       >
-                        <SelectTrigger className="justify-between mx-auto cursor-pointer text-[12px] !h-[28px] min-w-[120px] px-2">
+                        <SelectTrigger className="justify-between mx-auto cursor-pointer text-[14px] !h-[28px] min-w-[120px] px-2">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Dipinjam" className="text-[12px]">Dipinjam</SelectItem>
-                          <SelectItem value="Tersedia" className="text-[12px]">Tersedia</SelectItem>
-                          <SelectItem value="Tidak Tersedia" className="text-[12px]">Tidak Tersedia</SelectItem>
+                          <SelectItem value="Dipinjam" className="text-[14px]">Dipinjam</SelectItem>
+                          <SelectItem value="Tersedia" className="text-[14px]">Tersedia</SelectItem>
+                          <SelectItem value="Tidak Tersedia" className="text-[14px]">Tidak Tersedia</SelectItem>
                         </SelectContent>
                       </Select>
                     </td>
@@ -347,7 +347,7 @@ export default function DataBMNAdminPage() {
                       {item.foto && JSON.parse(item.foto).length > 0 ? (
                         <button
                           onClick={() => window.open(JSON.parse(item.foto)[0], "_blank")}
-                          className="bg-blue-500 text-white text-[12px] py-1 px-2 rounded hover:bg-blue-600"
+                          className="bg-blue-500 text-white text-[14px] py-1 px-2 rounded hover:bg-blue-600"
                         >
                           Lihat Foto
                         </button>
@@ -355,7 +355,7 @@ export default function DataBMNAdminPage() {
                         <>
                           <label
                             htmlFor={`upload-${item.id}`}
-                            className="cursor-pointer bg-green-500 text-white text-[12px] py-1 px-2 rounded hover:bg-green-600"
+                            className="cursor-pointer bg-green-500 text-white text-[14px] py-1 px-2 rounded hover:bg-green-600"
                           >
                             Tambah Foto
                           </label>
@@ -375,7 +375,7 @@ export default function DataBMNAdminPage() {
                     <td className="border p-2 text-center">
                       <button
                         onClick={() => handleAjukanPenghapusan(item.id)}
-                        className="cursor-pointer bg-yellow-500 text-white text-[12px] py-1 px-2 rounded hover:bg-yellow-600"
+                        className="cursor-pointer bg-yellow-500 text-white text-[14px] py-1 px-2 rounded hover:bg-yellow-600"
                       >
                         Usulkan
                       </button>

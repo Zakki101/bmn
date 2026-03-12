@@ -126,7 +126,7 @@ export default function LogPeminjamanPage() {
       <div className="bg-white rounded-lg shadow border overflow-x-auto">
         <div className="max-h-[400px] max-w-auto overflow-y-auto">
           <table className="w-full border-collapse">
-            <thead className="bg-blue-100 text-[13px] text-left sticky top-0 z-10">
+            <thead className="bg-blue-100 text-[14px] text-left sticky top-0 z-10">
               <tr>
                 <th className="border p-2">No</th>
                 <th className="border p-2 min-w-[135px]">Nomor Peminjaman</th>
@@ -146,7 +146,7 @@ export default function LogPeminjamanPage() {
                 <th className="border p-2 text-center">Status</th>
               </tr>
             </thead>
-            <tbody className="text-[12px]">
+            <tbody className="text-[14px]">
               {paginatedData.length > 0 ? (
                 paginatedData.map((item, index) => (
                   <tr key={item.idPeminjaman} className="hover:bg-gray-50">

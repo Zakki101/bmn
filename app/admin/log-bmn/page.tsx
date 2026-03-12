@@ -103,9 +103,9 @@ export default function LogBMNPage() {
         {/* export data */}
         <div className="ml-auto">
           <Button
-            className="cursor-pointer text-[12px] h-[35px] px-4 bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground"
+            className="cursor-pointer text-[14px] h-[35px] px-4 bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground"
             onClick={() => handleDownloadExcel()}>
-            <FolderDown className="mr-2 h-4 w-4" />
+            <FolderDown className="h-5 w-5" />
             Eksport Data
           </Button>
         </div>
@@ -115,7 +115,7 @@ export default function LogBMNPage() {
       <div className="bg-white rounded-lg shadow border overflow-x-auto">
         <div className="max-h-[400px] max-w-auto overflow-y-auto">
           <table className="w-full border-collapse">
-            <thead className="bg-blue-100 text-[13px] text-left sticky top-0 z-10">
+            <thead className="bg-blue-100 text-[14px] text-left sticky top-0 z-10">
               <tr>
                 <th className="border p-2">No</th>
                 <th className="border p-2 min-w-[170px]">IKMM / Kode Barang</th>
@@ -128,14 +128,14 @@ export default function LogBMNPage() {
                 <th className="border p-2 min-w-[130px]">Tanggal Perolehan</th>
                 <th className="border p-2 min-w-[150px]">Tanggal Penghapusan</th>
                 <th className="border p-2 min-w-[180px]">Alasan Penghapusan</th>
-                <th className="border p-2 min-w-[140px] text-center">Disetujui Oleh</th>
+                <th className="border p-2 min-w-[140px]">Disetujui Oleh</th>
               </tr>
             </thead>
 
-            <tbody className="text-[12px]">
+            <tbody className="text-[14px]">
               {paginatedData.length > 0 ? (
                 paginatedData.map((item, index) => (
-                  <tr key={item.idBMN} className="text-[12px] hover:bg-gray-50">
+                  <tr key={item.idBMN} className="text-[14px] hover:bg-gray-50">
                     <td className="border p-2">{startIndex + index + 1}</td>
                     <td className="border p-2">{item.ikmm}</td>
                     <td className="border p-2">{item.akun}</td>
@@ -154,8 +154,8 @@ export default function LogBMNPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={12} className="border p-4 text-center bg-pink-100">
-                    <span className="text-pink-600 font-semibold text-xs">Data tidak ada</span>
+                  <td colSpan={12} className="border p-4 text-center bg-red-100">
+                    <span className="text-red-600 font-semibold text-[14px]">Data tidak ada</span>
                   </td>
                 </tr>
               )}

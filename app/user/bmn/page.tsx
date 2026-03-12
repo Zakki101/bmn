@@ -399,7 +399,7 @@ export default function DataBMNUserPage() {
       <div className="bg-white pb-0 rounded-lg shadow border overflow-x-auto">
         <div className="max-h-[400px] overflow-y-auto">
           <table className="w-full border-collapse">
-            <thead className="bg-blue-100 text-[13px] text-left sticky top-0 z-10">
+            <thead className="bg-blue-100 text-[14px] text-left sticky top-0 z-10">
               <tr>
                 <th className="border p-2">No</th>
                 <th className="border p-2">IKMM</th>
@@ -411,7 +411,7 @@ export default function DataBMNUserPage() {
                 <th className="border p-2">Ketersediaan</th>
               </tr>
             </thead>
-            <tbody className="text-[12px]">
+            <tbody className="text-[14px]">
               {paginatedData.length > 0 ? (
                 paginatedData.map((item, index) => (
                   <tr key={item.idBMN} className="hover:bg-gray-100">

@@ -213,32 +213,34 @@ export default function DataPeminjamanAdminPage() {
         </div>
 
         <div className="flex gap-2 ml-auto">
-          <Button className="h-[35px]" onClick={handleDownloadExcel}>
-            <FolderDown className="mr-1 h-4 w-4" />
+          <Button className="h-[35px] text-[14px] bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground" 
+            onClick={handleDownloadExcel}>
+            <FolderDown className="h-4 w-4" />
             Eksport
           </Button>
 
-          <Button className="h-[35px]" onClick={() => router.push("/admin/peminjaman/add-peminjaman")}>
-            <Plus className="h-4 w-4 mr-1" />
-            Tambah
+          <Button className="h-[35px] text-[14px] bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground" 
+            onClick={() => router.push("/admin/peminjaman/add-peminjaman")}>
+            <Plus className="h-4 w-4" />
+            Tambah Data
           </Button>
         </div>
       </div>
 
       <div className="bg-white rounded-lg shadow border overflow-x-auto">
         <table className="w-full border-collapse">
-          <thead className="bg-blue-100 text-[13px] text-left">
+          <thead className="bg-blue-100 text-[14px] text-left">
             <tr>
               <th className="border p-2">No</th>
               <th className="border p-2">Nomor Peminjaman</th>
               <th className="border p-2">Nama Peminjam</th>
               <th className="border p-2">NIP</th>
               <th className="border p-2">Tanggal Pinjam</th>
-              <th className="border p-2 text-center">Status</th>
-              <th className="border p-2 text-center">Aksi</th>
+              <th className="border p-2">Status</th>
+              <th className="border p-2">Aksi</th>
             </tr>
           </thead>
-          <tbody className="text-[12px]">
+          <tbody className="text-[14px]">
             {loading ? (
               <tr>
                 <td colSpan={7} className="p-4 text-center">
@@ -256,9 +258,8 @@ export default function DataPeminjamanAdminPage() {
                   <td className="border p-2 text-center">
                     <Select
                       value={item.statusPeminjaman}
-                      onValueChange={(val) => handleInlineStatusChange(item.id, val)}
-                    >
-                      <SelectTrigger className="h-[30px] min-w-[100px]">
+                      onValueChange={(val) => handleInlineStatusChange(item.id, val)}>
+                      <SelectTrigger className="h-[30px] min-w-[100px] justify-center text-center">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>

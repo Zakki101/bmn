@@ -154,21 +154,21 @@ export default function Dashboard() {
         <CardContent className="px-3 pt-0 pb-2">
           <div className="max-h-32 overflow-y-auto">
             <table className="w-full border-collapse">
-              <thead className="bg-gray-100 italic">
+              <thead className="bg-gray-100">
                 <tr>
-                  <th className="text-left p-1 border text-[12px]">Nama Barang</th>
-                  <th className="text-left p-1 border text-[12px]">Unit (NUP)</th>
-                  <th className="text-left p-1 border text-[12px]">Tanggal Masuk</th>
+                  <th className="text-left p-1 border text-[14px]">Nama Barang</th>
+                  <th className="text-left p-1 border text-[14px]">Unit (NUP)</th>
+                  <th className="text-left p-1 border text-[14px]">Tanggal Masuk</th>
                 </tr>
               </thead>
               <tbody>
                 {perolehanBMN.length > 0 ? perolehanBMN.map((item) => (
                   <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="p-1 border text-[11px]">{item.namaBarang}</td>
-                    <td className="p-1 border text-[11px]">{item.unit}</td>
-                    <td className="p-1 border text-[11px]">{new Date(item.createdAt).toLocaleDateString("id-ID")}</td>
+                    <td className="p-1 border text-[13px]">{item.namaBarang}</td>
+                    <td className="p-1 border text-[13px]">{item.unit}</td>
+                    <td className="p-1 border text-[13px]">{new Date(item.createdAt).toLocaleDateString("id-ID")}</td>
                   </tr>
-                )) : <tr><td colSpan={3} className="text-center p-2 text-[11px]">No data</td></tr>}
+                )) : <tr><td colSpan={3} className="text-center p-2 text-[14px]">No data</td></tr>}
               </tbody>
             </table>
           </div>
@@ -177,27 +177,27 @@ export default function Dashboard() {
 
       {/* Tabel Peminjaman BMN */}
       <SmallCard className="row-span-1 col-span-4">
-        <CardHeader className="px-3 pt-2 pb-0">
+        <CardHeader className="px-3 pt-2 pb-1">
           <CardTitle className="text-[16px]">Peminjaman Aktif</CardTitle>
         </CardHeader>
         <CardContent className="px-3 pt-0 pb-2">
           <div className="max-h-32 overflow-y-auto">
             <table className="w-full border-collapse">
-              <thead className="bg-gray-100 italic">
+              <thead className="bg-gray-100">
                 <tr>
-                  <th className="text-left p-1 border text-[12px]">Peminjam</th>
-                  <th className="text-left p-1 border text-[12px]">Status</th>
-                  <th className="text-left p-1 border text-[12px]">Tanggal Pinjam</th>
+                  <th className="text-left p-1 border text-[14px]">Peminjam</th>
+                  <th className="text-left p-1 border text-[14px]">Status</th>
+                  <th className="text-left p-1 border text-[14px]">Tanggal Pinjam</th>
                 </tr>
               </thead>
               <tbody>
                 {peminjamanTerbaru.length > 0 ? peminjamanTerbaru.map((item) => (
                   <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="p-1 border text-[11px]">{item.namaPeminjam}</td>
-                    <td className="p-1 border text-[11px]">{item.statusPeminjaman}</td>
-                    <td className="p-1 border text-[11px]">{new Date(item.tanggalPinjam).toLocaleDateString("id-ID")}</td>
+                    <td className="p-1 border text-[13px]">{item.namaPeminjam}</td>
+                    <td className="p-1 border text-[13px]">{item.statusPeminjaman}</td>
+                    <td className="p-1 border text-[13px]">{new Date(item.tanggalPinjam).toLocaleDateString("id-ID")}</td>
                   </tr>
-                )) : <tr><td colSpan={3} className="text-center p-2 text-[11px]">No data</td></tr>}
+                )) : <tr><td colSpan={3} className="text-center p-2 text-[14px]">No data</td></tr>}
               </tbody>
             </table>
           </div>
