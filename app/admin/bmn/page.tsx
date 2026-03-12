@@ -417,7 +417,7 @@ export default function DataBMNAdminPage() {
         currentPage={currentPage}
         totalPages={totalPages}
         itemsPerPage={itemsPerPage}
-        totalItems={sortedData.length}
+        totalItems={bmnData.length}
         startIndex={startIndex}
         endIndex={endIndex}
         onPageChange={setCurrentPage}
