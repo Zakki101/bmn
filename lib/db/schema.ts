@@ -6,16 +6,25 @@ import { sql } from "drizzle-orm";
  */
 export const bmn = sqliteTable("bmn", {
   id: integer("id").primaryKey({ autoIncrement: true }),
-  ikmm: text("ikmm").notNull(),
-  akun: integer("akun").notNull().default(132111),
-  bidang: text("bidang").notNull(), // "MTI" | "BDI" | "TU"
-  unit: integer("unit").notNull(), // NUP
-  namaBarang: text("nama_barang").notNull(),
-  kategori: text("kategori").notNull(),
-  kondisiBarang: text("kondisi_barang").notNull().default("Baik"), // "Baik" | "Rusak" | "Dalam Perbaikan"
-  tanggalPerolehan: text("tanggal_perolehan").notNull(), // Using text for compatibility with existing format or ISO
-  dipinjam: text("dipinjam").notNull().default("Tersedia"), // "Dipinjam" | "Tersedia" | "Tidak Tersedia"
-  foto: text("foto"), // Store as JSON string array if multiple
+  kodeSatker: text("kode_satker"),
+  ikmm: text("ikmm").notNull(), // From Excel Col C
+  kodeAkun: text("kode_akun"), // From Excel Col B
+  bidang: text("bidang"), // Default null/default
+  nup: integer("nup"), // From Excel Col D
+  namaBarang: text("nama_barang").notNull(), // From Excel Col E
+  merkType: text("merk_type"), // From Excel Col F
+  kuantitas: integer("kuantitas").default(1), // From Excel Col J
+  satuan: text("satuan"), // From Excel Col G
+  kategori: text("kategori"), // Enum: Laptop, PC / Server, Printer / Scanner, Furniture, Multimedia, Elektronik, Telekomunikasi, Jaringan, Kendaraan, Peralatan Kantor, Lainnya
+  kondisiBarang: text("kondisi_barang").notNull().default("Baik"), // From Excel Col I
+  tanggalPerolehan: text("tanggal_perolehan").notNull(), // From Excel Col H
+  nilaiPerolehan: integer("nilai_perolehan"), // From Excel Col K
+  mutasiBmn: integer("mutasi_bmn"), // From Excel Col L
+  nilaiBmn: integer("nilai_bmn"), // From Excel Col M
+  nilaiPenyusutan: integer("nilai_penyusutan"), // From Excel Col N
+  nilaiBuku: integer("nilai_buku"), // From Excel Col O
+  status: text("status").notNull().default("Tersedia"), // From Excel Col P
+  foto: text("foto"),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
     .default(sql`(unixepoch())`),
