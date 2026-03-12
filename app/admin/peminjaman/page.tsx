@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { Download, FolderDown, Plus, Loader2 } from "lucide-react";
+import Pagination from "@/components/ui/pagination";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import imageCompression from "browser-image-compression";
 import { pdf } from "@react-pdf/renderer";
@@ -284,6 +285,21 @@ export default function DataPeminjamanAdminPage() {
           </tbody>
         </table>
       </div>
+
+      {/* pagination */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        itemsPerPage={itemsPerPage}
+        totalItems={sortedData.length}
+        startIndex={startIndex}
+        endIndex={endIndex}
+        onPageChange={setCurrentPage}
+        onItemsPerPageChange={(value) => {
+          setItemsPerPage(value);
+          setCurrentPage(1);
+        }}
+      />
     </div>
   );
 }

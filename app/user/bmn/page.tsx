@@ -9,7 +9,8 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
 import { dataBMN } from "@/data/dataBMN";
-import { FolderDown } from "lucide-react";
+import { FolderDown, ArrowDownNarrowWide, ArrowUpWideNarrow } from "lucide-react";
+import Pagination from "@/components/ui/pagination";
 
 // state
 export default function DataBMNUserPage() {
@@ -20,7 +21,25 @@ export default function DataBMNUserPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [sortField, setSortField] = useState<string>('tanggalPerolehan');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortOrder('asc');
+    }
+  };
+
+  const SortIcon = ({ field }: { field: string }) => {
+    if (sortField !== field) return <ArrowDownNarrowWide size={20} className="inline ml-1 text-black" />;
+    return sortOrder === 'desc'
+      ? <ArrowUpWideNarrow size={20} className="inline ml-1 text-black" />
+      : <ArrowDownNarrowWide size={20} className="inline ml-1 text-black" />;
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -41,13 +60,22 @@ export default function DataBMNUserPage() {
 
   // filter + sort
   const sortedData = [...dataBMN].sort((a, b) => {
-    const [dayA, monthA, yearA] = a.tanggalPerolehan.split("/");
-    const [dayB, monthB, yearB] = b.tanggalPerolehan.split("/");
+    let aVal: any;
+    let bVal: any;
 
-    const dateA = new Date(`${yearA}-${monthA}-${dayA}`);
-    const dateB = new Date(`${yearB}-${monthB}-${dayB}`);
+    if (sortField === 'tanggalPerolehan') {
+      const [dayA, monthA, yearA] = a.tanggalPerolehan.split("/");
+      const [dayB, monthB, yearB] = b.tanggalPerolehan.split("/");
+      aVal = new Date(`${yearA}-${monthA}-${dayA}`).getTime();
+      bVal = new Date(`${yearB}-${monthB}-${dayB}`).getTime();
+    } else {
+      aVal = a[sortField as keyof typeof a];
+      bVal = b[sortField as keyof typeof b];
+    }
 
-    return dateB.getTime() - dateA.getTime();
+    if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
+    return 0;
   });
 
   const filteredData = sortedData.filter((item) => {
@@ -379,6 +407,8 @@ export default function DataBMNUserPage() {
             setKondisiFilter([]);
             setCurrentPage(1);
             setShowKondisiDropdown(false);
+            setSortField('tanggalPerolehan');
+            setSortOrder('asc');
           }}
         >
           Reset
@@ -403,10 +433,14 @@ export default function DataBMNUserPage() {
               <tr>
                 <th className="border p-2">No</th>
                 <th className="border p-2">IKMM</th>
-                <th className="border p-2">Nama</th>
+                <th className="border p-2 cursor-pointer select-none hover:bg-blue-200" onClick={() => handleSort('namaBarang')}>
+                  Nama <SortIcon field="namaBarang" />
+                </th>
                 <th className="border p-2">Kategori</th>
                 <th className="border p-2">Jumlah</th>
-                <th className="border p-2">Tanggal Perolehan</th>
+                <th className="border p-2 cursor-pointer select-none hover:bg-blue-200" onClick={() => handleSort('tanggalPerolehan')}>
+                  Tanggal Perolehan <SortIcon field="tanggalPerolehan" />
+                </th>
                 <th className="border p-2">Kondisi</th>
                 <th className="border p-2">Ketersediaan</th>
               </tr>
@@ -423,26 +457,26 @@ export default function DataBMNUserPage() {
                     <td className="border p-2">{item.tanggalPerolehan}</td>
                     <td className="border p-2 text-center">
                       {item.kondisiBarang === "Baik" ? (
-                        <span className="inline-block bg-green-200 text-green-800 px-3 py-1 rounded text-[12px] font-semibold min-w-[70px]">
+                        <span className="inline-block bg-green-200 text-green-800 px-3 py-1 rounded text-[14px] font-semibold min-w-[70px]">
                           Baik
                         </span>
                       ) : item.kondisiBarang === "Rusak" ? (
-                        <span className="inline-block bg-red-200 text-red-800 px-3 py-1 rounded text-[12px] font-semibold min-w-[70px]">
+                        <span className="inline-block bg-red-200 text-red-800 px-3 py-1 rounded text-[14px] font-semibold min-w-[70px]">
                           Rusak
                         </span>
                       ) : (
-                        <span className="inline-block bg-yellow-200 text-yellow-800 px-3 py-1 rounded text-[12px] font-semibold min-w-[70px]">
+                        <span className="inline-block bg-yellow-200 text-yellow-800 px-3 py-1 rounded text-[14px] font-semibold min-w-[70px]">
                           Perbaikan
                         </span>
                       )}
                     </td>
                     <td className="border p-2 text-center">
                       {item.dipinjam === "Tersedia" ? (
-                        <span className="inline-block bg-green-200 text-green-800 px-3 py-1 rounded text-[12px] font-semibold min-w-[120px]">
+                        <span className="inline-block bg-green-200 text-green-800 px-3 py-1 rounded text-[14px] font-semibold min-w-[120px]">
                           Tersedia
                         </span>
                       ) : item.dipinjam === "Dipinjam" ? (
-                        <span className="inline-block bg-blue-200 text-blue-800 px-3 py-1 rounded text-[12px] font-semibold min-w-[120px]">
+                        <span className="inline-block bg-blue-200 text-blue-800 px-3 py-1 rounded text-[14px] font-semibold min-w-[120px]">
                           Dipinjam
                         </span>
                       ) : (
@@ -466,48 +500,19 @@ export default function DataBMNUserPage() {
       </div>
 
       {/* pagination */}
-      <div className="flex items-center justify-between gap-2 bg-white p-4 rounded-lg shadow border">
-        <div className="flex items-center gap-2">
-          {/* items per page */}
-          <Select value={String(itemsPerPage)} onValueChange={(value) => {
-            setItemsPerPage(Number(value));
-            setCurrentPage(1);
-          }}>
-            <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[100px] px-2">
-              <SelectValue placeholder="Items per page" />
-            </SelectTrigger>
-            <SelectContent className="text-[12px]">
-              <SelectItem value="10" className="text-[12px]">10 Data</SelectItem>
-              <SelectItem value="20" className="text-[12px]">20 Data</SelectItem>
-              <SelectItem value="100" className="text-[12px]">100 Data</SelectItem>
-            </SelectContent>
-          </Select>
-          <div className="text-[14px] text-black">
-            Menampilkan {filteredData.length === 0 ? 0 : startIndex + 1} - {Math.min(endIndex, filteredData.length)} dari {filteredData.length} data
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            className="cursor-pointer text-[12px] h-[35px] px-3"
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(currentPage - 1)}
-          >
-            ← Sebelumnya
-          </Button>
-          <div className="text-[12px] text-gray-600 px-3">
-            Halaman {currentPage} dari {totalPages}
-          </div>
-          <Button
-            variant="outline"
-            className="cursor-pointer text-[12px] h-[35px] px-3"
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage(currentPage + 1)}
-          >
-            Berikutnya →
-          </Button>
-        </div>
-      </div>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        itemsPerPage={itemsPerPage}
+        totalItems={filteredData.length}
+        startIndex={startIndex}
+        endIndex={endIndex}
+        onPageChange={setCurrentPage}
+        onItemsPerPageChange={(value) => {
+          setItemsPerPage(value);
+          setCurrentPage(1);
+        }}
+      />
 
       {/* export modal */}
       <Dialog open={showExportModal} onOpenChange={setShowExportModal}>
