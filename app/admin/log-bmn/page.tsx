@@ -38,10 +38,10 @@ export default function LogBMNPage() {
         const exportData = filteredData.map((item, i) => ({
           No: i + 1,
           IKMM: item.ikmm,
-          Akun: item.akun,
+          Akun: item.kodeAkun,
           Bidang: item.bidang,
           "Nama Barang": item.namaBarang,
-          NUP: item.unit,
+          NUP: item.nup,
           Kategori: item.kategori,
           "Kondisi Barang": item.kondisiBarang,
           "Tanggal Penghapusan": item.tanggalPenghapusan,
@@ -139,10 +139,10 @@ export default function LogBMNPage() {
                   <tr key={item.idBMN} className="text-[14px] hover:bg-gray-50">
                     <td className="border p-2">{startIndex + index + 1}</td>
                     <td className="border p-2">{item.ikmm}</td>
-                    <td className="border p-2">{item.akun}</td>
+                    <td className="border p-2">{item.kodeAkun}</td>
                     <td className="border p-2">{item.bidang}</td>
                     <td className="border p-2">{item.namaBarang}</td>
-                    <td className="border p-2">{item.unit}</td>
+                    <td className="border p-2">{item.nup}</td>
                     <td className="border p-2">{item.kategori}</td>
                     <td className="border p-2">{item.kondisiBarang}</td>
                     <td className="border p-2">{item.tanggalPerolehan}</td>

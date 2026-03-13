@@ -114,13 +114,13 @@ export default function DataBMNUserPage() {
     if (ketersediaanFilters.length > 0) {
       matchKetersediaan = false;
       for (const filter of ketersediaanFilters) {
-        if (filter === "tersedia" && item.dipinjam === "Tersedia") {
+        if (filter === "tersedia" && item.status === "Tersedia") {
           matchKetersediaan = true;
           break;
-        } else if (filter === "dipinjam" && item.dipinjam === "Dipinjam") {
+        } else if (filter === "dipinjam" && item.status === "Dipinjam") {
           matchKetersediaan = true;
           break;
-        } else if (filter === "tidak-tersedia" && item.dipinjam === "Tidak Tersedia") {
+        } else if (filter === "tidak-tersedia" && item.status === "Tidak Tersedia") {
           matchKetersediaan = true;
           break;
         }
@@ -147,7 +147,7 @@ export default function DataBMNUserPage() {
       "Jumlah": 1,
       "Tanggal Perolehan": item.tanggalPerolehan,
       "Kondisi (Baik/Rusak/Perbaikan)": item.kondisiBarang,
-      "Ketersediaan (Tersedia/Dipinjam/Tidak Tersedia)": item.dipinjam
+      "Ketersediaan (Tersedia/Dipinjam/Tidak Tersedia)": item.status
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(data);
@@ -217,7 +217,7 @@ export default function DataBMNUserPage() {
           <td>1</td>
           <td>${item.tanggalPerolehan}</td>
           <td>${item.kondisiBarang}</td>
-          <td>${item.dipinjam}</td>
+          <td>${item.status}</td>
         </tr>
       `;
     });
@@ -471,11 +471,11 @@ export default function DataBMNUserPage() {
                       )}
                     </td>
                     <td className="border p-2 text-center">
-                      {item.dipinjam === "Tersedia" ? (
+                      {item.status === "Tersedia" ? (
                         <span className="inline-block bg-green-200 text-green-800 px-3 py-1 rounded text-[14px] font-semibold min-w-[120px]">
                           Tersedia
                         </span>
-                      ) : item.dipinjam === "Dipinjam" ? (
+                      ) : item.status === "Dipinjam" ? (
                         <span className="inline-block bg-blue-200 text-blue-800 px-3 py-1 rounded text-[14px] font-semibold min-w-[120px]">
                           Dipinjam
                         </span>
