@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +23,7 @@ export default function DataBMNAdminPage() {
   const [kondisi, setKondisi] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const tableContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   const fetchBMN = useCallback(async () => {
@@ -263,7 +264,7 @@ export default function DataBMNAdminPage() {
 
       {/* Tabel */}
       <div className="bg-white pb-0 rounded-lg shadow border overflow-x-auto">
-        <div className="max-h-[400px] max-w-auto overflow-y-auto">
+        <div ref={tableContainerRef} className="max-h-[400px] max-w-auto overflow-y-auto">
           <table className="w-full border-collapse">
             <thead className="bg-blue-100 text-[14px] text-left sticky top-0 z-10">
               <tr>
@@ -402,7 +403,7 @@ export default function DataBMNAdminPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={13} className="border p-4 text-center bg-red-100">
+                  <td colSpan={17} className="border p-4 text-center bg-red-100">
                     <span className="text-red-800 font-semibold text-[14px]">Data tidak ada</span>
                   </td>
                 </tr>
@@ -425,6 +426,7 @@ export default function DataBMNAdminPage() {
           setItemsPerPage(value);
           setCurrentPage(1);
         }}
+        tableContainerRef={tableContainerRef}
       />
 
     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FileSpreadsheet, PenLine, FolderDown, Plus, Loader2, Trash2 } from "lucide-react";
@@ -34,6 +34,7 @@ export default function UsulanHapusPage() {
   
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const tableContainerRef = useRef<HTMLDivElement>(null);
 
   const fetchProposals = useCallback(async () => {
     setLoading(true);
@@ -208,7 +209,8 @@ export default function UsulanHapusPage() {
       </div>
 
       <div className="bg-white rounded-lg shadow border overflow-x-auto">
-        <table className="w-full border-collapse">
+        <div ref={tableContainerRef} className="max-h-[400px] overflow-y-auto">
+          <table className="w-full border-collapse">
           <thead className="bg-blue-100 text-[14px] text-left">
             <tr>
               <th className="border p-2">No</th>
@@ -256,6 +258,7 @@ export default function UsulanHapusPage() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* pagination */}
@@ -271,6 +274,7 @@ export default function UsulanHapusPage() {
           setItemsPerPage(value);
           setCurrentPage(1);
         }}
+        tableContainerRef={tableContainerRef}
       />
 
       {/* Add Dialog */}

@@ -1,5 +1,6 @@
 "use client";
 
+import { RefObject } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 
@@ -12,6 +13,7 @@ interface PaginationProps {
   endIndex: number;
   onPageChange: (page: number) => void;
   onItemsPerPageChange: (value: number) => void;
+  tableContainerRef?: RefObject<HTMLDivElement | null>;
 }
 
 export default function Pagination({
@@ -23,7 +25,15 @@ export default function Pagination({
   endIndex,
   onPageChange,
   onItemsPerPageChange,
+  tableContainerRef,
 }: PaginationProps) {
+  const handlePageChange = (page: number) => {
+    onPageChange(page);
+    if (tableContainerRef?.current) {
+      tableContainerRef.current.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    }
+  };
+
   return (
     <div className="flex items-center justify-between gap-2 bg-white p-4 rounded-lg shadow border">
       <div className="flex items-center gap-2">
@@ -51,7 +61,7 @@ export default function Pagination({
           variant="outline"
           className="cursor-pointer text-[12px] h-[35px] px-3"
           disabled={currentPage === 1}
-          onClick={() => onPageChange(currentPage - 1)}
+          onClick={() => handlePageChange(currentPage - 1)}
         >
           ← Sebelumnya
         </Button>
@@ -62,7 +72,7 @@ export default function Pagination({
           variant="outline"
           className="cursor-pointer text-[12px] h-[35px] px-3"
           disabled={currentPage === totalPages || totalPages === 0}
-          onClick={() => onPageChange(currentPage + 1)}
+          onClick={() => handlePageChange(currentPage + 1)}
         >
           Berikutnya →
         </Button>

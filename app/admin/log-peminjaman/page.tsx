@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +21,7 @@ export default function LogPeminjamanPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const tableContainerRef = useRef<HTMLDivElement>(null);
 
 
   // Filter + search
@@ -125,7 +126,7 @@ export default function LogPeminjamanPage() {
 
       {/* Table */}
       <div className="bg-white rounded-lg shadow border overflow-x-auto">
-        <div className="max-h-[400px] max-w-auto overflow-y-auto">
+        <div ref={tableContainerRef} className="max-h-[400px] max-w-auto overflow-y-auto">
           <table className="w-full border-collapse">
             <thead className="bg-blue-100 text-[14px] text-left sticky top-0 z-10">
               <tr>
@@ -194,6 +195,7 @@ export default function LogPeminjamanPage() {
           setItemsPerPage(value);
           setCurrentPage(1);
         }}
+        tableContainerRef={tableContainerRef}
       />
     </div>
   );

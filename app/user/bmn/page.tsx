@@ -24,6 +24,7 @@ export default function DataBMNUserPage() {
   const [sortField, setSortField] = useState<string>('tanggalPerolehan');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const tableContainerRef = useRef<HTMLDivElement>(null);
 
   const handleSort = (field: string) => {
     if (sortField === field) {
@@ -427,7 +428,7 @@ export default function DataBMNUserPage() {
 
       {/* tabel */}
       <div className="bg-white pb-0 rounded-lg shadow border overflow-x-auto">
-        <div className="max-h-[400px] overflow-y-auto">
+        <div ref={tableContainerRef} className="max-h-[400px] overflow-y-auto">
           <table className="w-full border-collapse">
             <thead className="bg-blue-100 text-[14px] text-left sticky top-0 z-10">
               <tr>
@@ -512,6 +513,7 @@ export default function DataBMNUserPage() {
           setItemsPerPage(value);
           setCurrentPage(1);
         }}
+        tableContainerRef={tableContainerRef}
       />
 
       {/* export modal */}
