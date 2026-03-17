@@ -44,7 +44,7 @@ export default function Dashboard() {
   }, []);
 
   // Process data for charts
-  const categories = ["Laptop", "Monitor", "Printer", "TV", "Peripheral", "Lainnya"];
+  const categories = ["Laptop/Server", "Monitor", "Printer", "TV", "Furniture", "Jaringan", "Elektronik", "Peripheral", "Lainnya"];
   const kategoriStats = categories.map(cat => {
     const items = bmnData.filter(b => b.kategori === cat);
     const baik = items.filter(b => b.kondisiBarang === "Baik").length;
@@ -77,7 +77,7 @@ export default function Dashboard() {
         <CardHeader className="p-2 pb-0">
           <div className="flex items-center px-1 py-1">
             <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center mr-2">
-              <ChartLine className="w-6 h-6 text-secondary-foreground" strokeWidth={2.5}/>
+              <ChartLine className="w-6 h-6 text-secondary-foreground" strokeWidth={2.5} />
             </div>
             <CardTitle className="text-[18px]">Statistik BMN</CardTitle>
           </div>
@@ -88,7 +88,7 @@ export default function Dashboard() {
               <span className="text-[14px] font-medium">Total Unit BMN</span>
               <span className="text-[20px] font-bold">{totalBMN} Unit</span>
             </div>
-            
+
             {kategoriStats.map((stat, i) => {
               const total = stat.total;
               const baikPercent = total > 0 ? Math.round((stat.baik / total) * 100) : 0;
@@ -129,7 +129,7 @@ export default function Dashboard() {
         <CardHeader className="p-2 pb-5">
           <div className="flex items-center px-1 py-1">
             <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center mr-2">
-              <ChartNoAxesColumn className="w-6 h-6 text-secondary-foreground" strokeWidth={2.5}/>
+              <ChartNoAxesColumn className="w-6 h-6 text-secondary-foreground" strokeWidth={2.5} />
             </div>
             <CardTitle className="text-[18px]"> Visualisasi Kategori Barang</CardTitle>
           </div>
