@@ -21,11 +21,11 @@ export default function LogBMNPage() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
- const filteredData = logData
+  const filteredData = logData
     .filter((i) => {
       const matchSearch = i.namaBarang.toLowerCase().includes(search.toLowerCase());
-      const matchKategori    = kategori === "all" || i.kategori === kategori;
-    return matchSearch && matchKategori;
+      const matchKategori = kategori === "all" || i.kategori === kategori;
+      return matchSearch && matchKategori;
     });
 
   // pagination
@@ -33,36 +33,36 @@ export default function LogBMNPage() {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedData = filteredData.slice(startIndex, endIndex);
-  
+
   // function download excel
   const handleDownloadExcel = () => {
-        const exportData = filteredData.map((item, i) => ({
-          No: i + 1,
-          IKMM: item.ikmm,
-          Akun: item.kodeAkun,
-          Bidang: item.bidang,
-          "Nama Barang": item.namaBarang,
-          NUP: item.nup,
-          Kategori: item.kategori,
-          "Kondisi Barang": item.kondisiBarang,
-          "Tanggal Penghapusan": item.tanggalPenghapusan,
-          "Alasan Penghapusan": item.alasanPenghapusan,
-          "Disetujui Oleh": item.disetujuiOleh,
-        }));
-    
-        const worksheet = XLSX.utils.json_to_sheet(exportData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Log Data BMN");
-    
-        const excelBuffer = XLSX.write(workbook, {
-          bookType: "xlsx",
-          type: "array",
-        });
-        const blob = new Blob([excelBuffer], {
-          type: "application/octet-stream",
-        });
-        saveAs(blob, "LOG_data_bmn.xlsx");
-      };
+    const exportData = filteredData.map((item, i) => ({
+      No: i + 1,
+      IKMM: item.ikmm,
+      Akun: item.kodeAkun,
+      Bidang: item.bidang,
+      "Nama Barang": item.namaBarang,
+      NUP: item.nup,
+      Kategori: item.kategori,
+      "Kondisi Barang": item.kondisiBarang,
+      "Tanggal Penghapusan": item.tanggalPenghapusan,
+      "Alasan Penghapusan": item.alasanPenghapusan,
+      "Disetujui Oleh": item.disetujuiOleh,
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Log Data BMN");
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const blob = new Blob([excelBuffer], {
+      type: "application/octet-stream",
+    });
+    saveAs(blob, "LOG_data_bmn.xlsx");
+  };
 
   return (
     <div className="space-y-2">
@@ -82,7 +82,7 @@ export default function LogBMNPage() {
               <SelectValue placeholder="Kategori" />
             </SelectTrigger>
             <SelectContent className="text-[14px]">
-              {["all", "Laptop", "Monitor", "Printer", "TV", "Peripheral", "Lainnya"].map((k) => (
+              {["all", "Laptop/Server", "Monitor", "Printer", "TV", "Furniture", "Jaringan", "Elektronik", "Peripheral", "Lainnya"].map((k) => (
                 <SelectItem key={k} value={k} className="text-[12px]">
                   {k === "all" ? "Semua Kategori" : k}
                 </SelectItem>
@@ -99,9 +99,9 @@ export default function LogBMNPage() {
             }}
           >
             Reset
-          </Button>          
+          </Button>
         </div>
-        
+
         {/* export data */}
         <div className="ml-auto">
           <Button

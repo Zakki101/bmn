@@ -223,7 +223,7 @@ export default function DataBMNAdminPage() {
               <SelectValue placeholder="Kategori" />
             </SelectTrigger>
             <SelectContent className="text-[14px]">
-              {["all", "Laptop", "Monitor", "Printer", "TV", "Peripheral", "Lainnya"].map((k) => (
+              {["all", "Laptop/Server", "Monitor", "Printer", "TV", "Furniture", "Jaringan", "Elektronik", "Peripheral", "Lainnya"].map((k) => (
                 <SelectItem key={k} value={k} className="text-[14px]">
                   {k === "all" ? "Semua Kategori" : k}
                 </SelectItem>

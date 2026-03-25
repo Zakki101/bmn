@@ -17,17 +17,15 @@ export default function AddBMNPage() {
 
   // mapping kategori - IKMM
   const kategoriToIkmm: Record<string, string> = {
-    Laptop: "3100101002",
-    "PC / Server": "3100102001",
-    "Printer / Scanner": "3100102005",
-    Furniture: "3080101001",
-    Multimedia: "3100102010",
-    Elektronik: "3080105001",
-    Telekomunikasi: "3100101001",
-    Jaringan: "3100203001",
-    Kendaraan: "3020101001",
-    "Peralatan Kantor": "3080104001",
-    Lainnya: "0",
+    "Laptop/Server": "3100101002",
+    "Monitor": "3100102003",
+    "Printer": "3100102005",
+    "TV": "3100102010",
+    "Furniture": "3080101001",
+    "Jaringan": "3100203001",
+    "Elektronik": "3080105001",
+    "Peripheral": "3100102001",
+    "Lainnya": "0",
   };
 
   // format tanggal
@@ -135,16 +133,14 @@ export default function AddBMNPage() {
             required
           >
             <option value="">Pilih kategori</option>
-            <option value="Laptop">Laptop</option>
-            <option value="PC / Server">PC / Server</option>
-            <option value="Printer / Scanner">Printer / Scanner</option>
+            <option value="Laptop/Server">Laptop/Server</option>
+            <option value="Monitor">Monitor</option>
+            <option value="Printer">Printer</option>
+            <option value="TV">TV</option>
             <option value="Furniture">Furniture</option>
-            <option value="Multimedia">Multimedia</option>
-            <option value="Elektronik">Elektronik</option>
-            <option value="Telekomunikasi">Telekomunikasi</option>
             <option value="Jaringan">Jaringan</option>
-            <option value="Kendaraan">Kendaraan</option>
-            <option value="Peralatan Kantor">Peralatan Kantor</option>
+            <option value="Elektronik">Elektronik</option>
+            <option value="Peripheral">Peripheral</option>
             <option value="Lainnya">Lainnya</option>
           </select>
 

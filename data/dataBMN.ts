@@ -6,16 +6,14 @@ export type BMN = {
   nup: number;
   namaBarang: string;
   kategori:
-  | "Laptop"
-  | "PC / Server"
-  | "Printer / Scanner"
+  | "Laptop/Server"
+  | "Monitor"
+  | "Printer"
+  | "TV"
   | "Furniture"
-  | "Multimedia"
-  | "Elektronik"
-  | "Telekomunikasi"
   | "Jaringan"
-  | "Kendaraan"
-  | "Peralatan Kantor"
+  | "Elektronik"
+  | "Peripheral"
   | "Lainnya";
   kondisiBarang: "Baik" | "Rusak" | "Dalam Perbaikan";
   tanggalPerolehan: string;
@@ -31,7 +29,7 @@ export const dataBMN: BMN[] = [
     nup: 1,
     bidang: "BDI",
     namaBarang: "Lenovo IdeaPad 3 14/TL6",
-    kategori: "Laptop",
+    kategori: "Laptop/Server",
     kondisiBarang: "Baik",
     tanggalPerolehan: "26/08/2024",
     status: "Dipinjam",
@@ -43,7 +41,7 @@ export const dataBMN: BMN[] = [
     bidang: "BDI",
     nup: 2,
     namaBarang: "Lenovo IdeaPad 3 14/TL6",
-    kategori: "Laptop",
+    kategori: "Laptop/Server",
     kondisiBarang: "Baik",
     tanggalPerolehan: "26/08/2024",
     status: "Dipinjam",
@@ -55,7 +53,7 @@ export const dataBMN: BMN[] = [
     bidang: "MTI",
     nup: 3,
     namaBarang: "Lenovo IdeaPad 3 14/TL6",
-    kategori: "Laptop",
+    kategori: "Laptop/Server",
     kondisiBarang: "Baik",
     tanggalPerolehan: "26/08/2024",
     status: "Tersedia",
@@ -67,7 +65,7 @@ export const dataBMN: BMN[] = [
     bidang: "TU",
     nup: 1,
     namaBarang: "HP LaserJet Pro M404dn",
-    kategori: "Printer / Scanner",
+    kategori: "Printer",
     kondisiBarang: "Baik",
     tanggalPerolehan: "15/03/2023",
     status: "Dipinjam",
@@ -79,7 +77,7 @@ export const dataBMN: BMN[] = [
     bidang: "TU",
     nup: 2,
     namaBarang: "HP LaserJet Pro M404dn",
-    kategori: "Printer / Scanner",
+    kategori: "Printer",
     kondisiBarang: "Baik",
     tanggalPerolehan: "15/03/2023",
     status: "Tersedia",
@@ -91,7 +89,7 @@ export const dataBMN: BMN[] = [
     bidang: "BDI",
     nup: 1,
     namaBarang: "Dell 24-inch UltraSharp Monitor",
-    kategori: "PC / Server",
+    kategori: "Monitor",
     kondisiBarang: "Baik",
     tanggalPerolehan: "09/11/2022",
     status: "Dipinjam",
@@ -103,7 +101,7 @@ export const dataBMN: BMN[] = [
     bidang: "MTI",
     nup: 2,
     namaBarang: "Dell 24-inch UltraSharp Monitor",
-    kategori: "PC / Server",
+    kategori: "Monitor",
     kondisiBarang: "Dalam Perbaikan",
     tanggalPerolehan: "09/11/2022",
     status: "Tidak Tersedia",
@@ -115,7 +113,7 @@ export const dataBMN: BMN[] = [
     bidang: "MTI",
     nup: 3,
     namaBarang: "Dell 24-inch UltraSharp Monitor",
-    kategori: "PC / Server",
+    kategori: "Monitor",
     kondisiBarang: "Baik",
     tanggalPerolehan: "09/11/2022",
     status: "Dipinjam",
@@ -127,7 +125,7 @@ export const dataBMN: BMN[] = [
     bidang: "TU",
     nup: 1,
     namaBarang: "LG 43-inch Smart TV",
-    kategori: "Multimedia",
+    kategori: "TV",
     kondisiBarang: "Baik",
     tanggalPerolehan: "20/10/2021",
     status: "Dipinjam",
@@ -139,7 +137,7 @@ export const dataBMN: BMN[] = [
     bidang: "TU",
     nup: 2,
     namaBarang: "LG 43-inch Smart TV",
-    kategori: "Multimedia",
+    kategori: "TV",
     kondisiBarang: "Baik",
     tanggalPerolehan: "20/10/2021",
     status: "Dipinjam",
@@ -151,7 +149,7 @@ export const dataBMN: BMN[] = [
     bidang: "MTI",
     nup: 1,
     namaBarang: "Seagate Expansion 1TB External Hard Drive",
-    kategori: "PC / Server",
+    kategori: "Peripheral",
     kondisiBarang: "Baik",
     tanggalPerolehan: "10/09/2023",
     status: "Dipinjam",
@@ -163,7 +161,7 @@ export const dataBMN: BMN[] = [
     bidang: "BDI",
     nup: 2,
     namaBarang: "Seagate Expansion 1TB External Hard Drive",
-    kategori: "PC / Server",
+    kategori: "Peripheral",
     kondisiBarang: "Rusak",
     tanggalPerolehan: "10/09/2023",
     status: "Tidak Tersedia",
@@ -175,7 +173,7 @@ export const dataBMN: BMN[] = [
     bidang: "MTI",
     nup: 3,
     namaBarang: "Seagate Expansion 1TB External Hard Drive",
-    kategori: "PC / Server",
+    kategori: "Peripheral",
     kondisiBarang: "Baik",
     tanggalPerolehan: "10/09/2023",
     status: "Dipinjam",
@@ -187,7 +185,7 @@ export const dataBMN: BMN[] = [
     bidang: "TU",
     nup: 4,
     namaBarang: "Seagate Expansion 1TB External Hard Drive",
-    kategori: "PC / Server",
+    kategori: "Peripheral",
     kondisiBarang: "Baik",
     tanggalPerolehan: "10/09/2023",
     status: "Tersedia",
