@@ -71,9 +71,31 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="grid grid-cols-4 grid-rows-4 gap-2">
+    <div className="grid grid-cols-4 grid-rows-1 gap-2">
+      {/* Bar Chart */}
+      <SmallCard className="row-span-1 col-span-3">
+        <CardHeader className="p-2 pb-5">
+          <div className="flex items-center px-1 py-1">
+            <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center mr-2">
+              <ChartNoAxesColumn className="w-6 h-6 text-secondary-foreground" strokeWidth={2.5} />
+            </div>
+            <CardTitle className="text-[18px]"> Visualisasi Kategori Barang</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="flex-1 p-2 pb-0 text-[10px] flex flex-col">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={kategoriStats}>
+              <XAxis dataKey="name" fontSize={10} />
+              <YAxis fontSize={10} />
+              <Tooltip />
+              <Bar dataKey="total" fill="#142B6F" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </SmallCard>
+      
       {/* Total Unit + Statistik */}
-      <SmallCard className="row-span-2 col-span-2">
+      <SmallCard className="row-span-1 col-span-1">
         <CardHeader className="p-2 pb-0">
           <div className="flex items-center px-1 py-1">
             <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center mr-2">
@@ -124,37 +146,16 @@ export default function Dashboard() {
         </CardContent>
       </SmallCard>
 
-      {/* Bar Chart */}
-      <SmallCard className="row-span-2 col-span-2">
-        <CardHeader className="p-2 pb-5">
-          <div className="flex items-center px-1 py-1">
-            <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center mr-2">
-              <ChartNoAxesColumn className="w-6 h-6 text-secondary-foreground" strokeWidth={2.5} />
-            </div>
-            <CardTitle className="text-[18px]"> Visualisasi Kategori Barang</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="h-[250px] p-2 pb-0 text-[10px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={kategoriStats}>
-              <XAxis dataKey="name" fontSize={10} />
-              <YAxis fontSize={10} />
-              <Tooltip />
-              <Bar dataKey="total" fill="#142B6F" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </SmallCard>
 
       {/* Tabel Perolehan BMN */}
       <SmallCard className="row-span-1 col-span-4">
         <CardHeader className="px-3 pt-2 pb-0">
           <CardTitle className="text-[16px]">Perolehan BMN Terbaru</CardTitle>
         </CardHeader>
-        <CardContent className="px-3 pt-0 pb-2">
+        <CardContent className="px-3 pt-0 pb-4">
           <div className="max-h-32 overflow-y-auto">
             <table className="w-full border-collapse">
-              <thead className="bg-gray-100">
+              <thead className="bg-gray-200 text-black">
                 <tr>
                   <th className="text-left p-1 border text-[14px]">Nama Barang</th>
                   <th className="text-left p-1 border text-[14px]">Unit (NUP)</th>
@@ -163,12 +164,12 @@ export default function Dashboard() {
               </thead>
               <tbody>
                 {perolehanBMN.length > 0 ? perolehanBMN.map((item) => (
-                  <tr key={item.id} className="hover:bg-gray-50">
+                  <tr key={item.id} className="hover:bg-gray-100">
                     <td className="p-1 border text-[13px]">{item.namaBarang}</td>
                     <td className="p-1 border text-[13px]">{item.unit}</td>
                     <td className="p-1 border text-[13px]">{new Date(item.createdAt).toLocaleDateString("id-ID")}</td>
                   </tr>
-                )) : <tr><td colSpan={3} className="text-center p-2 text-[14px]">No data</td></tr>}
+                )) : <tr><td colSpan={3} className="hover:bg-gray-100 text-center p-2 text-[14px] border-1">Data Tidak Ditemukan</td></tr>}
               </tbody>
             </table>
           </div>
@@ -180,10 +181,10 @@ export default function Dashboard() {
         <CardHeader className="px-3 pt-2 pb-1">
           <CardTitle className="text-[16px]">Peminjaman Aktif</CardTitle>
         </CardHeader>
-        <CardContent className="px-3 pt-0 pb-2">
+        <CardContent className="px-3 pt-0 pb-4">
           <div className="max-h-32 overflow-y-auto">
             <table className="w-full border-collapse">
-              <thead className="bg-gray-100">
+              <thead className="bg-gray-200 text-black">
                 <tr>
                   <th className="text-left p-1 border text-[14px]">Peminjam</th>
                   <th className="text-left p-1 border text-[14px]">Status</th>
@@ -192,12 +193,14 @@ export default function Dashboard() {
               </thead>
               <tbody>
                 {peminjamanTerbaru.length > 0 ? peminjamanTerbaru.map((item) => (
-                  <tr key={item.id} className="hover:bg-gray-50">
+                  <tr key={item.id} className="hover:bg-gray-100">
                     <td className="p-1 border text-[13px]">{item.namaPeminjam}</td>
                     <td className="p-1 border text-[13px]">{item.statusPeminjaman}</td>
                     <td className="p-1 border text-[13px]">{new Date(item.tanggalPinjam).toLocaleDateString("id-ID")}</td>
                   </tr>
-                )) : <tr><td colSpan={3} className="text-center p-2 text-[14px]">No data</td></tr>}
+                )) : <tr>
+                      <td colSpan={3} className="hover:bg-gray-100 text-center p-2 text-[14px] border-1">Data Tidak Ditemukan</td>
+                    </tr>}
               </tbody>
             </table>
           </div>

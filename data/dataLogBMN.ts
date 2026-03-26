@@ -30,7 +30,7 @@ export const dataLogBMN: LogBMN[] = [
     bidang: "MTI",
     nup: 1,
     namaBarang: "Printer Canon G3010",
-    kategori: "Printer / Scanner",
+    kategori: "Printer",
     kondisiBarang: "Rusak",
     tanggalPerolehan: "10/01/2021",
     status: "Tidak Tersedia",
