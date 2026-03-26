@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import * as XLSX from "xlsx";
 
-import { dataBMN } from "@/data/dataBMN";
-import { FolderDown, ArrowDownUp } from "lucide-react";
+import { FolderDown, ArrowDownNarrowWide, ArrowUpWideNarrow, Loader2 } from "lucide-react";
 import Pagination from "@/components/ui/pagination";
 
 // state
@@ -47,18 +46,54 @@ export default function DataBMNUserPage() {
   const filteredData = sortedData.filter((item) => {
     const matchSearch = item.namaBarang.toLowerCase().includes(search.toLowerCase());
     const matchKategori = kategori === "all" || item.kategori === kategori;
-    let matchKondisi = true;
-    let matchStatus = true;
-    
-    if (kondisi === "baik") matchKondisi = item.kondisiBarang === "Baik";
-    else if (kondisi === "rusak") matchKondisi = item.kondisiBarang === "Rusak";
-    else if (kondisi === "perbaikan") matchKondisi = item.kondisiBarang === "Dalam Perbaikan";
-    
-    if (status === "tersedia") matchStatus = item.status === "Tersedia";
-    else if (status === "dipinjam") matchStatus = item.status === "Dipinjam";
-    else if (status === "tidak-tersedia") matchStatus = item.status === "Tidak Tersedia";
-    
-    return matchSearch && matchKategori && matchKondisi && matchStatus;
+
+    // Separate filters by category
+    const kondisiFilters = kondisiFilter.filter(f => ["baik", "rusak", "perbaikan"].includes(f));
+    const ketersediaanFilters = kondisiFilter.filter(f => ["tersedia", "dipinjam", "tidak-tersedia"].includes(f));
+
+    // If no filter selected, show all items
+    if (kondisiFilter.length === 0) {
+      return matchSearch && matchKategori;
+    }
+
+    // Check kondisi barang filters (OR logic within this category)
+    let matchKondisiBarang = true;
+    if (kondisiFilters.length > 0) {
+      matchKondisiBarang = false;
+      for (const filter of kondisiFilters) {
+        if (filter === "baik" && item.kondisiBarang === "Baik") {
+          matchKondisiBarang = true;
+          break;
+        } else if (filter === "rusak" && item.kondisiBarang === "Rusak") {
+          matchKondisiBarang = true;
+          break;
+        } else if (filter === "perbaikan" && item.kondisiBarang === "Dalam Perbaikan") {
+          matchKondisiBarang = true;
+          break;
+        }
+      }
+    }
+
+    // Check ketersediaan filters (OR logic within this category)
+    let matchKetersediaan = true;
+    if (ketersediaanFilters.length > 0) {
+      matchKetersediaan = false;
+      for (const filter of ketersediaanFilters) {
+        if (filter === "tersedia" && item.status === "Tersedia") {
+          matchKetersediaan = true;
+          break;
+        } else if (filter === "dipinjam" && item.status === "Dipinjam") {
+          matchKetersediaan = true;
+          break;
+        } else if (filter === "tidak-tersedia" && item.status === "Tidak Tersedia") {
+          matchKetersediaan = true;
+          break;
+        }
+      }
+    }
+
+    // AND logic between categories
+    return matchSearch && matchKategori && matchKondisiBarang && matchKetersediaan;
   });
 
   // pagination
@@ -74,7 +109,7 @@ export default function DataBMNUserPage() {
       "IKMM": item.ikmm,
       "Nama": item.namaBarang,
       "Kategori": item.kategori,
-      "Jumlah": 1,
+      "Jumlah": item.kuantitas || 1,
       "Tanggal Perolehan": item.tanggalPerolehan,
       "Kondisi (Baik/Rusak/Perbaikan)": item.kondisiBarang,
       "Ketersediaan (Tersedia/Dipinjam/Tidak Tersedia)": item.status
@@ -83,7 +118,7 @@ export default function DataBMNUserPage() {
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Data BMN");
-    
+
     worksheet["!cols"] = [
       { wch: 5 },
       { wch: 12 },
@@ -210,14 +245,23 @@ export default function DataBMNUserPage() {
               </tr>
             </thead>
             <tbody className="text-[14px]">
-              {paginatedData.length > 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan={8} className="border p-8 text-center bg-gray-50">
+                    <div className="flex justify-center items-center gap-2">
+                      <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                      <span>Memuat data...</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : paginatedData.length > 0 ? (
                 paginatedData.map((item, index) => (
-                  <tr key={item.idBMN} className="hover:bg-gray-100">
+                  <tr key={item.id} className="hover:bg-gray-100">
                     <td className="border p-2">{startIndex + index + 1}</td>
                     <td className="border p-2">{item.ikmm}</td>
                     <td className="border p-2">{item.namaBarang}</td>
                     <td className="border p-2">{item.kategori}</td>
-                    <td className="border p-2">1</td>
+                    <td className="border p-2">{item.kuantitas || 1}</td>
                     <td className="border p-2">{item.tanggalPerolehan}</td>
                     <td className="border p-2 text-center">
                       {item.kondisiBarang === "Baik" ? (
