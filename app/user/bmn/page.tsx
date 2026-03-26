@@ -466,7 +466,7 @@ export default function DataBMNUserPage() {
                           Rusak
                         </span>
                       ) : (
-                        <span className="inline-block bg-yellow-200 text-yellow-800 px-3 py-1 rounded text-[14px] font-semibold min-w-[70px]">
+                        <span className="inline-block bg-blue-200 text-blue-800 px-3 py-1 rounded text-[14px] font-semibold min-w-[70px]">
                           Perbaikan
                         </span>
                       )}
@@ -481,7 +481,7 @@ export default function DataBMNUserPage() {
                           Dipinjam
                         </span>
                       ) : (
-                        <span className="inline-block bg-gray-300 text-gray-800 px-3 py-1 rounded text-[12px] font-semibold min-w-[120px]">
+                        <span className="inline-block bg-red-200 text-red-800 px-3 py-1 rounded text-[14px] font-semibold min-w-[120px]">
                           Tidak Tersedia
                         </span>
                       )}
