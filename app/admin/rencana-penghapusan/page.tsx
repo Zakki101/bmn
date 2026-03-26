@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { FileSpreadsheet, PenLine, FolderDown, Plus, Loader2, Trash2 } from "lucide-react";
+import { FileSpreadsheet, PenLine, FolderDown, Plus, Loader2, Trash2, ArrowDownUp } from "lucide-react";
 import Pagination from "@/components/ui/pagination";
 import {
   Select, SelectContent, SelectItem,
@@ -35,15 +35,21 @@ export default function UsulanHapusPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const tableContainerRef = useRef<HTMLDivElement>(null);
+  const [sortBy, setSortBy] = useState("tanggal-terlama");
 
   const fetchProposals = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/usulan-hapus");
       const data = await res.json();
-      setHapusData(data);
+      if (!res.ok) {
+        throw new Error(data?.error || "Failed to fetch proposals");
+      }
+
+      setHapusData(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error(err);
+      setHapusData([]);
     } finally {
       setLoading(false);
     }
@@ -53,10 +59,19 @@ export default function UsulanHapusPage() {
     try {
       const res = await fetch("/api/bmn");
       const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.error || "Failed to fetch BMN data");
+      }
+
       // Only BMNs not in usulan already
-      setBmns(data.filter((b: any) => b.dipinjam === "Tersedia"));
+      const availableBmns = Array.isArray(data)
+        ? data.filter((b: any) => b.dipinjam === "Tersedia")
+        : [];
+
+      setBmns(availableBmns);
     } catch (err) {
       console.error(err);
+      setBmns([]);
     }
   };
 
@@ -143,7 +158,19 @@ export default function UsulanHapusPage() {
       const matchStatus = statusFilter === "all" || item.statusUsulan === statusFilter;
       return matchSearch && matchStatus;
     })
-    .sort((a, b) => new Date(b.tanggalUsulan).getTime() - new Date(a.tanggalUsulan).getTime());
+    .sort((a, b) => {
+      switch (sortBy) {
+        case "nama-az":
+          return a.namaBarang.localeCompare(b.namaBarang);
+        case "nama-za":
+          return b.namaBarang.localeCompare(a.namaBarang);
+        case "tanggal-terlama":
+          return new Date(a.tanggalUsulan).getTime() - new Date(b.tanggalUsulan).getTime();
+        case "tanggal-terbaru":
+        default:
+          return new Date(b.tanggalUsulan).getTime() - new Date(a.tanggalUsulan).getTime();
+      }
+    });
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -166,17 +193,32 @@ export default function UsulanHapusPage() {
 
   return (
     <div className="space-y-2">
-      <h1 className="text-[25px] font-bold">Usulan Penghapusan BMN</h1>
-
       <div className="flex items-center justify-between">
-        <div className="flex flex-wrap items-center gap-1">
+        <h1 className="pt-0 pb-0 text-[25px] font-bold">Usulan Penghapusan BMN</h1>
+        <div className="flex gap-2 ml-auto">
+          <Button className="h-[35px] text-[14px] bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground" 
+            onClick={handleDownloadExcel}>
+            <FolderDown className="h-4 w-4" />
+            Eksport Data
+          </Button>
+          <Button className="h-[35px] text-[14px] bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground" 
+            onClick={() => { fetchBmns(); setOpenAddDialog(true); }}>
+            <Plus className="h-4 w-4" />
+            Tambah Usulan
+          </Button>
+        </div>
+      </div>
+
+      <div className="bg-white border border-gray-400 rounded-lg p-4 space-y-3">
+        <div className="flex flex-wrap items-center gap-1 mb-4">
+          {/* input */}
           <Input
-            placeholder="Cari nama barang..."
+            placeholder="Cari barang..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="text-[14px] placeholder:text-[14px] h-[35px] w-[200px] px-2"
           />
-
+          {/* status filter */}
           <Select onValueChange={setStatusFilter} value={statusFilter}>
             <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[160px] px-2">
               <SelectValue placeholder="Status Usulan" />
@@ -188,94 +230,98 @@ export default function UsulanHapusPage() {
               <SelectItem value="Ditolak">Ditolak</SelectItem>
             </SelectContent>
           </Select>
-
-          <Button variant="outline" className="h-[35px]" onClick={() => {setSearch(""); setStatusFilter("all");}}>
+          {/* sort */}
+          <Select onValueChange={setSortBy} value={sortBy}>
+            <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[200px] px-2">
+              <ArrowDownUp className="h-4 w-4 mr-2" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="tanggal-terbaru">Tanggal Terbaru</SelectItem>
+              <SelectItem value="tanggal-terlama">Tanggal Terlama</SelectItem>
+              <SelectItem value="nama-az">Nama (A - Z)</SelectItem>
+              <SelectItem value="nama-za">Nama (Z - A)</SelectItem>
+            </SelectContent>
+          </Select>
+          {/* reset */}
+          <Button variant="outline" className="h-[35px]" onClick={() => {setSearch(""); setStatusFilter("all"); setSortBy("tanggal-terbaru");}}>
             Reset
           </Button>
         </div>
-        
-        <div className="flex gap-2 ml-auto">
-            <Button className="h-[35px] text-[14px] bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground" 
-              onClick={handleDownloadExcel}>
-              <FolderDown className="h-4 w-4" />
-              Eksport Data
-            </Button>
-            <Button className="h-[35px] text-[14px] bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground" 
-              onClick={() => { fetchBmns(); setOpenAddDialog(true); }}>
-              <Plus className="h-4 w-4" />
-              Tambah Usulan
-            </Button>
-        </div>
-      </div>
 
-      <div className="bg-white rounded-lg shadow border overflow-x-auto">
-        <div ref={tableContainerRef} className="max-h-[400px] overflow-y-auto">
-          <table className="w-full border-collapse">
-          <thead className="bg-blue-100 text-[14px] text-left">
-            <tr>
-              <th className="border p-2">No</th>
-              <th className="border p-2">IKMM</th>
-              <th className="border p-2">Nama Barang</th>
-              <th className="border p-2">NUP</th>
-              <th className="border p-2">Tanggal Usulan</th>
-              <th className="border p-2">Alasan</th>
-              <th className="border p-2 max-w-[100px]">Status</th>
-              <th className="border p-2 max-w-[150px]">Penyetuju</th>
-            </tr>
-          </thead>
-          <tbody className="text-[14px]">
-            {loading ? (
-              <tr><td colSpan={8} className="p-4 text-center"><Loader2 className="animate-spin h-6 w-6 mx-auto" /></td></tr>
-            ) : paginatedData.length > 0 ? (
-              paginatedData.map((item, index) => (
-                <tr key={item.id} className="hover:bg-gray-50">
-                  <td className="border p-2">{startIndex + index + 1}</td>
-                  <td className="border p-2">{item.ikmm}</td>
-                  <td className="border p-2">{item.namaBarang}</td>
-                  <td className="border p-2">{item.unit}</td>
-                  <td className="border p-2">{new Date(item.tanggalUsulan).toLocaleDateString("id-ID")}</td>
-                  <td className="border p-2">{item.alasan}</td>
-                  <td className="border p-2 text-center">
-                    <Select
-                      value={item.statusUsulan}
-                      onValueChange={(v) => handleStatusChange(item.id, v)}
-                    >
-                      <SelectTrigger className="h-[30px] w-[125px] mx-auto">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Menunggu">Menunggu</SelectItem>
-                        <SelectItem value="Disetujui">Disetujui</SelectItem>
-                        <SelectItem value="Ditolak">Ditolak</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </td>
-                  <td className="border p-2 text-center">{item.disetujuiOleh || "-"}</td>
-                </tr>
-              ))
-            ) : (
-              <tr><td colSpan={8} className="p-4 text-center">No data found</td></tr>
-            )}
-          </tbody>
-        </table>
+        <div className="overflow-x-auto">
+          <div ref={tableContainerRef} className="max-h-[400px] overflow-y-auto">
+            <table className="w-full border-collapse">
+            <thead className="bg-blue-100 text-[14px] text-left">
+              <tr>
+                <th className="border p-2">No</th>
+                <th className="border p-2">IKMM</th>
+                <th className="border p-2">Nama Barang</th>
+                <th className="border p-2">NUP</th>
+                <th className="border p-2">Tanggal Usulan</th>
+                <th className="border p-2">Alasan</th>
+                <th className="border p-2 max-w-[100px]">Status</th>
+                <th className="border p-2 max-w-[150px]">Penyetuju</th>
+              </tr>
+            </thead>
+            <tbody className="text-[14px]">
+              {loading ? (
+                <tr><td colSpan={8} className="p-4 text-center"><Loader2 className="animate-spin h-6 w-6 mx-auto" /></td></tr>
+              ) : paginatedData.length > 0 ? (
+                paginatedData.map((item, index) => (
+                  <tr key={item.id} className="hover:bg-gray-50">
+                    <td className="border p-2">{startIndex + index + 1}</td>
+                    <td className="border p-2">{item.ikmm}</td>
+                    <td className="border p-2">{item.namaBarang}</td>
+                    <td className="border p-2">{item.nup ?? "-"}</td>
+                    <td className="border p-2">{new Date(item.tanggalUsulan).toLocaleDateString("id-ID")}</td>
+                    <td className="border p-2">{item.alasan}</td>
+                    <td className="border p-2 text-center">
+                      <Select
+                        value={item.statusUsulan}
+                        onValueChange={(v) => handleStatusChange(item.id, v)}
+                      >
+                        <SelectTrigger className="h-[30px] w-[125px] mx-auto">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Menunggu">Menunggu</SelectItem>
+                          <SelectItem value="Disetujui">Disetujui</SelectItem>
+                          <SelectItem value="Ditolak">Ditolak</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </td>
+                    <td className="border p-2 text-center">{item.disetujuiOleh || "Isi Penyetuju"}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                    <td colSpan={8} className="border p-4 text-center bg-gray-100">
+                      <span className="text-gray-500 font-semibold text-[14px]">Data tidak ditemukan</span>
+                    </td>
+                  </tr>
+              )}
+            </tbody>
+            </table>
+          </div>
         </div>
-      </div>
 
-      {/* pagination */}
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        itemsPerPage={itemsPerPage}
-        totalItems={filteredData.length}
-        startIndex={startIndex}
-        endIndex={endIndex}
-        onPageChange={setCurrentPage}
-        onItemsPerPageChange={(value) => {
-          setItemsPerPage(value);
-          setCurrentPage(1);
-        }}
-        tableContainerRef={tableContainerRef}
-      />
+        {/* pagination */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          itemsPerPage={itemsPerPage}
+          totalItems={filteredData.length}
+          startIndex={startIndex}
+          endIndex={endIndex}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={(value) => {
+            setItemsPerPage(value);
+            setCurrentPage(1);
+          }}
+          tableContainerRef={tableContainerRef}
+        />
+      </div>
 
       {/* Add Dialog */}
       <Dialog open={openAddDialog} onOpenChange={setOpenAddDialog}>

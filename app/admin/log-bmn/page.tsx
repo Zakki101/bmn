@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import { FolderDown } from "lucide-react";
+import { FolderDown, ArrowDownUp } from "lucide-react";
 import Pagination from "@/components/ui/pagination";
 
 export default function LogBMNPage() {
@@ -20,12 +20,26 @@ export default function LogBMNPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const tableContainerRef = useRef<HTMLDivElement>(null);
+  const [sortBy, setSortBy] = useState("tanggal-terlama");
 
   const filteredData = logData
     .filter((i) => {
       const matchSearch = i.namaBarang.toLowerCase().includes(search.toLowerCase());
       const matchKategori = kategori === "all" || i.kategori === kategori;
       return matchSearch && matchKategori;
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case "nama-az":
+          return a.namaBarang.localeCompare(b.namaBarang);
+        case "nama-za":
+          return b.namaBarang.localeCompare(a.namaBarang);
+        case "tanggal-terlama":
+          return new Date(a.tanggalPenghapusan).getTime() - new Date(b.tanggalPenghapusan).getTime();
+        case "tanggal-terbaru":
+        default:
+          return new Date(b.tanggalPenghapusan).getTime() - new Date(a.tanggalPenghapusan).getTime();
+      }
     });
 
   // pagination
@@ -66,44 +80,9 @@ export default function LogBMNPage() {
 
   return (
     <div className="space-y-2">
-      <h1 className="text-[25px] font-bold">Log Penghapusan BMN</h1>
-
-      {/* Search + Reset */}
-      <div className="flex items-center justify-between">
-        <div className="flex flex-wrap items-center gap-1">
-          <Input
-            placeholder="Cari nama barang..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="text-[14px] placeholder:text-[14px] h-[35px] w-[250px] px-2"
-          />
-          <Select onValueChange={setKategori} defaultValue="all">
-            <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[200px] px-2">
-              <SelectValue placeholder="Kategori" />
-            </SelectTrigger>
-            <SelectContent className="text-[14px]">
-              {["all", "Laptop/Server", "Monitor", "Printer", "TV", "Furniture", "Jaringan", "Elektronik", "Peripheral", "Lainnya"].map((k) => (
-                <SelectItem key={k} value={k} className="text-[12px]">
-                  {k === "all" ? "Semua Kategori" : k}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button
-            variant="outline"
-            className="cursor-pointer text-[14px] h-[35px] px-3"
-            onClick={() => {
-              setSearch("");
-              setKategori("all");
-              setCurrentPage(1);
-            }}
-          >
-            Reset
-          </Button>
-        </div>
-
-        {/* export data */}
-        <div className="ml-auto">
+        <div className="flex items-center justify-between">
+          <h1 className="text-[25px] font-bold">Log Penghapusan BMN</h1>
+          {/* export data */}
           <Button
             className="cursor-pointer text-[14px] h-[35px] px-4 bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground"
             onClick={() => handleDownloadExcel()}>
@@ -111,76 +90,129 @@ export default function LogBMNPage() {
             Eksport Data
           </Button>
         </div>
-      </div>
 
-      {/* Table Log BMN */}
-      <div className="bg-white rounded-lg shadow border overflow-x-auto">
-        <div ref={tableContainerRef} className="max-h-[400px] max-w-auto overflow-y-auto">
-          <table className="w-full border-collapse">
-            <thead className="bg-blue-100 text-[14px] text-left sticky top-0 z-10">
-              <tr>
-                <th className="border p-2">No</th>
-                <th className="border p-2 min-w-[170px]">IKMM / Kode Barang</th>
-                <th className="border p-2">Akun</th>
-                <th className="border p-2">Bidang</th>
-                <th className="border p-2 min-w-[150px]">Nama / Merek / Tipe</th>
-                <th className="border p-2">NUP</th>
-                <th className="border p-2">Kategori</th>
-                <th className="border p-2">Kondisi</th>
-                <th className="border p-2 min-w-[130px]">Tanggal Perolehan</th>
-                <th className="border p-2 min-w-[150px]">Tanggal Penghapusan</th>
-                <th className="border p-2 min-w-[180px]">Alasan Penghapusan</th>
-                <th className="border p-2 min-w-[140px]">Disetujui Oleh</th>
-              </tr>
-            </thead>
+    <div className="bg-white border border-gray-400 rounded-lg p-4 space-y-3">
+        {/* Button search, filter, sort, reset */}
+        <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center gap-1">
+            {/* search */}
+            <Input
+              placeholder="Cari barang..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="text-[14px] placeholder:text-[14px] h-[35px] w-[250px] px-2"
+            />
+            {/* filter kategori */}
+            <Select onValueChange={setKategori} value={kategori}>
+              <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[200px] px-2">
+                <SelectValue placeholder="Kategori" />
+              </SelectTrigger>
+              <SelectContent className="text-[14px]">
+                {["all", "Laptop/Server", "Monitor", "Printer", "TV", "Furniture", "Jaringan", "Elektronik", "Peripheral", "Lainnya"].map((k) => (
+                  <SelectItem key={k} value={k} className="text-[12px]">
+                    {k === "all" ? "Semua Kategori" : k}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {/* sort */}
+            <Select onValueChange={setSortBy} value={sortBy}>
+              <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[200px] px-2">
+                <ArrowDownUp className="h-4 w-4 mr-2" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="text-[14px]">
+                <SelectItem value="tanggal-terbaru" className="text-[14px]">Tanggal Terbaru</SelectItem>
+                <SelectItem value="tanggal-terlama" className="text-[14px]">Tanggal Terlama</SelectItem>
+                <SelectItem value="nama-az" className="text-[14px]">Nama (A - Z)</SelectItem>
+                <SelectItem value="nama-za" className="text-[14px]">Nama (Z - A)</SelectItem>
+              </SelectContent>
+            </Select>
+            {/* Reset */}
+            <Button
+              variant="outline"
+              className="cursor-pointer text-[14px] h-[35px] px-3"
+              onClick={() => {
+                setSearch("");
+                setKategori("all");
+                setSortBy("tanggal-terlama");
+                setCurrentPage(1);
+              }}
+            >
+              Reset
+            </Button>
+          </div>
+        </div>
 
-            <tbody className="text-[14px]">
-              {paginatedData.length > 0 ? (
-                paginatedData.map((item, index) => (
-                  <tr key={item.idBMN} className="text-[14px] hover:bg-gray-50">
-                    <td className="border p-2">{startIndex + index + 1}</td>
-                    <td className="border p-2">{item.ikmm}</td>
-                    <td className="border p-2">{item.kodeAkun}</td>
-                    <td className="border p-2">{item.bidang}</td>
-                    <td className="border p-2">{item.namaBarang}</td>
-                    <td className="border p-2">{item.nup}</td>
-                    <td className="border p-2">{item.kategori}</td>
-                    <td className="border p-2">{item.kondisiBarang}</td>
-                    <td className="border p-2">{item.tanggalPerolehan}</td>
-                    <td className="border p-2">{item.tanggalPenghapusan}</td>
-                    <td className="border p-2">{item.alasanPenghapusan || "-"}</td>
-                    <td className="border p-2 text-center">
-                      {item.disetujuiOleh || "-"}
+        {/* Table Log BMN */}
+        <div className="bg-white rounded-lg shadow border overflow-x-auto">
+          <div ref={tableContainerRef} className="max-h-[400px] max-w-auto overflow-y-auto">
+            <table className="w-full border-collapse">
+              <thead className="bg-blue-100 text-[14px] text-left sticky top-0 z-10">
+                <tr>
+                  <th className="border p-2">No</th>
+                  <th className="border p-2 min-w-[170px]">IKMM / Kode Barang</th>
+                  <th className="border p-2">Akun</th>
+                  <th className="border p-2">Bidang</th>
+                  <th className="border p-2 min-w-[150px]">Nama / Merek / Tipe</th>
+                  <th className="border p-2">NUP</th>
+                  <th className="border p-2">Kategori</th>
+                  <th className="border p-2">Kondisi</th>
+                  <th className="border p-2 min-w-[130px]">Tanggal Perolehan</th>
+                  <th className="border p-2 min-w-[150px]">Tanggal Penghapusan</th>
+                  <th className="border p-2 min-w-[180px]">Alasan Penghapusan</th>
+                  <th className="border p-2 min-w-[140px]">Disetujui Oleh</th>
+                </tr>
+              </thead>
+
+              <tbody className="text-[14px]">
+                {paginatedData.length > 0 ? (
+                  paginatedData.map((item, index) => (
+                    <tr key={item.idBMN} className="text-[14px] hover:bg-gray-50">
+                      <td className="border p-2">{startIndex + index + 1}</td>
+                      <td className="border p-2">{item.ikmm}</td>
+                      <td className="border p-2">{item.kodeAkun}</td>
+                      <td className="border p-2">{item.bidang}</td>
+                      <td className="border p-2">{item.namaBarang}</td>
+                      <td className="border p-2">{item.nup}</td>
+                      <td className="border p-2">{item.kategori}</td>
+                      <td className="border p-2">{item.kondisiBarang}</td>
+                      <td className="border p-2">{item.tanggalPerolehan}</td>
+                      <td className="border p-2">{item.tanggalPenghapusan}</td>
+                      <td className="border p-2">{item.alasanPenghapusan || "-"}</td>
+                      <td className="border p-2 text-center">
+                        {item.disetujuiOleh || "-"}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={12} className="border p-4 text-center bg-gray-100">
+                      <span className="text-gray-500 font-semibold text-[14px]">Data tidak ditemukan</span>
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={12} className="border p-4 text-center bg-red-100">
-                    <span className="text-red-600 font-semibold text-[14px]">Data tidak ada</span>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
 
-      {/* pagination */}
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        itemsPerPage={itemsPerPage}
-        totalItems={filteredData.length}
-        startIndex={startIndex}
-        endIndex={endIndex}
-        onPageChange={setCurrentPage}
-        onItemsPerPageChange={(value) => {
-          setItemsPerPage(value);
-          setCurrentPage(1);
-        }}
-        tableContainerRef={tableContainerRef}
-      />
+        {/* pagination */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          itemsPerPage={itemsPerPage}
+          totalItems={filteredData.length}
+          startIndex={startIndex}
+          endIndex={endIndex}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={(value) => {
+            setItemsPerPage(value);
+            setCurrentPage(1);
+          }}
+          tableContainerRef={tableContainerRef}
+        />
+      </div>
     </div>
   );
 }

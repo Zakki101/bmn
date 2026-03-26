@@ -4,9 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
 
 import { FolderDown, ArrowDownNarrowWide, ArrowUpWideNarrow, Loader2 } from "lucide-react";
 import Pagination from "@/components/ui/pagination";
@@ -15,93 +13,34 @@ import Pagination from "@/components/ui/pagination";
 export default function DataBMNUserPage() {
   const [search, setSearch] = useState("");
   const [kategori, setKategori] = useState("all");
-  const [kondisiFilter, setKondisiFilter] = useState<string[]>([]);
-  const [showKondisiDropdown, setShowKondisiDropdown] = useState(false);
+  const [kondisi, setKondisi] = useState("all");
+  const [status, setStatus] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [showExportModal, setShowExportModal] = useState(false);
-  const [sortField, setSortField] = useState<string>('tanggalPerolehan');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [bmnData, setBmnData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [sortBy, setSortBy] = useState("tanggal-terbaru");
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
-  const fetchBMN = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/bmn`);
-      if (!res.ok) throw new Error("Failed to fetch data");
-      const data = await res.json();
-      setBmnData(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchBMN();
-  }, [fetchBMN]);
-
-  const handleSort = (field: string) => {
-    if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortOrder('asc');
-    }
-  };
-
-  const SortIcon = ({ field }: { field: string }) => {
-    if (sortField !== field) return <ArrowDownNarrowWide size={20} className="inline ml-1 text-black" />;
-    return sortOrder === 'desc'
-      ? <ArrowUpWideNarrow size={20} className="inline ml-1 text-black" />
-      : <ArrowDownNarrowWide size={20} className="inline ml-1 text-black" />;
-  };
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowKondisiDropdown(false);
-      }
-    };
-
-    if (showKondisiDropdown) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [showKondisiDropdown]);
-
   // filter + sort
-  const sortedData = [...bmnData].sort((a, b) => {
-    let aVal: any;
-    let bVal: any;
-
-    if (sortField === 'tanggalPerolehan') {
-      const parseDateStr = (d: any) => {
-        if (!d) return 0;
-        if (typeof d === 'string' && d.includes("/")) {
-          const [day, month, year] = d.split("/");
-          return new Date(`${year}-${month}-${day}`).getTime();
-        }
-        return new Date(d).getTime();
-      };
-      aVal = parseDateStr(a.tanggalPerolehan);
-      bVal = parseDateStr(b.tanggalPerolehan);
-    } else {
-      aVal = a[sortField as keyof typeof a];
-      bVal = b[sortField as keyof typeof b];
+  const sortedData = [...dataBMN].sort((a, b) => {
+    switch (sortBy) {
+      case "nama-az":
+        return a.namaBarang.localeCompare(b.namaBarang);
+      case "nama-za":
+        return b.namaBarang.localeCompare(a.namaBarang);
+      case "tanggal-terlama":
+        const [dayA1, monthA1, yearA1] = a.tanggalPerolehan.split("/");
+        const [dayB1, monthB1, yearB1] = b.tanggalPerolehan.split("/");
+        const dateA1 = new Date(`${yearA1}-${monthA1}-${dayA1}`).getTime();
+        const dateB1 = new Date(`${yearB1}-${monthB1}-${dayB1}`).getTime();
+        return dateA1 - dateB1;
+      case "tanggal-terbaru":
+      default:
+        const [dayA2, monthA2, yearA2] = a.tanggalPerolehan.split("/");
+        const [dayB2, monthB2, yearB2] = b.tanggalPerolehan.split("/");
+        const dateA2 = new Date(`${yearA2}-${monthA2}-${dayA2}`).getTime();
+        const dateB2 = new Date(`${yearB2}-${monthB2}-${dayB2}`).getTime();
+        return dateB2 - dateA2;
     }
-
-    if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
-    if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
-    return 0;
   });
 
   const filteredData = sortedData.filter((item) => {
@@ -164,7 +103,7 @@ export default function DataBMNUserPage() {
   const paginatedData = filteredData.slice(startIndex, endIndex);
 
   // export functions
-  const exportToExcel = () => {
+  const handleDownloadExcel = () => {
     const data = filteredData.map((item, index) => ({
       "No": index + 1,
       "IKMM": item.ikmm,
@@ -194,262 +133,100 @@ export default function DataBMNUserPage() {
     XLSX.writeFile(workbook, `BMN_Data_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
-  // Export ke pdf lewat HTML karena lib pdf di browser sering bermasalah dengan styling
-  const exportToPDF = () => {
-    const data = filteredData;
-    let htmlContent = `
-      <html>
-        <head>
-          <meta charset="utf-8" />
-          <title>Data BMN</title>
-          <style>
-            body { font-family: Arial, sans-serif; margin: 10px; }
-            h1 { text-align: center; color: #333; }
-            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-            th { background-color: #4472C4; color: white; font-weight: bold; }
-            tr:nth-child(even) { background-color: #f9f9f9; }
-            .container { max-width: 1200px; margin: 0 auto; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <h1>Data BMN</h1>
-            <p>Tanggal Export: ${new Date().toLocaleDateString('id-ID')}</p>
-            <p>Total Data: ${filteredData.length}</p>
-            <table>
-              <thead>
-                <tr>
-                  <th>No</th>
-                  <th>IKMM</th>
-                  <th>Nama</th>
-                  <th>Kategori</th>
-                  <th>Jumlah</th>
-                  <th>Tanggal Perolehan</th>
-                  <th>Kondisi</th>
-                  <th>Ketersediaan</th>
-                </tr>
-              </thead>
-              <tbody>
-    `;
-
-    data.forEach((item, index) => {
-      htmlContent += `
-        <tr>
-          <td>${index + 1}</td>
-          <td>${item.ikmm}</td>
-          <td>${item.namaBarang}</td>
-          <td>${item.kategori}</td>
-          <td>${item.kuantitas || 1}</td>
-          <td>${item.tanggalPerolehan}</td>
-          <td>${item.kondisiBarang}</td>
-          <td>${item.status}</td>
-        </tr>
-      `;
-    });
-
-    htmlContent += `
-              </tbody>
-            </table>
-          </div>
-        </body>
-      </html>
-    `;
-
-    const blob = new Blob([htmlContent], { type: "text/html;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `BMN_Data_${new Date().toISOString().split('T')[0]}.html`;
-    link.click();
-  };
-
   return (
     <div className="space-y-2">
       {/* header */}
       <div className="flex items-center justify-between">
         <h1 className="pt-0 pb-0 text-[25px] font-bold">Data BMN</h1>
+        {/* export */}
+        <Button
+          className="cursor-pointer text-[14px] h-[35px] px-4 bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground"
+          onClick={() => handleDownloadExcel()}>
+          <FolderDown className="mr-2 h-4 w-4" />
+          Eksport Data
+        </Button>
       </div>
 
-      <div className="flex flex-wrap items-center gap-1">
-        {/* search */}
-        <Input
-          placeholder="Cari barang..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="text-[14px] placeholder:text-[14px] h-[35px] w-[250px] px-2" />
+      <div className="bg-white border border-gray-400 rounded-lg p-4 space-y-3">
+        {/* Filter, Sort, Reset */}
+        <div className="flex flex-wrap items-center gap-1">
+          {/* search */}
+          <Input
+            placeholder="Cari barang..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="text-[14px] placeholder:text-[14px] h-[35px] w-[200px] px-2"/>
 
-        {/* filter kategori */}
-        <Select onValueChange={setKategori} defaultValue="all">
-          <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[200px] px-2">
-            <SelectValue placeholder="Kategori" />
-          </SelectTrigger>
-          <SelectContent className="text-[14px]">
-            {["all", "Laptop/Server", "Monitor", "Printer", "TV", "Furniture", "Jaringan", "Elektronik", "Peripheral", "Lainnya"].map((k) => (
-              <SelectItem key={k} value={k} className="text-[12px]">
-                {k === "all" ? "Semua Kategori" : k}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          {/* filter kategori */}
+          <Select onValueChange={setKategori} value={kategori}>
+            <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[180px] px-2">
+              <SelectValue placeholder="Kategori" />
+            </SelectTrigger>
+            <SelectContent className="text-[14px]">
+              <SelectItem value="all" className="text-[12px]">Semua Kategori</SelectItem>
+              <SelectItem value="Laptop" className="text-[12px]">Laptop</SelectItem>
+              <SelectItem value="TV" className="text-[12px]">TV</SelectItem>
+              <SelectItem value="Monitor" className="text-[12px]">Monitor</SelectItem>
+              <SelectItem value="Printer" className="text-[12px]">Printer</SelectItem>
+            </SelectContent>
+          </Select>
 
-        {/* multi select filter kondisi */}
-        <div className="relative" ref={dropdownRef}>
+          {/* filter kondisi */}
+          <Select onValueChange={setKondisi} value={kondisi}>
+            <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[180px] px-2">
+              <SelectValue placeholder="Kondisi" />
+            </SelectTrigger>
+            <SelectContent className="text-[14px]">
+              <SelectItem value="all" className="text-[14px]">Semua Kondisi</SelectItem>
+              <SelectItem value="baik" className="text-[14px]">Baik</SelectItem>
+              <SelectItem value="rusak" className="text-[14px]">Rusak</SelectItem>
+              <SelectItem value="perbaikan" className="text-[14px]">Dalam Perbaikan</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* filter status */}
+          <Select onValueChange={setStatus} value={status}>
+            <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[180px] px-2">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent className="text-[14px]">
+              <SelectItem value="all" className="text-[14px]">Semua Status</SelectItem>
+              <SelectItem value="tersedia" className="text-[14px]">Tersedia</SelectItem>
+              <SelectItem value="dipinjam" className="text-[14px]">Dipinjam</SelectItem>
+              <SelectItem value="tidak-tersedia" className="text-[14px]">Tidak Tersedia</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* sort */}
+          <Select onValueChange={setSortBy} value={sortBy}>
+            <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[200px] px-2">
+              <ArrowDownUp className="h-4 w-4 mr-2" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="text-[14px]">
+              <SelectItem value="tanggal-terbaru" className="text-[14px]">Tanggal Terbaru</SelectItem>
+              <SelectItem value="tanggal-terlama" className="text-[14px]">Tanggal Terlama</SelectItem>
+              <SelectItem value="nama-az" className="text-[14px]">Nama (A - Z)</SelectItem>
+              <SelectItem value="nama-za" className="text-[14px]">Nama (Z - A)</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* reset */}
           <Button
             variant="outline"
-            className="cursor-pointer text-[14px] h-[35px] px-3 w-[220px] items-center justify-start"
-            onClick={() => setShowKondisiDropdown(!showKondisiDropdown)}>
-            Filter Kondisi {kondisiFilter.length > 0 && `(${kondisiFilter.length})`}
-          </Button>
-
-          {showKondisiDropdown && (
-            <div className="absolute top-full left-0 mt-1 w-[280px] bg-white border border-gray-300 rounded-md shadow-lg z-50">
-              <div className="p-3 space-y-3 max-h-[300px] overflow-y-auto">
-                {/* Kondisi Section */}
-                <div>
-                  <div className="text-[11px] font-bold text-gray-700 px-2 py-1">KONDISI BARANG</div>
-                  <div className="space-y-2 pl-2">
-                    <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded">
-                      <input
-                        type="checkbox"
-                        checked={kondisiFilter.includes("baik")}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setKondisiFilter([...kondisiFilter, "baik"]);
-                          } else {
-                            setKondisiFilter(kondisiFilter.filter(f => f !== "baik"));
-                          }
-                        }}
-                        className="w-4 h-4 cursor-pointer" />
-                      <span className="text-[12px]">Baik</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded">
-                      <input
-                        type="checkbox"
-                        checked={kondisiFilter.includes("rusak")}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setKondisiFilter([...kondisiFilter, "rusak"]);
-                          } else {
-                            setKondisiFilter(kondisiFilter.filter(f => f !== "rusak"));
-                          }
-                        }}
-                        className="w-4 h-4 cursor-pointer" />
-                      <span className="text-[12px]">Rusak</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded">
-                      <input
-                        type="checkbox"
-                        checked={kondisiFilter.includes("perbaikan")}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setKondisiFilter([...kondisiFilter, "perbaikan"]);
-                          } else {
-                            setKondisiFilter(kondisiFilter.filter(f => f !== "perbaikan"));
-                          }
-                        }}
-                        className="w-4 h-4 cursor-pointer" />
-                      <span className="text-[12px]">Dalam Perbaikan</span>
-                    </label>
-                  </div>
-                </div>
-
-                {/* Ketersediaan Section */}
-                <div>
-                  <div className="text-[11px] font-bold text-gray-700 px-2 py-1">KETERSEDIAAN</div>
-                  <div className="space-y-2 pl-2">
-                    <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded">
-                      <input
-                        type="checkbox"
-                        checked={kondisiFilter.includes("tersedia")}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setKondisiFilter([...kondisiFilter, "tersedia"]);
-                          } else {
-                            setKondisiFilter(kondisiFilter.filter(f => f !== "tersedia"));
-                          }
-                        }}
-                        className="w-4 h-4 cursor-pointer"
-                      />
-                      <span className="text-[12px]">Tersedia untuk Pinjam</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded">
-                      <input
-                        type="checkbox"
-                        checked={kondisiFilter.includes("dipinjam")}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setKondisiFilter([...kondisiFilter, "dipinjam"]);
-                          } else {
-                            setKondisiFilter(kondisiFilter.filter(f => f !== "dipinjam"));
-                          }
-                        }}
-                        className="w-4 h-4 cursor-pointer"
-                      />
-                      <span className="text-[12px]">Sedang Dipinjam</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded">
-                      <input
-                        type="checkbox"
-                        checked={kondisiFilter.includes("tidak-tersedia")}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setKondisiFilter([...kondisiFilter, "tidak-tersedia"]);
-                          } else {
-                            setKondisiFilter(kondisiFilter.filter(f => f !== "tidak-tersedia"));
-                          }
-                        }}
-                        className="w-4 h-4 cursor-pointer"
-                      />
-                      <span className="text-[12px]">Tidak Tersedia</span>
-                    </label>
-                  </div>
-                </div>
-
-                {/* Clear button */}
-                {kondisiFilter.length > 0 && (
-                  <div className="border-t pt-2">
-                    <Button
-                      variant="outline"
-                      className="cursor-pointer text-[11px] h-[28px] px-2 w-full"
-                      onClick={() => setKondisiFilter([])}
-                    >
-                      Hapus Semua Filter
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* reset */}
-        <Button
-          variant="outline"
-          className="cursor-pointer text-[14px] h-[35px] px-3 "
-          onClick={() => {
-            setSearch("");
-            setKategori("all");
-            setKondisiFilter([]);
-            setCurrentPage(1);
-            setShowKondisiDropdown(false);
-            setSortField('tanggalPerolehan');
-            setSortOrder('asc');
-          }}
-        >
-          Reset
-        </Button>
-
-        <div className="ml-auto">
-          {/* export */}
-          <Button
-            className="cursor-pointer text-[12px] h-[35px] px-4 bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground"
-            onClick={() => setShowExportModal(true)}>
-            <FolderDown className="mr-2 h-4 w-4" />
-            Eksport Data
+            className="cursor-pointer text-[14px] h-[35px] px-3"
+            onClick={() => {
+              setSearch("");
+              setKategori("all");
+              setKondisi("all");
+              setStatus("all");
+              setSortBy("tanggal-terbaru");
+              setCurrentPage(1);
+            }}
+          >
+            Reset
           </Button>
         </div>
-      </div>
 
       {/* tabel */}
       <div className="bg-white pb-0 rounded-lg shadow border overflow-x-auto">
@@ -459,14 +236,10 @@ export default function DataBMNUserPage() {
               <tr>
                 <th className="border p-2">No</th>
                 <th className="border p-2">IKMM</th>
-                <th className="border p-2 cursor-pointer select-none hover:bg-blue-200" onClick={() => handleSort('namaBarang')}>
-                  Nama <SortIcon field="namaBarang" />
-                </th>
+                <th className="border p-2 min-w-[150px]">Nama</th>
                 <th className="border p-2">Kategori</th>
                 <th className="border p-2">Jumlah</th>
-                <th className="border p-2 cursor-pointer select-none hover:bg-blue-200" onClick={() => handleSort('tanggalPerolehan')}>
-                  Tanggal Perolehan <SortIcon field="tanggalPerolehan" />
-                </th>
+                <th className="border p-2 min-w-[130px]">Tanggal Perolehan</th>
                 <th className="border p-2">Kondisi</th>
                 <th className="border p-2">Ketersediaan</th>
               </tr>
@@ -549,38 +322,8 @@ export default function DataBMNUserPage() {
         }}
         tableContainerRef={tableContainerRef}
       />
+      </div>
 
-      {/* export modal */}
-      <Dialog open={showExportModal} onOpenChange={setShowExportModal}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Pilih Format Ekstrak</DialogTitle>
-            <DialogDescription>
-              Pilih format file yang ingin anda download. Data yang ditampilkan sesuai dengan filter yang aktif.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col gap-3 py-4">
-            <Button
-              className="cursor-pointer text-[14px] h-[40px] justify-start bg-green-600 text-green-50 hover:bg-green-700"
-              onClick={() => {
-                exportToExcel();
-                setShowExportModal(false);
-              }}
-            >
-              Excel
-            </Button>
-            <Button
-              className="cursor-pointer text-[14px] h-[40px] justify-start bg-red-600 text-red-50 hover:bg-red-700"
-              onClick={() => {
-                exportToPDF();
-                setShowExportModal(false);
-              }}
-            >
-              HTML
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

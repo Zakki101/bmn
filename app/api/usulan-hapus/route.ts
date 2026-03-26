@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
         disetujuiOleh: usulanHapus.disetujuiOleh,
         namaBarang: bmn.namaBarang,
         ikmm: bmn.ikmm,
-        unit: bmn.unit,
+        nup: bmn.nup,
       })
       .from(usulanHapus)
       .innerJoin(bmn, eq(usulanHapus.bmnId, bmn.id))
@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(data);
   } catch (error) {
     console.error("GET /api/usulan-hapus error:", error);
-    return NextResponse.json({ error: "Failed to fetch disposal proposals" }, { status: 500 });
+    return NextResponse.json({ error: "Gagal mengambil usulan penghapusan" }, { status: 500 });
   }
 }
 
@@ -49,6 +49,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(result[0], { status: 201 });
   } catch (error) {
     console.error("POST /api/usulan-hapus error:", error);
-    return NextResponse.json({ error: "Failed to create proposal" }, { status: 500 });
+    return NextResponse.json({ error: "Gagal membuat usulan penghapusan" }, { status: 500 });
   }
 }
