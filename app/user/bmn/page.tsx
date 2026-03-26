@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -8,8 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
-import { dataBMN } from "@/data/dataBMN";
-import { FolderDown, ArrowDownNarrowWide, ArrowUpWideNarrow } from "lucide-react";
+import { FolderDown, ArrowDownNarrowWide, ArrowUpWideNarrow, Loader2 } from "lucide-react";
 import Pagination from "@/components/ui/pagination";
 
 // state
@@ -23,8 +22,28 @@ export default function DataBMNUserPage() {
   const [showExportModal, setShowExportModal] = useState(false);
   const [sortField, setSortField] = useState<string>('tanggalPerolehan');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [bmnData, setBmnData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const tableContainerRef = useRef<HTMLDivElement>(null);
+
+  const fetchBMN = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/bmn`);
+      if (!res.ok) throw new Error("Failed to fetch data");
+      const data = await res.json();
+      setBmnData(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchBMN();
+  }, [fetchBMN]);
 
   const handleSort = (field: string) => {
     if (sortField === field) {
@@ -60,15 +79,21 @@ export default function DataBMNUserPage() {
   }, [showKondisiDropdown]);
 
   // filter + sort
-  const sortedData = [...dataBMN].sort((a, b) => {
+  const sortedData = [...bmnData].sort((a, b) => {
     let aVal: any;
     let bVal: any;
 
     if (sortField === 'tanggalPerolehan') {
-      const [dayA, monthA, yearA] = a.tanggalPerolehan.split("/");
-      const [dayB, monthB, yearB] = b.tanggalPerolehan.split("/");
-      aVal = new Date(`${yearA}-${monthA}-${dayA}`).getTime();
-      bVal = new Date(`${yearB}-${monthB}-${dayB}`).getTime();
+      const parseDateStr = (d: any) => {
+        if (!d) return 0;
+        if (typeof d === 'string' && d.includes("/")) {
+          const [day, month, year] = d.split("/");
+          return new Date(`${year}-${month}-${day}`).getTime();
+        }
+        return new Date(d).getTime();
+      };
+      aVal = parseDateStr(a.tanggalPerolehan);
+      bVal = parseDateStr(b.tanggalPerolehan);
     } else {
       aVal = a[sortField as keyof typeof a];
       bVal = b[sortField as keyof typeof b];
@@ -82,16 +107,16 @@ export default function DataBMNUserPage() {
   const filteredData = sortedData.filter((item) => {
     const matchSearch = item.namaBarang.toLowerCase().includes(search.toLowerCase());
     const matchKategori = kategori === "all" || item.kategori === kategori;
-    
+
     // Separate filters by category
     const kondisiFilters = kondisiFilter.filter(f => ["baik", "rusak", "perbaikan"].includes(f));
     const ketersediaanFilters = kondisiFilter.filter(f => ["tersedia", "dipinjam", "tidak-tersedia"].includes(f));
-    
+
     // If no filter selected, show all items
     if (kondisiFilter.length === 0) {
       return matchSearch && matchKategori;
     }
-    
+
     // Check kondisi barang filters (OR logic within this category)
     let matchKondisiBarang = true;
     if (kondisiFilters.length > 0) {
@@ -109,7 +134,7 @@ export default function DataBMNUserPage() {
         }
       }
     }
-    
+
     // Check ketersediaan filters (OR logic within this category)
     let matchKetersediaan = true;
     if (ketersediaanFilters.length > 0) {
@@ -127,7 +152,7 @@ export default function DataBMNUserPage() {
         }
       }
     }
-    
+
     // AND logic between categories
     return matchSearch && matchKategori && matchKondisiBarang && matchKetersediaan;
   });
@@ -145,7 +170,7 @@ export default function DataBMNUserPage() {
       "IKMM": item.ikmm,
       "Nama": item.namaBarang,
       "Kategori": item.kategori,
-      "Jumlah": 1,
+      "Jumlah": item.kuantitas || 1,
       "Tanggal Perolehan": item.tanggalPerolehan,
       "Kondisi (Baik/Rusak/Perbaikan)": item.kondisiBarang,
       "Ketersediaan (Tersedia/Dipinjam/Tidak Tersedia)": item.status
@@ -154,7 +179,7 @@ export default function DataBMNUserPage() {
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Data BMN");
-    
+
     worksheet["!cols"] = [
       { wch: 5 },
       { wch: 12 },
@@ -215,7 +240,7 @@ export default function DataBMNUserPage() {
           <td>${item.ikmm}</td>
           <td>${item.namaBarang}</td>
           <td>${item.kategori}</td>
-          <td>1</td>
+          <td>${item.kuantitas || 1}</td>
           <td>${item.tanggalPerolehan}</td>
           <td>${item.kondisiBarang}</td>
           <td>${item.status}</td>
@@ -252,7 +277,7 @@ export default function DataBMNUserPage() {
           placeholder="Cari barang..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="text-[14px] placeholder:text-[14px] h-[35px] w-[250px] px-2"/>
+          className="text-[14px] placeholder:text-[14px] h-[35px] w-[250px] px-2" />
 
         {/* filter kategori */}
         <Select onValueChange={setKategori} defaultValue="all">
@@ -260,11 +285,11 @@ export default function DataBMNUserPage() {
             <SelectValue placeholder="Kategori" />
           </SelectTrigger>
           <SelectContent className="text-[14px]">
-            <SelectItem value="all" className="text-[12px]">Semua Kategori</SelectItem>
-            <SelectItem value="Laptop" className="text-[12px]">Laptop</SelectItem>
-            <SelectItem value="TV" className="text-[12px]">TV</SelectItem>
-            <SelectItem value="Monitor" className="text-[12px]">Monitor</SelectItem>
-            <SelectItem value="Printer" className="text-[12px]">Printer</SelectItem>
+            {["all", "Laptop/Server", "Monitor", "Printer", "TV", "Furniture", "Jaringan", "Elektronik", "Peripheral", "Lainnya"].map((k) => (
+              <SelectItem key={k} value={k} className="text-[12px]">
+                {k === "all" ? "Semua Kategori" : k}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
 
@@ -273,10 +298,10 @@ export default function DataBMNUserPage() {
           <Button
             variant="outline"
             className="cursor-pointer text-[14px] h-[35px] px-3 w-[220px] items-center justify-start"
-            onClick={() => setShowKondisiDropdown(!showKondisiDropdown)}> 
+            onClick={() => setShowKondisiDropdown(!showKondisiDropdown)}>
             Filter Kondisi {kondisiFilter.length > 0 && `(${kondisiFilter.length})`}
           </Button>
-          
+
           {showKondisiDropdown && (
             <div className="absolute top-full left-0 mt-1 w-[280px] bg-white border border-gray-300 rounded-md shadow-lg z-50">
               <div className="p-3 space-y-3 max-h-[300px] overflow-y-auto">
@@ -295,7 +320,7 @@ export default function DataBMNUserPage() {
                             setKondisiFilter(kondisiFilter.filter(f => f !== "baik"));
                           }
                         }}
-                        className="w-4 h-4 cursor-pointer"/>
+                        className="w-4 h-4 cursor-pointer" />
                       <span className="text-[12px]">Baik</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded">
@@ -309,7 +334,7 @@ export default function DataBMNUserPage() {
                             setKondisiFilter(kondisiFilter.filter(f => f !== "rusak"));
                           }
                         }}
-                        className="w-4 h-4 cursor-pointer"/>
+                        className="w-4 h-4 cursor-pointer" />
                       <span className="text-[12px]">Rusak</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded">
@@ -323,7 +348,7 @@ export default function DataBMNUserPage() {
                             setKondisiFilter(kondisiFilter.filter(f => f !== "perbaikan"));
                           }
                         }}
-                        className="w-4 h-4 cursor-pointer"/>
+                        className="w-4 h-4 cursor-pointer" />
                       <span className="text-[12px]">Dalam Perbaikan</span>
                     </label>
                   </div>
@@ -415,15 +440,15 @@ export default function DataBMNUserPage() {
           Reset
         </Button>
 
-          <div className="ml-auto">
-            {/* export */}
-            <Button
-              className="cursor-pointer text-[12px] h-[35px] px-4 bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground"
-              onClick={() => setShowExportModal(true)}>
-              <FolderDown className="mr-2 h-4 w-4" />
-              Eksport Data
-            </Button>
-          </div>
+        <div className="ml-auto">
+          {/* export */}
+          <Button
+            className="cursor-pointer text-[12px] h-[35px] px-4 bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground"
+            onClick={() => setShowExportModal(true)}>
+            <FolderDown className="mr-2 h-4 w-4" />
+            Eksport Data
+          </Button>
+        </div>
       </div>
 
       {/* tabel */}
@@ -447,14 +472,23 @@ export default function DataBMNUserPage() {
               </tr>
             </thead>
             <tbody className="text-[14px]">
-              {paginatedData.length > 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan={8} className="border p-8 text-center bg-gray-50">
+                    <div className="flex justify-center items-center gap-2">
+                      <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                      <span>Memuat data...</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : paginatedData.length > 0 ? (
                 paginatedData.map((item, index) => (
-                  <tr key={item.idBMN} className="hover:bg-gray-100">
+                  <tr key={item.id} className="hover:bg-gray-100">
                     <td className="border p-2">{startIndex + index + 1}</td>
                     <td className="border p-2">{item.ikmm}</td>
                     <td className="border p-2">{item.namaBarang}</td>
                     <td className="border p-2">{item.kategori}</td>
-                    <td className="border p-2">1</td>
+                    <td className="border p-2">{item.kuantitas || 1}</td>
                     <td className="border p-2">{item.tanggalPerolehan}</td>
                     <td className="border p-2 text-center">
                       {item.kondisiBarang === "Baik" ? (
