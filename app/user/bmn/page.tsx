@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import * as XLSX from "xlsx";
 
-import { FolderDown, ArrowDownNarrowWide, ArrowUpWideNarrow, Loader2 } from "lucide-react";
+import { FolderDown, ArrowDownUp, Loader2 } from "lucide-react";
 import Pagination from "@/components/ui/pagination";
 
 // state
@@ -17,84 +17,52 @@ export default function DataBMNUserPage() {
   const [status, setStatus] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [sortBy, setSortBy] = useState("tanggal-terbaru");
+  const [sortBy, setSortBy] = useState("tanggal-terlama");
+  const [bmnData, setBmnData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
+  const fetchBMN = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (search) params.append("search", search);
+      if (status !== "all") params.append("status", status);
+      if (kategori !== "all") params.append("kategori", kategori);
+      if (kondisi !== "all") params.append("kondisi", kondisi);
+
+      const res = await fetch(`/api/bmn?${params.toString()}`);
+      if (!res.ok) throw new Error("Failed to fetch data");
+      const data = await res.json();
+      setBmnData(data);
+    } catch (err) {
+      console.error(err);
+      alert("Gagal mengambil data BMN");
+    } finally {
+      setLoading(false);
+    }
+  }, [search, status, kategori, kondisi]);
+
+  useEffect(() => {
+    fetchBMN();
+  }, [fetchBMN]);
+
   // filter + sort
-  const sortedData = [...dataBMN].sort((a, b) => {
+  const sortedData = [...bmnData].sort((a, b) => {
     switch (sortBy) {
       case "nama-az":
         return a.namaBarang.localeCompare(b.namaBarang);
       case "nama-za":
         return b.namaBarang.localeCompare(a.namaBarang);
       case "tanggal-terlama":
-        const [dayA1, monthA1, yearA1] = a.tanggalPerolehan.split("/");
-        const [dayB1, monthB1, yearB1] = b.tanggalPerolehan.split("/");
-        const dateA1 = new Date(`${yearA1}-${monthA1}-${dayA1}`).getTime();
-        const dateB1 = new Date(`${yearB1}-${monthB1}-${dayB1}`).getTime();
-        return dateA1 - dateB1;
+        return new Date(a.tanggalPerolehan).getTime() - new Date(b.tanggalPerolehan).getTime();
       case "tanggal-terbaru":
       default:
-        const [dayA2, monthA2, yearA2] = a.tanggalPerolehan.split("/");
-        const [dayB2, monthB2, yearB2] = b.tanggalPerolehan.split("/");
-        const dateA2 = new Date(`${yearA2}-${monthA2}-${dayA2}`).getTime();
-        const dateB2 = new Date(`${yearB2}-${monthB2}-${dayB2}`).getTime();
-        return dateB2 - dateA2;
+        return new Date(b.tanggalPerolehan).getTime() - new Date(a.tanggalPerolehan).getTime();
     }
   });
 
-  const filteredData = sortedData.filter((item) => {
-    const matchSearch = item.namaBarang.toLowerCase().includes(search.toLowerCase());
-    const matchKategori = kategori === "all" || item.kategori === kategori;
-
-    // Separate filters by category
-    const kondisiFilters = kondisiFilter.filter(f => ["baik", "rusak", "perbaikan"].includes(f));
-    const ketersediaanFilters = kondisiFilter.filter(f => ["tersedia", "dipinjam", "tidak-tersedia"].includes(f));
-
-    // If no filter selected, show all items
-    if (kondisiFilter.length === 0) {
-      return matchSearch && matchKategori;
-    }
-
-    // Check kondisi barang filters (OR logic within this category)
-    let matchKondisiBarang = true;
-    if (kondisiFilters.length > 0) {
-      matchKondisiBarang = false;
-      for (const filter of kondisiFilters) {
-        if (filter === "baik" && item.kondisiBarang === "Baik") {
-          matchKondisiBarang = true;
-          break;
-        } else if (filter === "rusak" && item.kondisiBarang === "Rusak") {
-          matchKondisiBarang = true;
-          break;
-        } else if (filter === "perbaikan" && item.kondisiBarang === "Dalam Perbaikan") {
-          matchKondisiBarang = true;
-          break;
-        }
-      }
-    }
-
-    // Check ketersediaan filters (OR logic within this category)
-    let matchKetersediaan = true;
-    if (ketersediaanFilters.length > 0) {
-      matchKetersediaan = false;
-      for (const filter of ketersediaanFilters) {
-        if (filter === "tersedia" && item.status === "Tersedia") {
-          matchKetersediaan = true;
-          break;
-        } else if (filter === "dipinjam" && item.status === "Dipinjam") {
-          matchKetersediaan = true;
-          break;
-        } else if (filter === "tidak-tersedia" && item.status === "Tidak Tersedia") {
-          matchKetersediaan = true;
-          break;
-        }
-      }
-    }
-
-    // AND logic between categories
-    return matchSearch && matchKategori && matchKondisiBarang && matchKetersediaan;
-  });
+  const filteredData = sortedData;
 
   // pagination
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -111,8 +79,8 @@ export default function DataBMNUserPage() {
       "Kategori": item.kategori,
       "Jumlah": item.kuantitas || 1,
       "Tanggal Perolehan": item.tanggalPerolehan,
-      "Kondisi (Baik/Rusak/Perbaikan)": item.kondisiBarang,
-      "Ketersediaan (Tersedia/Dipinjam/Tidak Tersedia)": item.status
+      "Kondisi": item.kondisiBarang,
+      "Status": item.status
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(data);
@@ -155,7 +123,7 @@ export default function DataBMNUserPage() {
             placeholder="Cari barang..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="text-[14px] placeholder:text-[14px] h-[35px] w-[200px] px-2"/>
+            className="text-[14px] placeholder:text-[14px] h-[35px] w-[365px] px-2"/>
 
           {/* filter kategori */}
           <Select onValueChange={setKategori} value={kategori}>
@@ -163,11 +131,11 @@ export default function DataBMNUserPage() {
               <SelectValue placeholder="Kategori" />
             </SelectTrigger>
             <SelectContent className="text-[14px]">
-              <SelectItem value="all" className="text-[12px]">Semua Kategori</SelectItem>
-              <SelectItem value="Laptop" className="text-[12px]">Laptop</SelectItem>
-              <SelectItem value="TV" className="text-[12px]">TV</SelectItem>
-              <SelectItem value="Monitor" className="text-[12px]">Monitor</SelectItem>
-              <SelectItem value="Printer" className="text-[12px]">Printer</SelectItem>
+              {["all", "Laptop/Server", "Monitor", "Printer", "TV", "Furniture", "Jaringan", "Elektronik", "Peripheral", "Lainnya"].map((k) => (
+                <SelectItem key={k} value={k} className="text-[12px]">
+                  {k === "all" ? "Semua Kategori" : k}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
@@ -178,22 +146,22 @@ export default function DataBMNUserPage() {
             </SelectTrigger>
             <SelectContent className="text-[14px]">
               <SelectItem value="all" className="text-[14px]">Semua Kondisi</SelectItem>
-              <SelectItem value="baik" className="text-[14px]">Baik</SelectItem>
-              <SelectItem value="rusak" className="text-[14px]">Rusak</SelectItem>
-              <SelectItem value="perbaikan" className="text-[14px]">Dalam Perbaikan</SelectItem>
+              <SelectItem value="Baik" className="text-[14px]">Baik</SelectItem>
+              <SelectItem value="Rusak" className="text-[14px]">Rusak</SelectItem>
+              <SelectItem value="Dalam Perbaikan" className="text-[14px]">Dalam Perbaikan</SelectItem>
             </SelectContent>
           </Select>
 
           {/* filter status */}
           <Select onValueChange={setStatus} value={status}>
             <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[180px] px-2">
-              <SelectValue placeholder="Status" />
+              <SelectValue placeholder="Ketersediaan" />
             </SelectTrigger>
             <SelectContent className="text-[14px]">
-              <SelectItem value="all" className="text-[14px]">Semua Status</SelectItem>
-              <SelectItem value="tersedia" className="text-[14px]">Tersedia</SelectItem>
-              <SelectItem value="dipinjam" className="text-[14px]">Dipinjam</SelectItem>
-              <SelectItem value="tidak-tersedia" className="text-[14px]">Tidak Tersedia</SelectItem>
+              <SelectItem value="all" className="text-[14px]">Semua Ketersediaan</SelectItem>
+              <SelectItem value="Tersedia" className="text-[14px]">Tersedia</SelectItem>
+              <SelectItem value="Dipinjam" className="text-[14px]">Dipinjam</SelectItem>
+              <SelectItem value="Tidak Tersedia" className="text-[14px]">Tidak Tersedia</SelectItem>
             </SelectContent>
           </Select>
 
@@ -220,7 +188,7 @@ export default function DataBMNUserPage() {
               setKategori("all");
               setKondisi("all");
               setStatus("all");
-              setSortBy("tanggal-terbaru");
+              setSortBy("tanggal-terlama");
               setCurrentPage(1);
             }}
           >
@@ -297,9 +265,9 @@ export default function DataBMNUserPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={8} className="border p-4 text-center bg-pink-100">
-                    <span className="text-pink-600 font-semibold text-[14px]">Data tidak ada</span>
-                  </td>
+                    <td colSpan={8} className="border p-4 text-center bg-gray-100">
+                      <span className="text-gray-500 font-semibold text-[14px]">Data tidak ditemukan</span>
+                    </td>
                 </tr>
               )}
             </tbody>

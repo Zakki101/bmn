@@ -250,8 +250,19 @@ export default function DataPeminjamanAdminPage() {
               placeholder="Cari peminjam..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="text-[14px] placeholder:text-[14px] h-[35px] w-[200px] px-2"
+              className="text-[14px] placeholder:text-[14px] h-[35px] w-[365px] px-2"
             />
+            {/* Kategori */}
+            <Select onValueChange={setKategori} value={kategori}>
+              <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[180px] px-2">
+                <SelectValue placeholder="Kategori" />
+              </SelectTrigger>
+              <SelectContent>
+                {["all", "Laptop/Server", "Monitor", "Printer", "TV", "Furniture", "Jaringan", "Elektronik", "Peripheral", "Lainnya"].map((k) => (
+                  <SelectItem key={k} value={k}>{k === "all" ? "Semua Kategori" : k}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {/* Status */}
             <Select onValueChange={setStatusFilter} value={statusFilter}>
               <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[140px] px-2">
@@ -262,17 +273,6 @@ export default function DataPeminjamanAdminPage() {
                 <SelectItem value="Aktif">Aktif</SelectItem>
                 <SelectItem value="Selesai">Selesai</SelectItem>
                 <SelectItem value="Terlambat">Terlambat</SelectItem>
-              </SelectContent>
-            </Select>
-            {/* Kategori */}
-            <Select onValueChange={setKategori} value={kategori}>
-              <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[180px] px-2">
-                <SelectValue placeholder="Kategori" />
-              </SelectTrigger>
-              <SelectContent>
-                {["all", "Laptop/Server", "Monitor", "Printer", "TV", "Furniture", "Jaringan", "Elektronik", "Peripheral", "Lainnya"].map((k) => (
-                  <SelectItem key={k} value={k}>{k === "all" ? "Semua Kategori" : k}</SelectItem>
-                ))}
               </SelectContent>
             </Select>
             {/* Sort */}
@@ -320,7 +320,7 @@ export default function DataPeminjamanAdminPage() {
                   <th className="border p-2 min-w-[150px]">Nama / Merek / Tipe</th>
                   <th className="border p-2">NUP</th>
                   <th className="border p-2">Kategori</th>
-                  <th className="border p-2 min-w-[130px] text-center">Tahun Peorlehan</th>
+                  <th className="border p-2 min-w-[130px] text-center">Tahun Perolehan</th>
                   <th className="border p-2">Jumlah</th>
                   <th className="border p-2 min-w-[110px]">Tanggal Pinjam</th>
                   <th className="border p-2 min-w-[130px] text-center">Tanggal Selesai</th>

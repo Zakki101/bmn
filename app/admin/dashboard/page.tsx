@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { StatTooltip } from "@/components/ui/stat-tooltip";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { ReactNode } from "react";
-import { ChartLine, ChartNoAxesColumn, Loader2 } from "lucide-react";
+import { ChartLine, ChartNoAxesColumn, Loader2, PackageOpen, HandHelping } from "lucide-react";
 
 type SmallCardProps = {
   children: ReactNode;
@@ -149,8 +149,13 @@ export default function Dashboard() {
 
       {/* Tabel Perolehan BMN */}
       <SmallCard className="row-span-1 col-span-4">
-        <CardHeader className="px-3 pt-2 pb-0">
-          <CardTitle className="text-[16px]">Perolehan BMN Terbaru</CardTitle>
+        <CardHeader className="p-2 pb-0">
+          <div className="flex items-center p-1">
+            <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center mr-2">
+              <PackageOpen className="w-6 h-6 ml-0.5 text-secondary-foreground" strokeWidth={2} />
+            </div>
+            <CardTitle className="text-[18px]">Perolehan BMN Terbaru</CardTitle>
+          </div>
         </CardHeader>
         <CardContent className="px-3 pt-0 pb-4">
           <div className="max-h-32 overflow-y-auto">
@@ -178,8 +183,13 @@ export default function Dashboard() {
 
       {/* Tabel Peminjaman BMN */}
       <SmallCard className="row-span-1 col-span-4">
-        <CardHeader className="px-3 pt-2 pb-1">
-          <CardTitle className="text-[16px]">Peminjaman Aktif</CardTitle>
+        <CardHeader className="p-2 pb-0">
+          <div className="flex items-center p-1">
+            <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center mr-2">
+              <HandHelping className="w-7 h-7 ml-0.5 text-secondary-foreground" strokeWidth={2} />
+            </div>
+            <CardTitle className="text-[18px]">Peminjaman Aktif</CardTitle>
+          </div>
         </CardHeader>
         <CardContent className="px-3 pt-0 pb-4">
           <div className="max-h-32 overflow-y-auto">

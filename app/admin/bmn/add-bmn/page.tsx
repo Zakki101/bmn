@@ -2,18 +2,21 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { dataBMN, BMN } from "@/data/dataBMN";
 
 export default function AddBMNPage() {
   const router = useRouter();
 
   // state
   const [namaBarang, setNamaBarang] = useState("");
-  const [kategori, setKategori] = useState<BMN["kategori"] | "">("");
+  const [kategori, setKategori] = useState("");
   const [tanggalPerolehan, setTanggalPerolehan] = useState("");
   const [ikmm, setIkmm] = useState("");
-  const [jumlahBarang, setJumlahBarang] = useState<number>(1);
-  const [bidang, setBidang] = useState<BMN["bidang"] | "">("");
+  const [bidang, setBidang] = useState("");
+  const [nup, setNup] = useState<number>(0);
+  const [merkType, setMerkType] = useState("");
+  const [kuantitas, setKuantitas] = useState<number>(1);
+  const [satuan, setSatuan] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // mapping kategori - IKMM
   const kategoriToIkmm: Record<string, string> = {
@@ -28,56 +31,21 @@ export default function AddBMNPage() {
     "Lainnya": "0",
   };
 
-  // format tanggal
-  const formatDate = (isoDate: string): string => {
-    const [year, month, day] = isoDate.split("-");
-    return `${day}/${month}/${year}`;
-  };
-
-  const generateNUP = (
-    existingData: BMN[],
-    namaBarang: string,
-    jumlahBaru: number,
-    kategori: BMN["kategori"],
-    ikmm: string,
-    tanggalPerolehan: string,
-    bidang: BMN["bidang"]
-  ): BMN[] => {
-    // cari data BMN yang sama berdasarkan namaBarang
-    const sameItems = existingData.filter((item) => item.namaBarang === namaBarang);
-
-    // cari NUP terakhir
-    const lastNUP = sameItems.length > 0 ? Math.max(...sameItems.map((i) => i.nup)) : 0;
-
-    // buat array baru sesuai jumlah yang ditambahkan
-    return Array.from({ length: jumlahBaru }, (_, i) => ({
-      idBMN: existingData.length + i + 1,
-      kodeAkun: "132111", // ✅ angka, bukan string
-      ikmm,
-      nup: lastNUP + i + 1,
-      namaBarang,
-      kategori,
-      tanggalPerolehan: formatDate(tanggalPerolehan),
-      kondisiBarang: "Baik",
-      status: "Tersedia", // ✅ sesuai tipe union
-      bidang: bidang,
-    }));
-  };
-
   // submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!namaBarang || !kategori || !tanggalPerolehan || !bidang) {
+    if (!namaBarang || !kategori || !tanggalPerolehan || !bidang || !merkType || !satuan) {
       alert("Semua field wajib diisi!");
       return;
     }
 
-    if (jumlahBarang < 1) {
-      alert("Jumlah barang minimal 1!");
+    if (kuantitas < 1) {
+      alert("Kuantitas minimal 1!");
       return;
     }
 
+    setLoading(true);
     try {
       const res = await fetch("/api/bmn", {
         method: "POST",
@@ -87,17 +55,25 @@ export default function AddBMNPage() {
           kategori,
           ikmm,
           bidang,
-          jumlahBarang,
+          nup: nup || undefined,
+          merkType,
+          kuantitas,
+          satuan,
           tanggalPerolehan,
+          kondisiBarang: "Baik",
+          status: "Tersedia",
         }),
       });
 
       if (!res.ok) throw new Error("Failed to create BMN");
 
+      alert("Data BMN berhasil ditambahkan!");
       router.push("/admin/bmn");
     } catch (err) {
       console.error(err);
       alert("Gagal menambahkan data BMN");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -126,9 +102,8 @@ export default function AddBMNPage() {
             className="w-full rounded border px-3 py-2 text-[14px]"
             value={kategori}
             onChange={(e) => {
-              const val = e.target.value as BMN["kategori"];
-              setKategori(val);
-              setIkmm(kategoriToIkmm[val] || "");
+              setKategori(e.target.value);
+              setIkmm(kategoriToIkmm[e.target.value] || "");
             }}
             required
           >
@@ -163,7 +138,7 @@ export default function AddBMNPage() {
           <select
             className="w-full rounded border px-3 py-2 text-[14px]"
             value={bidang}
-            onChange={(e) => setBidang(e.target.value as BMN["bidang"])}
+            onChange={(e) => setBidang(e.target.value)}
             required
           >
             <option value="">Pilih bidang</option>
@@ -173,18 +148,60 @@ export default function AddBMNPage() {
           </select>
         </div>
 
-        {/* jumlah barang */}
+        {/* NUP */}
         <div>
-          <label className="mb-1 block text-[14px] font-medium">Jumlah Barang *</label>
+          <label className="mb-1 block text-[14px] font-medium">NUP</label>
           <input
             type="number"
-            min={1}
             className="w-full rounded border px-3 py-2 text-[14px]"
-            placeholder="Masukkan jumlah barang"
-            value={jumlahBarang}
-            onChange={(e) => setJumlahBarang(Number(e.target.value))}
+            placeholder="Masukkan NUP (opsional)"
+            value={nup || ""}
+            onChange={(e) => setNup(e.target.value ? Number(e.target.value) : 0)}
+          />
+        </div>
+
+        {/* Merk / Type */}
+        <div>
+          <label className="mb-1 block text-[14px] font-medium">Merk / Type *</label>
+          <input
+            type="text"
+            className="w-full rounded border px-3 py-2 text-[14px]"
+            placeholder="Masukkan merk atau tipe barang"
+            value={merkType}
+            onChange={(e) => setMerkType(e.target.value)}
             required
           />
+        </div>
+
+        {/* Kuantitas */}
+        <div>
+          <label className="mb-1 block text-[14px] font-medium">Kuantitas *</label>
+          <input
+            type="number"
+            className="w-full rounded border px-3 py-2 text-[14px]"
+            placeholder="Masukkan kuantitas"
+            value={kuantitas}
+            onChange={(e) => setKuantitas(Number(e.target.value) || 0)}
+            required
+          />
+        </div>
+
+        {/* Satuan */}
+        <div>
+          <label className="mb-1 block text-[14px] font-medium">Satuan *</label>
+          <select
+            className="w-full rounded border px-3 py-2 text-[14px]"
+            value={satuan}
+            onChange={(e) => setSatuan(e.target.value)}
+            required
+          >
+            <option value="">Pilih satuan</option>
+            <option value="Unit">Unit</option>
+            <option value="Buah">Buah</option>
+            <option value="Set">Set</option>
+            <option value="Lembar">Lembar</option>
+            <option value="Meter">Meter</option>
+          </select>
         </div>
 
         {/* tanggal perolehan */}
@@ -203,15 +220,17 @@ export default function AddBMNPage() {
         <div className="flex justify-end gap-2">
           <button
             type="button"
-            className="cursor-pointer text-[14px] bg-red-500 font-bold text-white px-2 py-1 rounded hover:bg-red-800"
-            onClick={() => router.push("/admin/bmn")}>
+            className="cursor-pointer text-[14px] bg-red-500 font-bold text-white px-2 py-1 rounded hover:bg-red-800 disabled:opacity-50"
+            onClick={() => router.push("/admin/bmn")}
+            disabled={loading}>
             Kembali
           </button>
 
           <button
             type="submit"
-            className="cursor-pointer text-[14px] bg-primary text-primary-foreground font-medium px-2 py-1 rounded hover:bg-secondary hover:text-secondary-foreground">
-            Tambah
+            className="cursor-pointer text-[14px] bg-primary text-primary-foreground font-medium px-2 py-1 rounded hover:bg-secondary hover:text-secondary-foreground disabled:opacity-50"
+            disabled={loading}>
+            {loading ? "Menyimpan..." : "Tambah"}
           </button>
         </div>
       </form>

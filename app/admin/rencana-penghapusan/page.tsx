@@ -23,7 +23,7 @@ export default function UsulanHapusPage() {
   const [loading, setLoading] = useState(true);
   
   const [openStatusDialog, setOpenStatusDialog] = useState(false);
-  const [openAddDialog, setOpenAddDialog] = useState(false);
+  // const [openAddDialog, setOpenAddDialog] = useState(false);
   
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [disetujuiOleh, setDisetujuiOleh] = useState("");
@@ -129,28 +129,28 @@ export default function UsulanHapusPage() {
     }
   };
 
-  const handleAddUsulan = async () => {
-    if (!selectedBmnId || !alasan) {
-      alert("Pilih barang dan isi alasan");
-      return;
-    }
-    try {
-      const res = await fetch("/api/usulan-hapus", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          bmnId: parseInt(selectedBmnId),
-          tanggalUsulan: new Date().toISOString().split("T")[0],
-          alasan,
-        }),
-      });
-      if (!res.ok) throw new Error("Failed to create");
-      setOpenAddDialog(false);
-      fetchProposals();
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  // const handleAddUsulan = async () => {
+  //   if (!selectedBmnId || !alasan) {
+  //     alert("Pilih barang dan isi alasan");
+  //     return;
+  //   }
+  //   try {
+  //     const res = await fetch("/api/usulan-hapus", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({
+  //         bmnId: parseInt(selectedBmnId),
+  //         tanggalUsulan: new Date().toISOString().split("T")[0],
+  //         alasan,
+  //       }),
+  //     });
+  //     if (!res.ok) throw new Error("Failed to create");
+  //     setOpenAddDialog(false);
+  //     fetchProposals();
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
 
   const filteredData = hapusData
     .filter((item) => {
@@ -201,11 +201,11 @@ export default function UsulanHapusPage() {
             <FolderDown className="h-4 w-4" />
             Eksport Data
           </Button>
-          <Button className="h-[35px] text-[14px] bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground" 
+          {/* <Button className="h-[35px] text-[14px] bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground" 
             onClick={() => { fetchBmns(); setOpenAddDialog(true); }}>
             <Plus className="h-4 w-4" />
             Tambah Usulan
-          </Button>
+          </Button> */}
         </div>
       </div>
 
@@ -216,7 +216,7 @@ export default function UsulanHapusPage() {
             placeholder="Cari barang..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="text-[14px] placeholder:text-[14px] h-[35px] w-[200px] px-2"
+            className="text-[14px] placeholder:text-[14px] h-[35px] w-[365px] px-2"
           />
           {/* status filter */}
           <Select onValueChange={setStatusFilter} value={statusFilter}>
@@ -324,7 +324,7 @@ export default function UsulanHapusPage() {
       </div>
 
       {/* Add Dialog */}
-      <Dialog open={openAddDialog} onOpenChange={setOpenAddDialog}>
+      {/* <Dialog open={openAddDialog} onOpenChange={setOpenAddDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader><DialogTitle>Tambah Usulan Penghapusan</DialogTitle></DialogHeader>
           <div className="space-y-4">
@@ -348,7 +348,7 @@ export default function UsulanHapusPage() {
             <Button onClick={handleAddUsulan}>Simpan</Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
 
       {/* Status Approval Dialog */}
       <Dialog open={openStatusDialog} onOpenChange={setOpenStatusDialog}>

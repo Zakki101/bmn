@@ -100,7 +100,7 @@ export default function LogBMNPage() {
               placeholder="Cari barang..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="text-[14px] placeholder:text-[14px] h-[35px] w-[250px] px-2"
+              className="text-[14px] placeholder:text-[14px] h-[35px] w-[365px] px-2"
             />
             {/* filter kategori */}
             <Select onValueChange={setKategori} value={kategori}>

@@ -229,32 +229,6 @@ export default function DataBMNAdminPage() {
             onChange={(e) => setSearch(e.target.value)}
             className="text-[14px] placeholder:text-[14px] h-[35px] w-[365px] px-2"
           />
-          {/* filter status */}
-          <Select onValueChange={setStatus} value={status}>
-            <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[180px] px-2">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent className="text-[14px]">
-              <SelectItem value="all" className="text-[14px]">Semua Status</SelectItem>
-              <SelectItem value="Dipinjam" className="text-[14px]">Dipinjam</SelectItem>
-              <SelectItem value="Tersedia" className="text-[14px]">Tersedia</SelectItem>
-              <SelectItem value="Tidak Tersedia" className="text-[14px]">Tidak Tersedia</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {/* filter kondisi */}
-          <Select onValueChange={setKondisi} value={kondisi}>
-            <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[180px] px-2">
-              <SelectValue placeholder="Kondisi" />
-            </SelectTrigger>
-            <SelectContent className="text-[14px]">
-              <SelectItem value="all" className="text-[14px]">Semua Kondisi</SelectItem>
-              <SelectItem value="Baik" className="text-[14px]">Baik</SelectItem>
-              <SelectItem value="Rusak" className="text-[14px]">Rusak</SelectItem>
-              <SelectItem value="Dalam Perbaikan" className="text-[14px]">Dalam Perbaikan</SelectItem>
-            </SelectContent>
-          </Select>
-
           {/* filter kategori */}
           <Select onValueChange={setKategori} value={kategori}>
             <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[180px] px-2">
@@ -268,8 +242,30 @@ export default function DataBMNAdminPage() {
               ))}
             </SelectContent>
           </Select>
-
-          
+          {/* filter kondisi */}
+          <Select onValueChange={setKondisi} value={kondisi}>
+            <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[180px] px-2">
+              <SelectValue placeholder="Kondisi" />
+            </SelectTrigger>
+            <SelectContent className="text-[14px]">
+              <SelectItem value="all" className="text-[14px]">Semua Kondisi</SelectItem>
+              <SelectItem value="Baik" className="text-[14px]">Baik</SelectItem>
+              <SelectItem value="Rusak" className="text-[14px]">Rusak</SelectItem>
+              <SelectItem value="Dalam Perbaikan" className="text-[14px]">Dalam Perbaikan</SelectItem>
+            </SelectContent>
+          </Select>
+          {/* filter status */}
+          <Select onValueChange={setStatus} value={status}>
+            <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[180px] px-2">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent className="text-[14px]">
+              <SelectItem value="all" className="text-[14px]">Semua Status</SelectItem>
+              <SelectItem value="Dipinjam" className="text-[14px]">Dipinjam</SelectItem>
+              <SelectItem value="Tersedia" className="text-[14px]">Tersedia</SelectItem>
+              <SelectItem value="Tidak Tersedia" className="text-[14px]">Tidak Tersedia</SelectItem>
+            </SelectContent>
+          </Select> 
           {/* sort */}
           <Select onValueChange={setSortBy} value={sortBy}>
             <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[200px] px-2">
@@ -322,7 +318,7 @@ export default function DataBMNAdminPage() {
                   <th className="border p-2">Status</th>
                   <th className="border p-2 min-w-[120px]">Bukti Foto</th>
                   <th className="border p-2 min-w-[170px]">Usulkan Penghapusan</th>
-                  <th className="border p-2">Hapus</th>
+                  <th className="border p-2 min-w-[80px]">Aksi</th>
                 </tr>
               </thead>
 
@@ -430,10 +426,10 @@ export default function DataBMNAdminPage() {
                       {/* hapus */}
                       <td className="border p-2 text-center">
                         <button
-                          className="cursor-pointer rounded bg-gray-300 p-1 text-gray-500 hover:text-white hover:bg-red-600"
+                          className="cursor-pointer rounded text-black hover:text-red-600"
                           onClick={() => handleDelete(item.id)}
                         >
-                          <MdDeleteOutline className="text-lg" />
+                          <MdDeleteOutline className="text-[20px]" />
                         </button>
                       </td>
 

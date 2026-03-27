@@ -85,7 +85,7 @@ export default function Dashboard() {
       {/* Baris 1: Total & Kategori (Grid Responsif) */}
       <div className="grid grid-cols-2 lg:grid-cols-6 gap-3 auto-rows-fr">
         {/* total BMN */}
-        <SmallCard className="col-span-2 bg-primary text-primary-foreground min-h-[100px]">
+        <SmallCard className="col-span-3 bg-primary text-primary-foreground min-h-[100px]">
           <CardHeader className="p-2">
             <CardTitle className="text-[18px] text ml-1">Total Unit BMN</CardTitle>
           </CardHeader>

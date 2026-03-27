@@ -110,7 +110,7 @@ export default function LogPeminjamanPage() {
               placeholder="Cari peminjam..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="text-[14px] placeholder:text-[14px] h-[35px] w-[200px] px-2"
+              className="text-[14px] placeholder:text-[14px] h-[35px] w-[365px] px-2"
             />
             {/* Status Filter */}
             <Select onValueChange={setStatusFilter} defaultValue="all">
