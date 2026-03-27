@@ -6,6 +6,10 @@ import {
   Select, SelectContent, SelectItem,
   SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog, DialogContent, DialogHeader,
+  DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
 import { MdDeleteOutline } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import imageCompression from "browser-image-compression";
@@ -18,6 +22,9 @@ export default function DataBMNAdminPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
   const [kategori, setKategori] = useState("all");
+  const [openUsulanDialog, setOpenUsulanDialog] = useState(false);
+  const [selectedBmnId, setSelectedBmnId] = useState<number | null>(null);
+  const [alasanUsulan, setAlasanUsulan] = useState("");
   const [bmnData, setBmnData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [kondisi, setKondisi] = useState("all");
@@ -161,8 +168,42 @@ export default function DataBMNAdminPage() {
   const handleAjukanPenghapusan = (id: number) => {
     const item = bmnData.find((b) => b.id === id);
     if (!item) return;
-    if (confirm(`Ajukan penghapusan untuk ${item.namaBarang} (NUP: ${item.nup})?`)) {
-      alert(`Usulan penghapusan untuk "${item.namaBarang}" berhasil diajukan!`);
+
+    setSelectedBmnId(id);
+    setAlasanUsulan("");
+    setOpenUsulanDialog(true);
+  };
+
+  const handleSubmitUsulan = async () => {
+    if (!selectedBmnId) return;
+    if (!alasanUsulan.trim()) {
+      alert("Alasan penghapusan wajib diisi!");
+      return;
+    }
+
+    const item = bmnData.find((b) => b.id === selectedBmnId);
+
+    try {
+      const res = await fetch("/api/usulan-hapus", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bmnId: selectedBmnId,
+          tanggalUsulan: new Date().toISOString().split("T")[0],
+          alasan: alasanUsulan.trim(),
+        }),
+      });
+
+      if (!res.ok) throw new Error("Gagal mengajukan usulan");
+
+      alert(`Usulan penghapusan untuk "${item?.namaBarang}" berhasil diajukan!`);
+      setOpenUsulanDialog(false);
+      setSelectedBmnId(null);
+      setAlasanUsulan("");
+      fetchBMN();
+    } catch (err) {
+      console.error("Error creating usulan:", err);
+      alert("Gagal menambahkan usulan penghapusan. Silakan coba lagi.");
     }
   };
 
@@ -214,7 +255,7 @@ export default function DataBMNAdminPage() {
           <Button
             className="cursor-pointer text-[14px] h-[35px] px-4 bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground"
             onClick={() => router.push("/admin/bmn/add-bmn")}>
-            <Plus className="h-4 w-4"/>Tambah Data
+            <Plus className="h-4 w-4" />Tambah Data
           </Button>
         </div>
       </div>
@@ -265,7 +306,7 @@ export default function DataBMNAdminPage() {
               <SelectItem value="Tersedia" className="text-[14px]">Tersedia</SelectItem>
               <SelectItem value="Tidak Tersedia" className="text-[14px]">Tidak Tersedia</SelectItem>
             </SelectContent>
-          </Select> 
+          </Select>
           {/* sort */}
           <Select onValueChange={setSortBy} value={sortBy}>
             <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[200px] px-2">
@@ -463,6 +504,29 @@ export default function DataBMNAdminPage() {
           tableContainerRef={tableContainerRef}
         />
       </div>
+
+      <Dialog open={openUsulanDialog} onOpenChange={setOpenUsulanDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Usulkan Penghapusan</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <label className="text-[14px] font-medium">Alasan Penghapusan</label>
+              <textarea
+                className="w-full min-h-[100px] border border-gray-300 rounded-md p-2 text-[14px] focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder="Masukkan alasan penghapusan BMN ini..."
+                value={alasanUsulan}
+                onChange={e => setAlasanUsulan(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpenUsulanDialog(false)}>Batal</Button>
+            <Button onClick={handleSubmitUsulan}>Submit Usulan</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -21,17 +21,17 @@ export default function UsulanHapusPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [hapusData, setHapusData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [openStatusDialog, setOpenStatusDialog] = useState(false);
-  // const [openAddDialog, setOpenAddDialog] = useState(false);
-  
+  const [openAddDialog, setOpenAddDialog] = useState(false);
+
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [disetujuiOleh, setDisetujuiOleh] = useState("");
-  
+
   const [bmns, setBmns] = useState<any[]>([]);
   const [selectedBmnId, setSelectedBmnId] = useState("");
   const [alasan, setAlasan] = useState("");
-  
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const tableContainerRef = useRef<HTMLDivElement>(null);
@@ -105,21 +105,21 @@ export default function UsulanHapusPage() {
       const res = await fetch(`/api/usulan-hapus/${selectedId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           statusUsulan: "Disetujui",
-          disetujuiOleh: disetujuiOleh.trim() || "-" 
+          disetujuiOleh: disetujuiOleh.trim() || "-"
         }),
       });
       if (!res.ok) throw new Error("Failed to approve");
-      
+
       // Also potentially delete from BMN if desired, but for now we just change status
       const proposal = hapusData.find(h => h.id === selectedId);
       if (proposal) {
-          await fetch(`/api/bmn/${proposal.bmnId}`, {
-              method: "PATCH",
-              body: JSON.stringify({ dipinjam: "Tidak Tersedia" }),
-              headers: { "Content-Type": "application/json" }
-          });
+        await fetch(`/api/bmn/${proposal.bmnId}`, {
+          method: "PATCH",
+          body: JSON.stringify({ dipinjam: "Tidak Tersedia" }),
+          headers: { "Content-Type": "application/json" }
+        });
       }
 
       setOpenStatusDialog(false);
@@ -129,28 +129,28 @@ export default function UsulanHapusPage() {
     }
   };
 
-  // const handleAddUsulan = async () => {
-  //   if (!selectedBmnId || !alasan) {
-  //     alert("Pilih barang dan isi alasan");
-  //     return;
-  //   }
-  //   try {
-  //     const res = await fetch("/api/usulan-hapus", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({
-  //         bmnId: parseInt(selectedBmnId),
-  //         tanggalUsulan: new Date().toISOString().split("T")[0],
-  //         alasan,
-  //       }),
-  //     });
-  //     if (!res.ok) throw new Error("Failed to create");
-  //     setOpenAddDialog(false);
-  //     fetchProposals();
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
+  const handleAddUsulan = async () => {
+    if (!selectedBmnId || !alasan) {
+      alert("Pilih barang dan isi alasan");
+      return;
+    }
+    try {
+      const res = await fetch("/api/usulan-hapus", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bmnId: parseInt(selectedBmnId),
+          tanggalUsulan: new Date().toISOString().split("T")[0],
+          alasan,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to create");
+      setOpenAddDialog(false);
+      fetchProposals();
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const filteredData = hapusData
     .filter((item) => {
@@ -196,7 +196,7 @@ export default function UsulanHapusPage() {
       <div className="flex items-center justify-between">
         <h1 className="pt-0 pb-0 text-[25px] font-bold">Usulan Penghapusan BMN</h1>
         <div className="flex gap-2 ml-auto">
-          <Button className="h-[35px] text-[14px] bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground" 
+          <Button className="h-[35px] text-[14px] bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground"
             onClick={handleDownloadExcel}>
             <FolderDown className="h-4 w-4" />
             Eksport Data
@@ -218,8 +218,8 @@ export default function UsulanHapusPage() {
             onChange={(e) => setSearch(e.target.value)}
             className="text-[14px] placeholder:text-[14px] h-[35px] w-[365px] px-2"
           />
-          {/* status filter */}
-          <Select onValueChange={setStatusFilter} value={statusFilter}>
+
+          <Select onValueChange={setStatusFilter} defaultValue={statusFilter}>
             <SelectTrigger className="cursor-pointer text-[14px] !h-[35px] w-[160px] px-2">
               <SelectValue placeholder="Status Usulan" />
             </SelectTrigger>
@@ -244,95 +244,88 @@ export default function UsulanHapusPage() {
             </SelectContent>
           </Select>
           {/* reset */}
-          <Button variant="outline" className="h-[35px]" onClick={() => {setSearch(""); setStatusFilter("all"); setSortBy("tanggal-terbaru");}}>
+          <Button variant="outline" className="h-[35px]" onClick={() => { setSearch(""); setStatusFilter("all"); setSortBy("tanggal-terbaru"); }}>
             Reset
           </Button>
         </div>
-
-        <div className="overflow-x-auto">
+        <div className="bg-white rounded-lg shadow border overflow-x-auto">
           <div ref={tableContainerRef} className="max-h-[400px] overflow-y-auto">
             <table className="w-full border-collapse">
-            <thead className="bg-blue-100 text-[14px] text-left">
-              <tr>
-                <th className="border p-2">No</th>
-                <th className="border p-2">IKMM</th>
-                <th className="border p-2">Nama Barang</th>
-                <th className="border p-2">NUP</th>
-                <th className="border p-2">Tanggal Usulan</th>
-                <th className="border p-2">Alasan</th>
-                <th className="border p-2 max-w-[100px]">Status</th>
-                <th className="border p-2 max-w-[150px]">Penyetuju</th>
-              </tr>
-            </thead>
-            <tbody className="text-[14px]">
-              {loading ? (
-                <tr><td colSpan={8} className="p-4 text-center"><Loader2 className="animate-spin h-6 w-6 mx-auto" /></td></tr>
-              ) : paginatedData.length > 0 ? (
-                paginatedData.map((item, index) => (
-                  <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="border p-2">{startIndex + index + 1}</td>
-                    <td className="border p-2">{item.ikmm}</td>
-                    <td className="border p-2">{item.namaBarang}</td>
-                    <td className="border p-2">{item.nup ?? "-"}</td>
-                    <td className="border p-2">{new Date(item.tanggalUsulan).toLocaleDateString("id-ID")}</td>
-                    <td className="border p-2">{item.alasan}</td>
-                    <td className="border p-2 text-center">
-                      <Select
-                        value={item.statusUsulan}
-                        onValueChange={(v) => handleStatusChange(item.id, v)}
-                      >
-                        <SelectTrigger className="h-[30px] w-[125px] mx-auto">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Menunggu">Menunggu</SelectItem>
-                          <SelectItem value="Disetujui">Disetujui</SelectItem>
-                          <SelectItem value="Ditolak">Ditolak</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </td>
-                    <td className="border p-2 text-center">{item.disetujuiOleh || "Isi Penyetuju"}</td>
-                  </tr>
-                ))
-              ) : (
+              <thead className="bg-blue-100 text-[14px] text-left">
                 <tr>
-                    <td colSpan={8} className="border p-4 text-center bg-gray-100">
-                      <span className="text-gray-500 font-semibold text-[14px]">Data tidak ditemukan</span>
-                    </td>
-                  </tr>
-              )}
-            </tbody>
+                  <th className="border p-2">No</th>
+                  <th className="border p-2">IKMM</th>
+                  <th className="border p-2">Nama Barang</th>
+                  <th className="border p-2">NUP</th>
+                  <th className="border p-2">Tanggal Usulan</th>
+                  <th className="border p-2">Alasan</th>
+                  <th className="border p-2 max-w-[100px]">Status</th>
+                  <th className="border p-2 max-w-[150px]">Penyetuju</th>
+                </tr>
+              </thead>
+              <tbody className="text-[14px]">
+                {loading ? (
+                  <tr><td colSpan={8} className="p-4 text-center"><Loader2 className="animate-spin h-6 w-6 mx-auto" /></td></tr>
+                ) : paginatedData.length > 0 ? (
+                  paginatedData.map((item, index) => (
+                    <tr key={item.id} className="hover:bg-gray-50">
+                      <td className="border p-2">{startIndex + index + 1}</td>
+                      <td className="border p-2">{item.ikmm}</td>
+                      <td className="border p-2">{item.namaBarang}</td>
+                      <td className="border p-2">{item.nup}</td>
+                      <td className="border p-2">{new Date(item.tanggalUsulan).toLocaleDateString("id-ID")}</td>
+                      <td className="border p-2">{item.alasan}</td>
+                      <td className="border p-2 text-center">
+                        <Select
+                          value={item.statusUsulan}
+                          onValueChange={(v) => handleStatusChange(item.id, v)}
+                        >
+                          <SelectTrigger className="h-[30px] w-[125px] mx-auto">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Menunggu">Menunggu</SelectItem>
+                            <SelectItem value="Disetujui">Disetujui</SelectItem>
+                            <SelectItem value="Ditolak">Ditolak</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </td>
+                      <td className="border p-2 text-center">{item.disetujuiOleh || "-"}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr><td colSpan={8} className="p-4 text-center">No data found</td></tr>
+                )}
+              </tbody>
             </table>
           </div>
         </div>
-
-        {/* pagination */}
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          itemsPerPage={itemsPerPage}
-          totalItems={filteredData.length}
-          startIndex={startIndex}
-          endIndex={endIndex}
-          onPageChange={setCurrentPage}
-          onItemsPerPageChange={(value) => {
-            setItemsPerPage(value);
-            setCurrentPage(1);
-          }}
-          tableContainerRef={tableContainerRef}
-        />
       </div>
 
-      {/* Add Dialog */}
-      {/* <Dialog open={openAddDialog} onOpenChange={setOpenAddDialog}>
+      {/* pagination */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        itemsPerPage={itemsPerPage}
+        totalItems={filteredData.length}
+        startIndex={startIndex}
+        endIndex={endIndex}
+        onPageChange={setCurrentPage}
+        onItemsPerPageChange={(value) => {
+          setItemsPerPage(value);
+          setCurrentPage(1);
+        }}
+        tableContainerRef={tableContainerRef}
+      />
+      <Dialog open={openAddDialog} onOpenChange={setOpenAddDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader><DialogTitle>Tambah Usulan Penghapusan</DialogTitle></DialogHeader>
           <div className="space-y-4">
             <div>
               <label className="text-sm font-medium">Pilih Barang (Tersedia)</label>
-              <select 
-                className="w-full border rounded p-2 text-sm" 
-                value={selectedBmnId} 
+              <select
+                className="w-full border rounded p-2 text-sm"
+                value={selectedBmnId}
                 onChange={e => setSelectedBmnId(e.target.value)}
               >
                 <option value="">-- Pilih --</option>
@@ -348,7 +341,7 @@ export default function UsulanHapusPage() {
             <Button onClick={handleAddUsulan}>Simpan</Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog> */}
+      </Dialog>
 
       {/* Status Approval Dialog */}
       <Dialog open={openStatusDialog} onOpenChange={setOpenStatusDialog}>

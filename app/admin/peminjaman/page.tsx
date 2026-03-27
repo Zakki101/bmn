@@ -182,7 +182,7 @@ export default function DataPeminjamanAdminPage() {
     const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
     saveAs(blob, "data_peminjaman.xlsx");
   };
-  
+
   const handleDownloadPDFBA = async (item: Peminjaman) => {
     try {
       const blob = await pdf(<GenerateBA data={item} />).toBlob();
@@ -221,28 +221,28 @@ export default function DataPeminjamanAdminPage() {
     setSelectedPeminjaman(item);
     setEditKeterangan(item.keterangan || "");
   };
-  
+
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <h1 className="pt-0 pb-0 text-[25px] font-bold">Data Peminjaman</h1>
         {/* export + tambah data */}
         <div className="flex gap-2 ml-auto">
-            <Button className="h-[35px] text-[14px] bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground"
-              onClick={handleDownloadExcel}>
-              <FolderDown className="h-4 w-4" />
-              Eksport Data
-            </Button>
+          <Button className="h-[35px] text-[14px] bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground"
+            onClick={handleDownloadExcel}>
+            <FolderDown className="h-4 w-4" />
+            Eksport Data
+          </Button>
 
-            <Button className="h-[35px] text-[14px] bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground"
-              onClick={() => router.push("/admin/peminjaman/add-peminjaman")}>
-              <Plus className="h-4 w-4" />
-              Tambah Data
-            </Button>
+          <Button className="h-[35px] text-[14px] bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground"
+            onClick={() => router.push("/admin/peminjaman/add-peminjaman")}>
+            <Plus className="h-4 w-4" />
+            Tambah Data
+          </Button>
         </div>
       </div>
 
-    <div className="bg-white border border-gray-400 rounded-lg p-4 space-y-3">
+      <div className="bg-white border border-gray-400 rounded-lg p-4 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex flex-wrap items-center gap-1">
             {/* search */}
@@ -343,118 +343,118 @@ export default function DataPeminjamanAdminPage() {
                   paginatedData.map((item, index) => (
                     <tr key={item.id} className="hover:bg-gray-50">
                       <td className="border p-2">{index + 1}</td>
-                    <td className="border p-2">{item.nomorPeminjaman}</td>
-                    <td className="border p-2">{item.namaPeminjam}</td>
-                    <td className="border p-2">{item.statusPegawai}</td>
-                    <td className="border p-2">{item.pangkatGolongan}</td>
-                    <td className="border p-2">{item.jabatan}</td>
-                    <td className="border p-2">{item.nip}</td>
-                    <td className="border p-2">{item.ikmm}</td>
-                    <td className="border p-2">{item.namaBarang}</td>
-                    <td className="border p-2 text-center">{item.unit}</td>
-                    <td className="border p-2">{item.kategori}</td>
-                    <td className="border p-2 text-center">{item.tanggalPerolehan.split("/")[2]}</td>
-                    <td className="border p-2 text-center">{item.jumlahPinjam}</td>
-                    <td className="border p-2 text-center">{item.tanggalPinjam}</td>
+                      <td className="border p-2">{item.nomorPeminjaman}</td>
+                      <td className="border p-2">{item.namaPeminjam}</td>
+                      <td className="border p-2">{item.statusPegawai}</td>
+                      <td className="border p-2">{item.pangkatGolongan}</td>
+                      <td className="border p-2">{item.jabatan}</td>
+                      <td className="border p-2">{item.nip}</td>
+                      <td className="border p-2">{item.ikmm}</td>
+                      <td className="border p-2">{item.namaBarang}</td>
+                      <td className="border p-2 text-center">{item.unit}</td>
+                      <td className="border p-2">{item.kategori}</td>
+                      <td className="border p-2 text-center">{item.tanggalPerolehan.split("/")[2]}</td>
+                      <td className="border p-2 text-center">{item.jumlahPinjam}</td>
+                      <td className="border p-2 text-center">{item.tanggalPinjam}</td>
 
-                    {/* Tanggal selesai */}
-                    <td className="border p-2 text-center">
-                      {item.tanggalSelesai ? item.tanggalSelesai : "-"}
-                    </td>
+                      {/* Tanggal selesai */}
+                      <td className="border p-2 text-center">
+                        {item.tanggalSelesai ? item.tanggalSelesai : "-"}
+                      </td>
 
-                    {/* Klik untuk edit keterangan */}
-                    <td
-                      className="border p-2 text-center cursor-pointer text-blue-600 hover:underline"
-                      onClick={() => handleOpenEdit(item)}
-                    >
-                      {item.keterangan || <span className="text-gray-400 italic">Klik untuk tambah...</span>}
-                    </td>
-
-                    {/* Status */}
-                    <td className="border p-2 text-center">
-                      <Select
-                        value={item.statusPeminjaman}
-                        onValueChange={(value) =>
-                          handleInlineStatusChange(
-                            item.idPeminjaman,
-                            value as "Aktif" | "Selesai" | "Terlambat"
-                          )
-                        }
+                      {/* Klik untuk edit keterangan */}
+                      <td
+                        className="border p-2 text-center cursor-pointer text-blue-600 hover:underline"
+                        onClick={() => handleOpenEdit(item)}
                       >
-                        <SelectTrigger className="justify-center mx-auto cursor-pointer text-xs !h-[22px] w-[100px] px-2">
-                          <SelectValue placeholder="Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Aktif" className="text-[10px]">Aktif</SelectItem>
-                          <SelectItem value="Selesai" className="text-[10px]">Selesai</SelectItem>
-                          <SelectItem value="Terlambat" className="text-[10px]">Terlambat</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </td>
+                        {item.keterangan || <span className="text-gray-400 italic">Klik untuk tambah...</span>}
+                      </td>
 
-                    {/* Foto */}
-                    <td className="border p-2 text-center">
-                      {item.foto ? (
-                        <button
-                          onClick={() => item.foto?.[0] && window.open(item.foto[0], "_blank")}
-                          className="bg-blue-500 text-white text-[10px] py-1 px-2 rounded hover:bg-blue-600"
+                      {/* Status */}
+                      <td className="border p-2 text-center">
+                        <Select
+                          value={item.statusPeminjaman}
+                          onValueChange={(value) =>
+                            handleInlineStatusChange(
+                              item.idPeminjaman,
+                              value as "Aktif" | "Selesai" | "Terlambat"
+                            )
+                          }
                         >
-                          Lihat Foto
-                        </button>
-                      ) : (
-                        <>
-                          <label
-                            htmlFor={`upload-${item.idPeminjaman}`}
-                            className="cursor-pointer bg-green-500 text-white text-[10px] py-1 px-2 rounded hover:bg-green-600"
+                          <SelectTrigger className="justify-center mx-auto cursor-pointer text-xs !h-[22px] w-[100px] px-2">
+                            <SelectValue placeholder="Status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Aktif" className="text-[10px]">Aktif</SelectItem>
+                            <SelectItem value="Selesai" className="text-[10px]">Selesai</SelectItem>
+                            <SelectItem value="Terlambat" className="text-[10px]">Terlambat</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </td>
+
+                      {/* Foto */}
+                      <td className="border p-2 text-center">
+                        {item.foto ? (
+                          <button
+                            onClick={() => item.foto?.[0] && window.open(item.foto[0], "_blank")}
+                            className="bg-blue-500 text-white text-[10px] py-1 px-2 rounded hover:bg-blue-600"
                           >
-                            Tambah Foto
-                          </label>
-                          <input
-                            id={`upload-${item.idPeminjaman}`}
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleUploadFoto(e, item.idPeminjaman)}
-                            className="hidden"
-                          />
-                        </>
-                      )}
-                    </td>
+                            Lihat Foto
+                          </button>
+                        ) : (
+                          <>
+                            <label
+                              htmlFor={`upload-${item.idPeminjaman}`}
+                              className="cursor-pointer bg-green-500 text-white text-[10px] py-1 px-2 rounded hover:bg-green-600"
+                            >
+                              Tambah Foto
+                            </label>
+                            <input
+                              id={`upload-${item.idPeminjaman}`}
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleUploadFoto(e, item.idPeminjaman)}
+                              className="hidden"
+                            />
+                          </>
+                        )}
+                      </td>
 
-                    {/* Hapus */}
-                    <td className="border p-2 text-center">
-                      <button
-                        className="cursor-pointer rounded bg-red-500 p-1 text-white hover:bg-red-600"
-                        onClick={() => handleDelete(item.idPeminjaman)}
-                      >
-                        <MdDeleteOutline className="text-lg" />
-                      </button>
-                    </td>
+                      {/* Hapus */}
+                      <td className="border p-2 text-center">
+                        <button
+                          className="cursor-pointer rounded bg-red-500 p-1 text-white hover:bg-red-600"
+                          onClick={() => handleDelete(item.idPeminjaman)}
+                        >
+                          <MdDeleteOutline className="text-lg" />
+                        </button>
+                      </td>
 
-                    <td className="border p-2 text-center">
-                      <button
-                        className="cursor-pointer rounded bg-blue-500 p-1 text-white hover:bg-blue-600"
-                        onClick={() => handleDownloadPDFBA(item)}
-                      >
-                        <Download className="w-4 h-4" />
-                      </button>
-                    </td>
+                      <td className="border p-2 text-center">
+                        <button
+                          className="cursor-pointer rounded bg-blue-500 p-1 text-white hover:bg-blue-600"
+                          onClick={() => handleDownloadPDFBA(item)}
+                        >
+                          <Download className="w-4 h-4" />
+                        </button>
+                      </td>
 
-                    <td className="border p-2 text-center">
-                      <button
-                        className="cursor-pointer rounded bg-blue-500 p-1 text-white hover:bg-blue-600"
-                        onClick={() => handleDownloadPDFSIP(item)}
-                      >
-                        <Download className="w-4 h-4" />
-                      </button>
-                    </td>
+                      <td className="border p-2 text-center">
+                        <button
+                          className="cursor-pointer rounded bg-blue-500 p-1 text-white hover:bg-blue-600"
+                          onClick={() => handleDownloadPDFSIP(item)}
+                        >
+                          <Download className="w-4 h-4" />
+                        </button>
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                      <td colSpan={21} className="border p-4 text-center bg-gray-100">
-                        <span className="text-gray-500 font-semibold text-[14px]">Data tidak ditemukan</span>
-                      </td>
-                    </tr>
+                    <td colSpan={21} className="border p-4 text-center bg-gray-100">
+                      <span className="text-gray-500 font-semibold text-[14px]">Data tidak ditemukan</span>
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>

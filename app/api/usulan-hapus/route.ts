@@ -37,6 +37,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+    console.log('POST /api/usulan-hapus body:', body);
     const { bmnId, tanggalUsulan, alasan } = body;
 
     const result = await db.insert(usulanHapus).values({
@@ -46,6 +47,11 @@ export async function POST(req: NextRequest) {
       statusUsulan: "Menunggu",
     }).returning();
 
+    if (!result || result.length === 0) {
+      console.error('Insertion failed, result empty');
+      return NextResponse.json({ error: "Insertion failed" }, { status: 500 });
+    }
+    console.log('Insertion result:', result);
     return NextResponse.json(result[0], { status: 201 });
   } catch (error) {
     console.error("POST /api/usulan-hapus error:", error);
