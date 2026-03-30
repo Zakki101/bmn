@@ -3,24 +3,39 @@
 import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { dataLogBMN as initialLogBMN } from "@/data/dataLogBMN";
 import {
   Select, SelectContent, SelectItem,
   SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import { FolderDown, ArrowDownUp } from "lucide-react";
+import { FolderDown, ArrowDownUp, Loader2 } from "lucide-react";
 import Pagination from "@/components/ui/pagination";
 
 export default function LogBMNPage() {
   const [search, setSearch] = useState("");
-  const [logData] = useState(initialLogBMN);
+  const [logData, setLogData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [kategori, setKategori] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const tableContainerRef = useRef<HTMLDivElement>(null);
-  const [sortBy, setSortBy] = useState("tanggal-terlama");
+  const [sortBy, setSortBy] = useState("tanggal-terbaru");
+
+  useEffect(() => {
+    async function fetchLog() {
+      try {
+        const res = await fetch("/api/log-hapus");
+        const data = await res.json();
+        setLogData(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchLog();
+  }, []);
 
   // Reset currentPage to 1 when filters change
   useEffect(() => {
@@ -40,10 +55,10 @@ export default function LogBMNPage() {
         case "nama-za":
           return b.namaBarang.localeCompare(a.namaBarang);
         case "tanggal-terlama":
-          return new Date(a.tanggalPenghapusan).getTime() - new Date(b.tanggalPenghapusan).getTime();
+          return new Date(a.tanggalHapus).getTime() - new Date(b.tanggalHapus).getTime();
         case "tanggal-terbaru":
         default:
-          return new Date(b.tanggalPenghapusan).getTime() - new Date(a.tanggalPenghapusan).getTime();
+          return new Date(b.tanggalHapus).getTime() - new Date(a.tanggalHapus).getTime();
       }
     });
 
@@ -61,12 +76,13 @@ export default function LogBMNPage() {
       Akun: item.kodeAkun,
       Bidang: item.bidang,
       "Nama Barang": item.namaBarang,
+      "Merk / Tipe": item.merkType || "-",
       NUP: item.nup,
       Kategori: item.kategori,
       "Kondisi Barang": item.kondisiBarang,
-      "Tanggal Penghapusan": item.tanggalPenghapusan,
-      "Alasan Penghapusan": item.alasanPenghapusan,
-      "Disetujui Oleh": item.disetujuiOleh,
+      "Tanggal Penghapusan": item.tanggalHapus,
+      "Alasan Penghapusan": item.alasanHapus || "-",
+      "Disetujui Oleh": item.disetujuiOleh || "-",
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);
@@ -85,18 +101,18 @@ export default function LogBMNPage() {
 
   return (
     <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <h1 className="text-[25px] font-bold">Log Penghapusan BMN</h1>
-          {/* export data */}
-          <Button
-            className="cursor-pointer text-[14px] h-[35px] px-4 bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground"
-            onClick={() => handleDownloadExcel()}>
-            <FolderDown className="h-5 w-5" />
-            Eksport Data
-          </Button>
-        </div>
+      <div className="flex items-center justify-between">
+        <h1 className="text-[25px] font-bold">Log Penghapusan BMN</h1>
+        {/* export data */}
+        <Button
+          className="cursor-pointer text-[14px] h-[35px] px-4 bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground"
+          onClick={() => handleDownloadExcel()}>
+          <FolderDown className="h-5 w-5" />
+          Eksport Data
+        </Button>
+      </div>
 
-    <div className="bg-white border border-gray-400 rounded-lg p-4 space-y-3">
+      <div className="bg-white border border-gray-400 rounded-lg p-4 space-y-3">
         {/* Button search, filter, sort, reset */}
         <div className="flex items-center justify-between">
           <div className="flex flex-wrap items-center gap-1">
@@ -159,7 +175,8 @@ export default function LogBMNPage() {
                   <th className="border p-2 min-w-[170px]">IKMM / Kode Barang</th>
                   <th className="border p-2">Akun</th>
                   <th className="border p-2">Bidang</th>
-                  <th className="border p-2 min-w-[150px]">Nama / Merek / Tipe</th>
+                  <th className="border p-2 min-w-[150px]">Nama Barang</th>
+                  <th className="border p-2 min-w-[100px]">Merk / Tipe</th>
                   <th className="border p-2">NUP</th>
                   <th className="border p-2">Kategori</th>
                   <th className="border p-2">Kondisi</th>
@@ -171,20 +188,23 @@ export default function LogBMNPage() {
               </thead>
 
               <tbody className="text-[14px]">
-                {paginatedData.length > 0 ? (
+                {loading ? (
+                  <tr><td colSpan={13} className="border p-4 text-center"><Loader2 className="animate-spin h-6 w-6 mx-auto" /></td></tr>
+                ) : paginatedData.length > 0 ? (
                   paginatedData.map((item, index) => (
-                    <tr key={item.idBMN} className="text-[14px] hover:bg-gray-50">
+                    <tr key={item.id} className="text-[14px] hover:bg-gray-50">
                       <td className="border p-2">{startIndex + index + 1}</td>
                       <td className="border p-2">{item.ikmm}</td>
                       <td className="border p-2">{item.kodeAkun}</td>
                       <td className="border p-2">{item.bidang}</td>
                       <td className="border p-2">{item.namaBarang}</td>
+                      <td className="border p-2">{item.merkType || "-"}</td>
                       <td className="border p-2">{item.nup}</td>
                       <td className="border p-2">{item.kategori}</td>
                       <td className="border p-2">{item.kondisiBarang}</td>
                       <td className="border p-2">{item.tanggalPerolehan}</td>
-                      <td className="border p-2">{item.tanggalPenghapusan}</td>
-                      <td className="border p-2">{item.alasanPenghapusan || "-"}</td>
+                      <td className="border p-2">{item.tanggalHapus}</td>
+                      <td className="border p-2">{item.alasanHapus || "-"}</td>
                       <td className="border p-2 text-center">
                         {item.disetujuiOleh || "-"}
                       </td>
@@ -192,7 +212,7 @@ export default function LogBMNPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={12} className="border p-4 text-center bg-gray-100">
+                    <td colSpan={13} className="border p-4 text-center bg-gray-100">
                       <span className="text-gray-500 font-semibold text-[14px]">Data tidak ditemukan</span>
                     </td>
                   </tr>
