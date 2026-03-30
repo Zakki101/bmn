@@ -74,3 +74,40 @@ export const usulanHapus = sqliteTable("usulan_hapus", {
     .notNull()
     .default(sql`(unixepoch())`),
 });
+
+/**
+ * Log Hapus Table
+ * Menyimpan riwayat BMN yang dihapus
+ */
+export const logHapus = sqliteTable("log_hapus", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  bmnId: integer("bmn_id"), // Reference to original ID if needed
+  kodeSatker: text("kode_satker"),
+  ikmm: text("ikmm").notNull(),
+  kodeAkun: text("kode_akun"),
+  bidang: text("bidang"),
+  nup: integer("nup"),
+  namaBarang: text("nama_barang").notNull(),
+  merkType: text("merk_type"),
+  kuantitas: integer("kuantitas").default(1),
+  satuan: text("satuan"),
+  kategori: text("kategori"),
+  kondisiBarang: text("kondisi_barang").notNull().default("Baik"),
+  tanggalPerolehan: text("tanggal_perolehan").notNull(),
+  tanggalHapus: text("tanggal_hapus"), // dari tanggal_usulan
+  alasanHapus: text("alasan_hapus"), // dari alasan
+  disetujuiOleh: text("disetujui_oleh"), // dari disetujuiOleh
+  nilaiPerolehan: integer("nilai_perolehan"),
+  mutasiBmn: integer("mutasi_bmn"),
+  nilaiBmn: integer("nilai_bmn"),
+  nilaiPenyusutan: integer("nilai_penyusutan"),
+  nilaiBuku: integer("nilai_buku"),
+  status: text("status").notNull().default("Dihapus"),
+  foto: text("foto"),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+});

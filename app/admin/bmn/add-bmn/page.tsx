@@ -58,6 +58,7 @@ export default function AddBMNPage() {
           nup: nup || undefined,
           merkType,
           kuantitas,
+          jumlahBarang: kuantitas,
           satuan,
           tanggalPerolehan,
           kondisiBarang: "Baik",
