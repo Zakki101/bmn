@@ -7,7 +7,7 @@ export default defineConfig({
   schema: "./lib/db/schema.ts",
   out: "./drizzle",
   dialect: "turso",
-  tablesFilter: ["bmn", "peminjaman", "usulan_hapus"],
+  tablesFilter: ["bmn", "peminjaman", "usulan_hapus", "log_hapus"],
   dbCredentials: {
     url: process.env.DATABASE_URL!,
     authToken: process.env.DB_AUTH_TOKEN || process.env.DATABASE_AUTH_TOKEN,
