@@ -65,6 +65,9 @@ export async function POST(req: NextRequest) {
       bidang,
       jumlahBarang,
       tanggalPerolehan,
+      merkType,
+      satuan,
+      kuantitas,
     } = body;
 
     if (!namaBarang || !kategori || !ikmm || !bidang || !jumlahBarang || !tanggalPerolehan) {
@@ -78,7 +81,7 @@ export async function POST(req: NextRequest) {
       .where(eq(bmn.namaBarang, namaBarang))
       .orderBy(bmn.nup);
 
-    const lastNUP = lastItems.length > 0 ? Math.max(...lastItems.map(i => i.nup as number)) : 0;
+    const lastNUP = lastItems.length > 0 ? Math.max(...lastItems.filter(i => i.nup !== null).map(i => i.nup as number), 0) : 0;
 
     const itemsToInsert = Array.from({ length: jumlahBarang }, (_, i) => ({
       ikmm,
@@ -86,6 +89,9 @@ export async function POST(req: NextRequest) {
       bidang,
       nup: lastNUP + i + 1,
       namaBarang,
+      merkType,
+      kuantitas: kuantitas || 1,
+      satuan,
       kategori,
       tanggalPerolehan,
       kondisiBarang: "Baik" as const,
