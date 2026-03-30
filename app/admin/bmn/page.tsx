@@ -59,6 +59,11 @@ export default function DataBMNAdminPage() {
     fetchBMN();
   }, [fetchBMN]);
 
+  // Reset currentPage to 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, status, kategori, kondisi]);
+
   const parseDate = (d: string): Date => {
     if (!d) return new Date();
     // Assuming format is DD/MM/YYYY or similar if it comes from dummy

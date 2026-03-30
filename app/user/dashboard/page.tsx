@@ -116,8 +116,8 @@ export default function Dashboard() {
         <SmallCard className="min-h-[120px] justify-center">
           <CardHeader className="p-2">
             <CardTitle className="flex items-center px-1 py-1">
-              <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center mr-2 flex-shrink-0">
-                <Warehouse className="w-6 h-6 text-primary-foreground" strokeWidth={2.5} />
+              <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center mr-2 flex-shrink-0">
+                <Warehouse className="w-6 h-6 text-primary" strokeWidth={2.5} />
               </div>
               <span className="text-[16px]">Jumlah BMN dalam Gudang</span>
             </CardTitle>
@@ -134,8 +134,8 @@ export default function Dashboard() {
         <SmallCard className="min-h-[120px] justify-center">
           <CardHeader className="p-2">
             <CardTitle className="flex items-center text-[16px] px-1 py-1">
-              <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center mr-2 flex-shrink-0">
-                <CalendarClock className="w-6 h-6 text-primary-foreground" strokeWidth={2.5} />
+              <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center mr-2 flex-shrink-0">
+                <CalendarClock className="w-6 h-6 text-primary" strokeWidth={2.5} />
               </div>
               <span>Jumlah BMN Dipinjam</span>
             </CardTitle>
@@ -155,8 +155,8 @@ export default function Dashboard() {
         <SmallCard className="min-h-[350px]">
           <CardHeader className="p-2 pb-0">
             <CardTitle className="flex items-center px-1 py-1">
-              <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center mr-2 flex-shrink-0">
-                <CheckCheck className="w-6 h-6 text-primary-foreground" strokeWidth={2.5} />
+              <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center mr-2 flex-shrink-0">
+                <CheckCheck className="w-6 h-6 text-primary" strokeWidth={2.5} />
               </div>
               <span className="text-[16px]">Ketersediaan BMN</span>
             </CardTitle>
@@ -197,8 +197,8 @@ export default function Dashboard() {
         <SmallCard className="min-h-[350px]">
           <CardHeader className="p-2 pb-3">
             <CardTitle className="flex items-center px-1 py-1">
-              <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center mr-2 flex-shrink-0">
-                <ChartBarStacked className="w-6 h-6 text-primary-foreground" strokeWidth={2.5} />
+              <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center mr-2 flex-shrink-0">
+                <ChartBarStacked className="w-6 h-6 text-primary" strokeWidth={2.5} />
               </div>
               <span className="text-[16px]">Kategori BMN</span>
             </CardTitle>

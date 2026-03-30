@@ -63,6 +63,11 @@ export default function DataPeminjamanAdminPage() {
     fetchLoans();
   }, [fetchLoans]);
 
+  // Reset currentPage to 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, statusFilter, kategori]);
+
   function parseDate(dateStr: string): Date {
     if (!dateStr) return new Date();
     // Assuming dd/mm/yyyy or iso

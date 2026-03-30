@@ -54,6 +54,9 @@ export default function Dashboard() {
 
   const totalBMN = bmnData.length;
 
+  const totalBaik = bmnData.filter(b => b.kondisiBarang === "Baik").length;
+  const totalRusak = bmnData.filter(b => b.kondisiBarang !== "Baik").length;
+
   const perolehanBMN = [...bmnData]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 5);
@@ -110,6 +113,18 @@ export default function Dashboard() {
               <span className="text-[14px] font-medium">Total Unit BMN</span>
               <span className="text-[20px] font-bold">{totalBMN} Unit</span>
             </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[14px]">Baik</span>
+                <span className="text-[14px] font-semibold">{totalBaik} Unit</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-[14px]">Rusak / Perbaikan</span>
+                <span className="text-[14px] font-semibold">{totalRusak} Unit</span>
+              </div>
+            </div>
+
+            <div className="border-b"></div>
 
             {kategoriStats.map((stat, i) => {
               const total = stat.total;

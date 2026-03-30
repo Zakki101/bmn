@@ -47,6 +47,11 @@ export default function DataBMNUserPage() {
     fetchBMN();
   }, [fetchBMN]);
 
+  // Reset currentPage to 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, status, kategori, kondisi]);
+
   // filter + sort
   const sortedData = [...bmnData].sort((a, b) => {
     switch (sortBy) {

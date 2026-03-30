@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { dataLogBMN as initialLogBMN } from "@/data/dataLogBMN";
@@ -21,6 +21,11 @@ export default function LogBMNPage() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const [sortBy, setSortBy] = useState("tanggal-terlama");
+
+  // Reset currentPage to 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, kategori]);
 
   const filteredData = logData
     .filter((i) => {

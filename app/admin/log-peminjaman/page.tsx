@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +24,10 @@ export default function LogPeminjamanPage() {
   const [sortBy, setSortBy] = useState("tanggal-terbaru");
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
+  // Reset currentPage to 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, statusFilter]);
 
   // Filter + search
   const filteredData = dataLogPeminjaman
